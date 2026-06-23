@@ -1,0 +1,12 @@
+.DS_Store
+*.map
+*.log
+.env
+.env.*
+node_modules/
+tmp/
+private/
+*.pem
+*.key
+*.p12
+*.mobileprovision
