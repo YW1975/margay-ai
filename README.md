@@ -3,6 +3,8 @@
 This repository publishes public documentation and approved release artifacts for
 MargayAI products.
 
+GitHub Pages target: <https://yw1975.github.io/margay-ai/>
+
 ## Products
 
 - `docs/ccl/` — CCL CLI documentation.
@@ -22,7 +24,19 @@ paths.
 
 See [PUBLICATION_RULES.md](PUBLICATION_RULES.md).
 
+## Local Checks
+
+```bash
+bash scripts/audit-public-content.sh
+node scripts/check-docs.mjs
+node scripts/build-site.mjs
+```
+
+The static site is generated into `site/` for GitHub Pages deployment. Build
+output is not committed.
+
 ## Current Import
 
-The initial `docs/ccl/en/` content was imported from the private CCL repository's
-public documentation output.
+The CCL documentation under `docs/ccl/` is imported from the private CCL
+repository's approved public documentation output and includes English, Chinese,
+and Japanese pages.

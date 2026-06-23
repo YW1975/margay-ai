@@ -1,0 +1,776 @@
+{
+  "schema_version": 1,
+  "generated_by": "scripts/generate-ccl-docs.mjs",
+  "product": "CCL",
+  "publisher": "MargayAI",
+  "languages": [
+    "en",
+    "zh",
+    "ja"
+  ],
+  "glossary": {
+    "CCL": {
+      "en": "CCL",
+      "zh": "CCL",
+      "ja": "CCL"
+    },
+    "MargayAI": {
+      "en": "MargayAI",
+      "zh": "MargayAI",
+      "ja": "MargayAI"
+    },
+    "gateway": {
+      "en": "gateway",
+      "zh": "网关",
+      "ja": "ゲートウェイ"
+    },
+    "subagent": {
+      "en": "subagent",
+      "zh": "子 agent",
+      "ja": "サブエージェント"
+    },
+    "AgentTool": {
+      "en": "AgentTool",
+      "zh": "AgentTool",
+      "ja": "AgentTool"
+    },
+    "workflow": {
+      "en": "workflow",
+      "zh": "工作流",
+      "ja": "ワークフロー"
+    },
+    "MCP": {
+      "en": "MCP",
+      "zh": "MCP",
+      "ja": "MCP"
+    },
+    "plugin": {
+      "en": "plugin",
+      "zh": "插件",
+      "ja": "プラグイン"
+    },
+    "skill": {
+      "en": "skill",
+      "zh": "skill",
+      "ja": "skill"
+    },
+    "hook": {
+      "en": "hook",
+      "zh": "hook",
+      "ja": "hook"
+    },
+    "RLL": {
+      "en": "RLL",
+      "zh": "RLL",
+      "ja": "RLL"
+    },
+    "attestation": {
+      "en": "attestation",
+      "zh": "证明记录",
+      "ja": "アテステーション"
+    }
+  },
+  "pages": [
+    {
+      "slug": "overview",
+      "group": "Start",
+      "title": "CCL Overview",
+      "source_evidence": [
+        "main.tsx",
+        "tools",
+        "commands",
+        "services"
+      ],
+      "related": [
+        "quickstart",
+        "installation",
+        "cli-reference",
+        "tools",
+        "agents"
+      ]
+    },
+    {
+      "slug": "quickstart",
+      "group": "Start",
+      "title": "Quickstart",
+      "source_evidence": [
+        "main.tsx",
+        "commands/login/login.tsx",
+        "commands/mcp/mcp.tsx",
+        "tools/AgentTool/builtInAgents.ts"
+      ],
+      "related": [
+        "installation",
+        "authentication",
+        "model-routing",
+        "mcp",
+        "agents"
+      ]
+    },
+    {
+      "slug": "installation",
+      "group": "Start",
+      "title": "Installation and Updates",
+      "source_evidence": [
+        "package.json",
+        "main.tsx",
+        "commands/upgrade/upgrade.tsx",
+        "commands/doctor/doctor.tsx"
+      ],
+      "related": [
+        "quickstart",
+        "configuration",
+        "troubleshooting"
+      ]
+    },
+    {
+      "slug": "configuration",
+      "group": "Configure",
+      "title": "Configuration and Settings",
+      "source_evidence": [
+        "tools/ConfigTool",
+        "services/settingsSync",
+        "services/remoteManagedSettings",
+        "commands/config/config.tsx"
+      ],
+      "related": [
+        "authentication",
+        "model-routing",
+        "permissions-security",
+        "agents"
+      ]
+    },
+    {
+      "slug": "authentication",
+      "group": "Configure",
+      "title": "Authentication",
+      "source_evidence": [
+        "commands/login/login.tsx",
+        "commands/logout/logout.tsx",
+        "commands/mcp/mcp.tsx",
+        "services/oauth",
+        "services/mcp/auth.ts"
+      ],
+      "related": [
+        "configuration",
+        "model-routing",
+        "mcp",
+        "permissions-security"
+      ]
+    },
+    {
+      "slug": "model-routing",
+      "group": "Configure",
+      "title": "Gateway and Model Routing",
+      "source_evidence": [
+        "services/api/gatewayTransport.ts",
+        "services/api/client.ts",
+        "commands/gateway/gateway.tsx",
+        "commands/model/model.tsx",
+        "services/compact"
+      ],
+      "related": [
+        "configuration",
+        "authentication",
+        "agents",
+        "troubleshooting"
+      ]
+    },
+    {
+      "slug": "interactive-sessions",
+      "group": "Use",
+      "title": "Interactive Sessions and Print Mode",
+      "source_evidence": [
+        "main.tsx",
+        "commands/resume",
+        "commands/session",
+        "commands/compact",
+        "commands/export",
+        "commands/rewind"
+      ],
+      "related": [
+        "cli-reference",
+        "commands",
+        "memory-sessions",
+        "workflows"
+      ]
+    },
+    {
+      "slug": "cli-reference",
+      "group": "Reference",
+      "title": "CLI Reference",
+      "source_evidence": [
+        "main.tsx"
+      ],
+      "related": [
+        "commands",
+        "mcp",
+        "plugins",
+        "agents",
+        "remote-automation"
+      ]
+    },
+    {
+      "slug": "commands",
+      "group": "Use",
+      "title": "Interactive Commands",
+      "source_evidence": [
+        "commands",
+        "commands/workflows/index.ts",
+        "commands/permissions/permissions.tsx",
+        "commands/hooks/hooks.tsx"
+      ],
+      "related": [
+        "cli-reference",
+        "workflows",
+        "permissions-security",
+        "hooks"
+      ]
+    },
+    {
+      "slug": "tools",
+      "group": "Use",
+      "title": "Built-in Tools",
+      "source_evidence": [
+        "tools",
+        "services/tools/toolExecution.ts",
+        "tools/BashTool",
+        "tools/FileReadTool",
+        "tools/MCPTool"
+      ],
+      "related": [
+        "permissions-security",
+        "agents",
+        "mcp",
+        "workflows"
+      ]
+    },
+    {
+      "slug": "agents",
+      "group": "Extend",
+      "title": "Agents",
+      "source_evidence": [
+        "tools/AgentTool/builtInAgents.ts",
+        "tools/AgentTool/built-in",
+        "tools/AgentTool/loadAgentsDir.ts",
+        "tools/AgentTool/runAgent.ts"
+      ],
+      "related": [
+        "sub-agents",
+        "tools",
+        "skills",
+        "permissions-security"
+      ]
+    },
+    {
+      "slug": "sub-agents",
+      "group": "Extend",
+      "title": "Subagents",
+      "source_evidence": [
+        "tools/AgentTool/loadAgentsDir.ts",
+        "tools/AgentTool/AgentTool.tsx",
+        "tools/AgentTool/agentMemory.ts",
+        "tools/AgentTool/agentMemorySnapshot.ts"
+      ],
+      "related": [
+        "agents",
+        "tools",
+        "skills",
+        "memory-sessions"
+      ]
+    },
+    {
+      "slug": "mcp",
+      "group": "Extend",
+      "title": "MCP Servers and Tools",
+      "source_evidence": [
+        "commands/mcp",
+        "services/mcp",
+        "tools/MCPTool",
+        "tools/ListMcpResourcesTool",
+        "tools/ReadMcpResourceTool"
+      ],
+      "related": [
+        "tools",
+        "plugins",
+        "authentication",
+        "permissions-security"
+      ]
+    },
+    {
+      "slug": "plugins",
+      "group": "Extend",
+      "title": "Plugins",
+      "source_evidence": [
+        "commands/plugin",
+        "services/plugins",
+        "main.tsx"
+      ],
+      "related": [
+        "mcp",
+        "skills",
+        "hooks",
+        "permissions-security"
+      ]
+    },
+    {
+      "slug": "skills",
+      "group": "Extend",
+      "title": "Skills",
+      "source_evidence": [
+        "tools/SkillTool",
+        "tools/DiscoverSkillsTool",
+        "services/skillSearch",
+        "commands/skills"
+      ],
+      "related": [
+        "agents",
+        "plugins",
+        "workflows",
+        "commands"
+      ]
+    },
+    {
+      "slug": "hooks",
+      "group": "Extend",
+      "title": "Hooks",
+      "source_evidence": [
+        "commands/hooks",
+        "services/tools/toolHooks.ts",
+        "services/tools/toolExecution.ts",
+        "commands/plugin/PluginErrors.tsx"
+      ],
+      "related": [
+        "permissions-security",
+        "plugins",
+        "tools",
+        "commands"
+      ]
+    },
+    {
+      "slug": "workflows",
+      "group": "Automate",
+      "title": "Workflows",
+      "source_evidence": [
+        "commands/workflows",
+        "tools/WorkflowTool",
+        "tools/WorkflowRun"
+      ],
+      "related": [
+        "commands",
+        "tools",
+        "github-ci",
+        "gates-attestation"
+      ]
+    },
+    {
+      "slug": "memory-sessions",
+      "group": "Use",
+      "title": "Memory, Context, and Sessions",
+      "source_evidence": [
+        "commands/memory",
+        "commands/resume",
+        "commands/session",
+        "services/SessionMemory",
+        "services/contextCollapse",
+        "tools/AgentTool/agentMemory.ts"
+      ],
+      "related": [
+        "interactive-sessions",
+        "sub-agents",
+        "configuration",
+        "troubleshooting"
+      ]
+    },
+    {
+      "slug": "permissions-security",
+      "group": "Operate",
+      "title": "Permissions and Security",
+      "source_evidence": [
+        "commands/permissions",
+        "tools/BashTool",
+        "tools/PowerShellTool",
+        "services/tools/toolExecution.ts",
+        "services/teamMemorySync/secretScanner.ts"
+      ],
+      "related": [
+        "tools",
+        "hooks",
+        "plugins",
+        "github-ci"
+      ]
+    },
+    {
+      "slug": "remote-automation",
+      "group": "Operate",
+      "title": "Remote Sessions and Automation",
+      "source_evidence": [
+        "main.tsx",
+        "commands/assistant/assistant.ts",
+        "commands/remote-setup",
+        "commands/remote-env",
+        "commands/bridge-kick.ts",
+        "tools/RemoteTriggerTool"
+      ],
+      "related": [
+        "cli-reference",
+        "permissions-security",
+        "authentication",
+        "troubleshooting"
+      ]
+    },
+    {
+      "slug": "github-ci",
+      "group": "Operate",
+      "title": "GitHub and CI Workflows",
+      "source_evidence": [
+        "commands/install-github-app",
+        "commands/review",
+        "commands/security-review.ts",
+        "commands/autofix-pr",
+        "commands/commit-push-pr.ts"
+      ],
+      "related": [
+        "workflows",
+        "permissions-security",
+        "gates-attestation",
+        "public-docs"
+      ]
+    },
+    {
+      "slug": "ralph-lisa-loop",
+      "group": "Govern",
+      "title": "Ralph-Lisa Loop",
+      "source_evidence": [
+        "AGENTS.md",
+        ".codex/skills/ralph-lisa-loop/SKILL.md"
+      ],
+      "related": [
+        "clarify-and-planning",
+        "gates-attestation",
+        "github-ci"
+      ]
+    },
+    {
+      "slug": "clarify-and-planning",
+      "group": "Govern",
+      "title": "Clarify and Planning",
+      "source_evidence": [
+        "tools/EnterPlanModeTool",
+        "tools/ExitPlanModeTool",
+        "tools/VerifyPlanExecutionTool",
+        "commands/plan",
+        "AGENTS.md"
+      ],
+      "related": [
+        "ralph-lisa-loop",
+        "gates-attestation",
+        "workflows"
+      ]
+    },
+    {
+      "slug": "gates-attestation",
+      "group": "Govern",
+      "title": "Gates and Attestation",
+      "source_evidence": [
+        "AGENTS.md",
+        "gate-manifest.json",
+        ".dual-agent"
+      ],
+      "related": [
+        "ralph-lisa-loop",
+        "clarify-and-planning",
+        "github-ci"
+      ]
+    },
+    {
+      "slug": "public-docs",
+      "group": "Operate",
+      "title": "Public Documentation Publishing",
+      "source_evidence": [
+        "docs/ccl-docs",
+        "scripts/check-ccl-docs.mjs"
+      ],
+      "related": [
+        "github-ci",
+        "permissions-security",
+        "overview"
+      ]
+    },
+    {
+      "slug": "troubleshooting",
+      "group": "Operate",
+      "title": "Troubleshooting",
+      "source_evidence": [
+        "commands/doctor",
+        "services/gateway/gatewayDoctor.ts",
+        "services/api/errors.ts",
+        "docs/ccl0622-runtime-issue-record.md"
+      ],
+      "related": [
+        "installation",
+        "authentication",
+        "model-routing",
+        "mcp",
+        "remote-automation"
+      ]
+    },
+    {
+      "slug": "how-ccl-works",
+      "group": "Start",
+      "title": "How CCL Works",
+      "source_evidence": [
+        "main.tsx",
+        "services/api/client.ts",
+        "services/tools/toolExecution.ts",
+        "services/compact",
+        "tools/AgentTool"
+      ],
+      "related": [
+        "overview",
+        "interactive-sessions",
+        "tools",
+        "agents",
+        "troubleshooting"
+      ]
+    },
+    {
+      "slug": "project-setup",
+      "group": "Start",
+      "title": "Project Setup",
+      "source_evidence": [
+        "commands/init.ts",
+        "commands/config",
+        "commands/permissions",
+        "commands/mcp",
+        "tools/AgentTool/loadAgentsDir.ts"
+      ],
+      "related": [
+        "quickstart",
+        "configuration",
+        "permissions-security",
+        "mcp",
+        "skills"
+      ]
+    },
+    {
+      "slug": "common-workflows",
+      "group": "Use",
+      "title": "Common Workflows",
+      "source_evidence": [
+        "commands/workflows",
+        "tools/AgentTool",
+        "tools/WorkflowTool",
+        "AGENTS.md"
+      ],
+      "related": [
+        "workflows",
+        "agents",
+        "ralph-lisa-loop",
+        "public-docs"
+      ]
+    },
+    {
+      "slug": "getting-started-rll",
+      "group": "Govern",
+      "title": "Getting Started with RLL",
+      "source_evidence": [
+        "AGENTS.md",
+        ".codex/skills/ralph-lisa-loop/SKILL.md"
+      ],
+      "related": [
+        "ralph-lisa-loop",
+        "gates-attestation",
+        "clarify-and-planning"
+      ]
+    },
+    {
+      "slug": "complexity-system",
+      "group": "Govern",
+      "title": "Complexity System",
+      "source_evidence": [
+        "AGENTS.md",
+        "gate-manifest.json",
+        ".dual-agent/complexity-judge"
+      ],
+      "related": [
+        "gates-attestation",
+        "clarify-and-planning",
+        "public-docs"
+      ]
+    },
+    {
+      "slug": "gate-system",
+      "group": "Govern",
+      "title": "Gate System",
+      "source_evidence": [
+        "AGENTS.md",
+        "gate-manifest.json",
+        "scripts/check-ccl-docs.mjs"
+      ],
+      "related": [
+        "gates-attestation",
+        "public-docs",
+        "github-ci"
+      ]
+    },
+    {
+      "slug": "attestation",
+      "group": "Govern",
+      "title": "Attestation",
+      "source_evidence": [
+        "AGENTS.md",
+        ".dual-agent"
+      ],
+      "related": [
+        "gates-attestation",
+        "ralph-lisa-loop",
+        "gate-system"
+      ]
+    },
+    {
+      "slug": "clarify-phase",
+      "group": "Govern",
+      "title": "Clarify Phase",
+      "source_evidence": [
+        "AGENTS.md",
+        ".dual-agent"
+      ],
+      "related": [
+        "clarify-and-planning",
+        "ralph-lisa-loop",
+        "complexity-system"
+      ]
+    },
+    {
+      "slug": "cli-reference-ccl",
+      "group": "Reference",
+      "title": "CCL CLI Compatibility Reference",
+      "source_evidence": [
+        "main.tsx"
+      ],
+      "related": [
+        "cli-reference",
+        "commands",
+        "remote-automation"
+      ]
+    }
+  ],
+  "feature_modules": [
+    {
+      "id": "cli",
+      "page": "cli-reference",
+      "source": [
+        "main.tsx"
+      ]
+    },
+    {
+      "id": "interactive-commands",
+      "page": "commands",
+      "source": [
+        "commands"
+      ]
+    },
+    {
+      "id": "tools",
+      "page": "tools",
+      "source": [
+        "tools"
+      ]
+    },
+    {
+      "id": "agents",
+      "page": "agents",
+      "source": [
+        "tools/AgentTool"
+      ]
+    },
+    {
+      "id": "subagents",
+      "page": "sub-agents",
+      "source": [
+        "tools/AgentTool/loadAgentsDir.ts"
+      ]
+    },
+    {
+      "id": "mcp",
+      "page": "mcp",
+      "source": [
+        "commands/mcp",
+        "services/mcp"
+      ]
+    },
+    {
+      "id": "plugins",
+      "page": "plugins",
+      "source": [
+        "commands/plugin",
+        "services/plugins"
+      ]
+    },
+    {
+      "id": "skills",
+      "page": "skills",
+      "source": [
+        "tools/SkillTool",
+        "services/skillSearch"
+      ]
+    },
+    {
+      "id": "hooks",
+      "page": "hooks",
+      "source": [
+        "commands/hooks",
+        "services/tools/toolHooks.ts"
+      ]
+    },
+    {
+      "id": "workflows",
+      "page": "workflows",
+      "source": [
+        "commands/workflows",
+        "tools/WorkflowTool"
+      ]
+    },
+    {
+      "id": "permissions",
+      "page": "permissions-security",
+      "source": [
+        "commands/permissions",
+        "tools/BashTool",
+        "tools/PowerShellTool"
+      ]
+    },
+    {
+      "id": "sessions-memory",
+      "page": "memory-sessions",
+      "source": [
+        "commands/session",
+        "services/SessionMemory"
+      ]
+    },
+    {
+      "id": "remote",
+      "page": "remote-automation",
+      "source": [
+        "commands/remote-setup",
+        "tools/RemoteTriggerTool"
+      ]
+    },
+    {
+      "id": "github-ci",
+      "page": "github-ci",
+      "source": [
+        "commands/install-github-app",
+        "commands/review"
+      ]
+    },
+    {
+      "id": "rll",
+      "page": "ralph-lisa-loop",
+      "source": [
+        "AGENTS.md"
+      ]
+    }
+  ]
+}
