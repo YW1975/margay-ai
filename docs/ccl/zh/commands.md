@@ -10,8 +10,8 @@
 <!-- section: capabilities -->
 ## 能力范围
 
-- 核心命令包括 help、config、model、permissions、memory、status、cost、compact、clear、resume、diff、commit、review、plan 和 workflows。
-- 集成命令覆盖 MCP、IDE、terminal setup、Chrome、GitHub app 安装、remote setup 和 plugin。
+- 核心命令包括 help、config、model、permissions、memory、status、cost、context、compact、clear、resume、diff、commit、review、plan 和 workflows。
+- 集成命令覆盖 MCP、IDE、terminal setup、Chrome、GitHub app 安装、remote setup、remote control 和 plugin。
 - 诊断命令包括 doctor、endpoint、gateway、stats、insights、usage，以及存在时的 debug tool call 辅助命令。
 
 <!-- section: operational-model -->
@@ -28,6 +28,9 @@
 ## 源码依据
 
 - `commands`
+- `commands/cost/index.ts`
+- `commands/context/index.ts`
+- `commands/usage/index.ts`
 - `commands/workflows/index.ts`
 - `commands/permissions/permissions.tsx`
 - `commands/hooks/hooks.tsx`
@@ -36,6 +39,7 @@
 ## 相关页面
 
 - [CLI 参考](cli-reference.md)
+- [网关与模型路由](model-routing.md)
 - [工作流](workflows.md)
 - [权限与安全](permissions-security.md)
 - [Hook](hooks.md)

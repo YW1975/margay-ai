@@ -22,7 +22,7 @@ CCL starts an interactive terminal session by default and can also run one-shot 
 <!-- section: configuration -->
 ## Configuration and commands
 
-- Common commands: `resume`, `session`, `rename`, `rewind`, `compact`, `clear`, `export`, `copy`, and `cost`.
+- Common commands: `resume`, `session`, `rename`, `rewind`, `compact`, `clear`, `export`, `copy`, `cost`, and `context`.
 
 <!-- section: source-evidence -->
 ## Source evidence
@@ -33,11 +33,14 @@ CCL starts an interactive terminal session by default and can also run one-shot 
 - `commands/compact`
 - `commands/export`
 - `commands/rewind`
+- `commands/cost`
+- `commands/context`
 
 <!-- section: related -->
 ## Related pages
 
 - [CLI Reference](cli-reference.md)
 - [Interactive Commands](commands.md)
+- [Gateway and Model Routing](model-routing.md)
 - [Memory, Context, and Sessions](memory-sessions.md)
 - [Workflows](workflows.md)

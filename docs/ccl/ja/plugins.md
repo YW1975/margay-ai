@@ -12,12 +12,13 @@
 
 - プラグインのインストール、検証、管理、有効化、無効化、削除、閲覧を行います。
 - マーケットプレイスと、許可されたソースに対する組織方針を設定します。
-- manifest、marketplace、MCP、hook、component、依存関係の失敗を表示します。
+- manifest が対応する場合、コマンド、エージェント、skill、hook、MCP サーバー、LSP サーバー、settings、出力スタイルをまとめます。
 
 <!-- section: operational-model -->
 ## 運用モデル
 
 - プラグインはサプライチェーン入力として扱います。プラグイン由来のツールや hook を有効化する前に、manifest を検証し、固定されたソースを優先し、信頼境界を記録してください。
+- プラグインエラーは型付けされ、manifest、marketplace、重複 MCP サーバー、hook 読み込み、component 読み込み、download、LSP の失敗を区別できます。
 
 <!-- section: configuration -->
 ## 設定とコマンド
@@ -29,6 +30,8 @@
 
 - `commands/plugin`
 - `services/plugins`
+- `types/plugin.ts`
+- `utils/plugins`
 - `main.tsx`
 
 <!-- section: related -->

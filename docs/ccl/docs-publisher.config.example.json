@@ -1,0 +1,27 @@
+{
+  "productName": "CCL",
+  "brandName": "MargayAI",
+  "docsBaseUrl": "/margay-ai/",
+  "publicUrl": "https://yw1975.github.io/margay-ai/",
+  "locales": ["en", "zh", "ja"],
+  "sourceRoots": [
+    "commands",
+    "tools",
+    "services",
+    "skills",
+    "plugins",
+    "workflows",
+    "docs/ccl-docs"
+  ],
+  "forbiddenTerms": [
+    "# Legacy Product",
+    "## Legacy Product",
+    "LegacyVendor"
+  ],
+  "publishRepo": "YW1975/margay-ai",
+  "privatePathPatterns": [
+    "/(?:home|Users)/[^/]+/Myprojects",
+    "sk-[A-Za-z0-9_-]{20,}",
+    "ghp_[A-Za-z0-9_]{20,}"
+  ]
+}

@@ -11,7 +11,7 @@
 ## 機能範囲
 
 - トップレベルコマンドには `mcp`、`server`、`ssh`、`open`、`auth`、`plugin`、`agents`、`auto-mode`、`doctor`、`update`、`install`、`completion` があります。
-- 対話型 slash command は [コマンド](commands.md) に分けて記載します。
+- 対話型 slash command は [コマンド](commands.md) に分けて記載します。利用可能な場合は cost、context、usage、gateway、endpoint、remote-control 面も含みます。
 - 内部用途コマンドを安定した公開自動化 API として記載しないでください。
 
 <!-- section: operational-model -->
@@ -33,6 +33,7 @@
 ## 関連ページ
 
 - [対話型コマンド](commands.md)
+- [ゲートウェイとモデルルーティング](model-routing.md)
 - [MCP サーバーとツール](mcp.md)
 - [プラグイン](plugins.md)
 - [エージェント](agents.md)

@@ -10,8 +10,8 @@ Interactive commands control a running CCL session. They switch modes, manage co
 <!-- section: capabilities -->
 ## Capabilities
 
-- Core commands include help, config, model, permissions, memory, status, cost, compact, clear, resume, diff, commit, review, plan, and workflows.
-- Integration commands cover MCP, IDE, terminal setup, Chrome, GitHub app installation, remote setup, and plugins.
+- Core commands include help, config, model, permissions, memory, status, cost, context, compact, clear, resume, diff, commit, review, plan, and workflows.
+- Integration commands cover MCP, IDE, terminal setup, Chrome, GitHub app installation, remote setup, remote control, and plugins.
 - Diagnostic commands include doctor, endpoint, gateway, stats, insights, usage, and debug tool call helpers where present.
 
 <!-- section: operational-model -->
@@ -28,6 +28,9 @@ Interactive commands control a running CCL session. They switch modes, manage co
 ## Source evidence
 
 - `commands`
+- `commands/cost/index.ts`
+- `commands/context/index.ts`
+- `commands/usage/index.ts`
 - `commands/workflows/index.ts`
 - `commands/permissions/permissions.tsx`
 - `commands/hooks/hooks.tsx`
@@ -36,6 +39,7 @@ Interactive commands control a running CCL session. They switch modes, manage co
 ## Related pages
 
 - [CLI Reference](cli-reference.md)
+- [Gateway and Model Routing](model-routing.md)
 - [Workflows](workflows.md)
 - [Permissions and Security](permissions-security.md)
 - [Hooks](hooks.md)

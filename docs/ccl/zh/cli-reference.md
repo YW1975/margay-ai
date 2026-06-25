@@ -11,7 +11,7 @@
 ## 能力范围
 
 - 顶层命令包括 `mcp`、`server`、`ssh`、`open`、`auth`、`plugin`、`agents`、`auto-mode`、`doctor`、`update`、`install` 和 `completion`。
-- 交互式 slash command 单独记录在 [命令](commands.md)。
+- 交互式 slash command 单独记录在 [命令](commands.md)，其中包括可用时的 cost、context、usage、gateway、endpoint 和 remote-control 入口。
 - 内部用途命令不应写成稳定公开自动化 API。
 
 <!-- section: operational-model -->
@@ -33,6 +33,7 @@
 ## 相关页面
 
 - [交互式命令](commands.md)
+- [网关与模型路由](model-routing.md)
 - [MCP Server 与工具](mcp.md)
 - [插件](plugins.md)
 - [Agent](agents.md)

@@ -13,6 +13,7 @@
 ## Configure
 
 - [設定](configuration.md)
+- [環境変数](env-vars.md)
 - [認証](authentication.md)
 - [ゲートウェイとモデルルーティング](model-routing.md)
 

@@ -11,7 +11,7 @@ The `ccl` binary exposes the interactive entry point, print mode, MCP management
 ## Capabilities
 
 - Top-level commands include `mcp`, `server`, `ssh`, `open`, `auth`, `plugin`, `agents`, `auto-mode`, `doctor`, `update`, `install`, and `completion`.
-- Interactive slash commands are documented separately in [Commands](commands.md).
+- Interactive slash commands are documented separately in [Commands](commands.md), including cost, context, usage, gateway, endpoint, and remote-control surfaces when available.
 - Internal-only commands should not be documented as stable public automation APIs.
 
 <!-- section: operational-model -->
@@ -33,6 +33,7 @@ The `ccl` binary exposes the interactive entry point, print mode, MCP management
 ## Related pages
 
 - [Interactive Commands](commands.md)
+- [Gateway and Model Routing](model-routing.md)
 - [MCP Servers and Tools](mcp.md)
 - [Plugins](plugins.md)
 - [Agents](agents.md)

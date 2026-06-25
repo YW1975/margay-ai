@@ -13,6 +13,7 @@
 ## Configure
 
 - [配置与设置](configuration.md)
+- [环境变量](env-vars.md)
 - [认证](authentication.md)
 - [网关与模型路由](model-routing.md)
 

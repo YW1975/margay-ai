@@ -13,6 +13,7 @@
 ## Configure
 
 - [Configuration and Settings](configuration.md)
+- [Environment Variables](env-vars.md)
 - [Authentication](authentication.md)
 - [Gateway and Model Routing](model-routing.md)
 

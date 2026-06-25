@@ -22,7 +22,7 @@ CCL 默认启动交互式终端会话，也可以通过 print 模式执行一次
 <!-- section: configuration -->
 ## 配置与命令
 
-- 常用命令：`resume`、`session`、`rename`、`rewind`、`compact`、`clear`、`export`、`copy` 和 `cost`。
+- 常用命令：`resume`、`session`、`rename`、`rewind`、`compact`、`clear`、`export`、`copy`、`cost` 和 `context`。
 
 <!-- section: source-evidence -->
 ## 源码依据
@@ -33,11 +33,14 @@ CCL 默认启动交互式终端会话，也可以通过 print 模式执行一次
 - `commands/compact`
 - `commands/export`
 - `commands/rewind`
+- `commands/cost`
+- `commands/context`
 
 <!-- section: related -->
 ## 相关页面
 
 - [CLI 参考](cli-reference.md)
 - [交互式命令](commands.md)
+- [网关与模型路由](model-routing.md)
 - [记忆、上下文与会话](memory-sessions.md)
 - [工作流](workflows.md)

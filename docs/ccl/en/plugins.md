@@ -12,12 +12,13 @@ Plugins package commands, MCP configuration, hooks, skills, components, marketpl
 
 - Install, validate, manage, enable, disable, uninstall, and browse plugins.
 - Configure marketplaces and organization policy around allowed sources.
-- Surface plugin errors for manifest, marketplace, MCP, hook, component, and dependency failures.
+- Package commands, agents, skills, hooks, MCP servers, LSP servers, settings, and output styles when the manifest supports them.
 
 <!-- section: operational-model -->
 ## Operational model
 
 - Treat plugins as supply-chain inputs. Validate manifests, prefer pinned sources, and document trust boundaries before enabling plugin-provided tools or hooks.
+- Plugin errors are typed so CCL can distinguish manifest, marketplace, duplicate MCP server, hook-load, component-load, download, and LSP failures.
 
 <!-- section: configuration -->
 ## Configuration and commands
@@ -29,6 +30,8 @@ Plugins package commands, MCP configuration, hooks, skills, components, marketpl
 
 - `commands/plugin`
 - `services/plugins`
+- `types/plugin.ts`
+- `utils/plugins`
 - `main.tsx`
 
 <!-- section: related -->

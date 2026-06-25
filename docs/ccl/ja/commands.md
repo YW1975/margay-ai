@@ -10,8 +10,8 @@
 <!-- section: capabilities -->
 ## 機能範囲
 
-- 主要コマンドには help、config、model、permissions、memory、status、cost、compact、clear、resume、diff、commit、review、plan、workflows があります。
-- 連携コマンドは MCP、IDE、terminal setup、Chrome、GitHub app インストール、remote setup、plugin を扱います。
+- 主要コマンドには help、config、model、permissions、memory、status、cost、context、compact、clear、resume、diff、commit、review、plan、workflows があります。
+- 連携コマンドは MCP、IDE、terminal setup、Chrome、GitHub app インストール、remote setup、remote control、plugin を扱います。
 - 診断コマンドには doctor、endpoint、gateway、stats、insights、usage、および存在する場合の debug tool call 補助があります。
 
 <!-- section: operational-model -->
@@ -28,6 +28,9 @@
 ## ソース上の根拠
 
 - `commands`
+- `commands/cost/index.ts`
+- `commands/context/index.ts`
+- `commands/usage/index.ts`
 - `commands/workflows/index.ts`
 - `commands/permissions/permissions.tsx`
 - `commands/hooks/hooks.tsx`
@@ -36,6 +39,7 @@
 ## 関連ページ
 
 - [CLI リファレンス](cli-reference.md)
+- [ゲートウェイとモデルルーティング](model-routing.md)
 - [ワークフロー](workflows.md)
 - [権限とセキュリティ](permissions-security.md)
 - [Hook](hooks.md)

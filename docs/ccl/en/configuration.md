@@ -18,12 +18,14 @@ CCL resolves settings from user, project, local, managed, and runtime sources, t
 ## Operational model
 
 - Settings are merged before session startup and can also be read by tools that need source-aware behavior, such as AgentTool and MCP management.
+- CCL-specific environment variables are intentionally separated from gateway routing credentials so endpoint selection is explicit and debuggable.
 
 <!-- section: configuration -->
 ## Configuration and commands
 
 - Use `--setting-sources user,project,local` with `ccl agents` when debugging agent visibility.
 - Use `ccl remote-env`, `ccl endpoint`, and gateway settings when deployment-specific routing differs by environment.
+- See [Environment Variables](env-vars.md) for the CCL-specific variables and the compatibility variables that are intentionally passed through.
 
 <!-- section: source-evidence -->
 ## Source evidence
@@ -32,11 +34,14 @@ CCL resolves settings from user, project, local, managed, and runtime sources, t
 - `services/settingsSync`
 - `services/remoteManagedSettings`
 - `commands/config/config.tsx`
+- `bootstrap/envSync.ts`
+- `bootstrap/gatewayConfig.ts`
 
 <!-- section: related -->
 ## Related pages
 
 - [Authentication](authentication.md)
 - [Gateway and Model Routing](model-routing.md)
+- [Environment Variables](env-vars.md)
 - [Permissions and Security](permissions-security.md)
 - [Agents](agents.md)

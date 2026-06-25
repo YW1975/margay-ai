@@ -131,13 +131,36 @@
         "tools/ConfigTool",
         "services/settingsSync",
         "services/remoteManagedSettings",
-        "commands/config/config.tsx"
+        "commands/config/config.tsx",
+        "bootstrap/envSync.ts",
+        "bootstrap/gatewayConfig.ts"
       ],
       "related": [
         "authentication",
         "model-routing",
+        "env-vars",
         "permissions-security",
         "agents"
+      ]
+    },
+    {
+      "slug": "env-vars",
+      "group": "Configure",
+      "title": "Environment Variables",
+      "source_evidence": [
+        "bootstrap/envSync.ts",
+        "bootstrap/gatewayConfig.ts",
+        "commands/gateway/gateway.tsx",
+        "commands/gateway/gateway-helpers.ts",
+        "commands/endpoint/endpoint.tsx",
+        "commands/model/model.tsx",
+        "package.json"
+      ],
+      "related": [
+        "configuration",
+        "authentication",
+        "model-routing",
+        "troubleshooting"
       ]
     },
     {
@@ -149,10 +172,14 @@
         "commands/logout/logout.tsx",
         "commands/mcp/mcp.tsx",
         "services/oauth",
-        "services/mcp/auth.ts"
+        "services/mcp/auth.ts",
+        "commands/gateway/gateway.tsx",
+        "commands/gateway/gateway-helpers.ts",
+        "services/gateway/gatewayDoctor.ts"
       ],
       "related": [
         "configuration",
+        "env-vars",
         "model-routing",
         "mcp",
         "permissions-security"
@@ -165,12 +192,22 @@
       "source_evidence": [
         "services/api/gatewayTransport.ts",
         "services/api/client.ts",
+        "services/api/claude.ts",
         "commands/gateway/gateway.tsx",
+        "commands/endpoint/endpoint.tsx",
         "commands/model/model.tsx",
+        "commands/cost/index.ts",
+        "commands/context/index.ts",
+        "commands/context/context-noninteractive.ts",
+        "commands/usage/index.ts",
+        "cost-tracker.ts",
+        "utils/modelCost.ts",
+        "utils/model/endpointCompat.ts",
         "services/compact"
       ],
       "related": [
         "configuration",
+        "env-vars",
         "authentication",
         "agents",
         "troubleshooting"
@@ -186,11 +223,14 @@
         "commands/session",
         "commands/compact",
         "commands/export",
-        "commands/rewind"
+        "commands/rewind",
+        "commands/cost",
+        "commands/context"
       ],
       "related": [
         "cli-reference",
         "commands",
+        "model-routing",
         "memory-sessions",
         "workflows"
       ]
@@ -204,6 +244,7 @@
       ],
       "related": [
         "commands",
+        "model-routing",
         "mcp",
         "plugins",
         "agents",
@@ -216,12 +257,16 @@
       "title": "Interactive Commands",
       "source_evidence": [
         "commands",
+        "commands/cost/index.ts",
+        "commands/context/index.ts",
+        "commands/usage/index.ts",
         "commands/workflows/index.ts",
         "commands/permissions/permissions.tsx",
         "commands/hooks/hooks.tsx"
       ],
       "related": [
         "cli-reference",
+        "model-routing",
         "workflows",
         "permissions-security",
         "hooks"
@@ -253,6 +298,7 @@
         "tools/AgentTool/builtInAgents.ts",
         "tools/AgentTool/built-in",
         "tools/AgentTool/loadAgentsDir.ts",
+        "tools/AgentTool/AgentTool.tsx",
         "tools/AgentTool/runAgent.ts"
       ],
       "related": [
@@ -304,6 +350,8 @@
       "source_evidence": [
         "commands/plugin",
         "services/plugins",
+        "types/plugin.ts",
+        "utils/plugins",
         "main.tsx"
       ],
       "related": [
@@ -320,6 +368,9 @@
       "source_evidence": [
         "tools/SkillTool",
         "tools/DiscoverSkillsTool",
+        "skills/loadSkillsDir.ts",
+        "skills/bundledSkills.ts",
+        "skills/mcpSkills.ts",
         "services/skillSearch",
         "commands/skills"
       ],
@@ -336,9 +387,12 @@
       "title": "Hooks",
       "source_evidence": [
         "commands/hooks",
+        "schemas/hooks.ts",
+        "types/hooks.ts",
         "services/tools/toolHooks.ts",
         "services/tools/toolExecution.ts",
-        "commands/plugin/PluginErrors.tsx"
+        "commands/plugin/PluginErrors.tsx",
+        "skills/loadSkillsDir.ts"
       ],
       "related": [
         "permissions-security",
@@ -388,8 +442,10 @@
       "title": "Permissions and Security",
       "source_evidence": [
         "commands/permissions",
+        "utils/settings/types.ts",
         "tools/BashTool",
         "tools/PowerShellTool",
+        "utils/sandbox",
         "services/tools/toolExecution.ts",
         "services/teamMemorySync/secretScanner.ts"
       ],
@@ -407,9 +463,12 @@
       "source_evidence": [
         "main.tsx",
         "commands/assistant/assistant.ts",
+        "commands/session",
+        "commands/bridge",
         "commands/remote-setup",
         "commands/remote-env",
         "commands/bridge-kick.ts",
+        "utils/background/remote/remoteSession.ts",
         "tools/RemoteTriggerTool"
       ],
       "related": [
@@ -489,7 +548,10 @@
       "title": "Public Documentation Publishing",
       "source_evidence": [
         "docs/ccl-docs",
-        "scripts/check-ccl-docs.mjs"
+        "scripts/check-ccl-docs.mjs",
+        "skills/bundled/docs-publisher/SKILL.md",
+        "skills/bundled/docs-reviewer/SKILL.md",
+        "docs/docs-publisher-ccl-process-report-2026-06-24.md"
       ],
       "related": [
         "github-ci",
@@ -503,16 +565,24 @@
       "title": "Troubleshooting",
       "source_evidence": [
         "commands/doctor",
+        "commands/gateway/gateway.tsx",
+        "commands/endpoint/endpoint.tsx",
+        "commands/cost/index.ts",
+        "commands/context/index.ts",
+        "commands/usage/index.ts",
         "services/gateway/gatewayDoctor.ts",
         "services/api/errors.ts",
+        "utils/background/remote/remoteSession.ts",
         "docs/ccl0622-runtime-issue-record.md"
       ],
       "related": [
         "installation",
         "authentication",
+        "env-vars",
         "model-routing",
         "mcp",
-        "remote-automation"
+        "remote-automation",
+        "public-docs"
       ]
     },
     {
