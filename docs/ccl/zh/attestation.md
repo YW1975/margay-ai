@@ -5,24 +5,12 @@
 <!-- section: purpose -->
 ## 用途
 
-证明记录说明测试了什么、覆盖了哪些验收 case、过程证据在哪里，以及哪个命令产生了报告结果。
-
-<!-- section: capabilities -->
-## 能力范围
-
-- 使用精确命令字符串和通过/失败计数。
-- 引用日志文件，不依赖记忆。
-- 把文档检查关联到文档验收 case，而不是无关单元测试。
-
-<!-- section: operational-model -->
-## 运行模型
-
-- 好的证明记录应窄且可证伪。reviewer 应能重跑命令或查看引用文件。
+证明记录现在合并到门禁工作流中说明，这样必需证据行会和检查它们的 policy 放在一起。
 
 <!-- section: configuration -->
 ## 配置与命令
 
-- 在 RLL 提交中，当当前 policy 要求时，应包含 Test-Process、Test-Cases 和 Test-Results 行。
+- [门禁与证明](gates-attestation.md#attestation)
 
 <!-- section: source-evidence -->
 ## 源码依据
@@ -33,6 +21,4 @@
 <!-- section: related -->
 ## 相关页面
 
-- [门禁与证明](gates-attestation.md)
-- [Ralph-Lisa 循环](ralph-lisa-loop.md)
-- [门禁系统](gate-system.md)
+- [门禁与证明](gates-attestation.md#attestation)

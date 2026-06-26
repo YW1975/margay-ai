@@ -24,6 +24,24 @@
 
 - RLL 提出では attest 行を使い、必要に応じてログを `.dual-agent/harness-results` に保存します。
 
+## ゲート
+
+<a id="gates"></a>
+
+ゲートは具体的な主張に結びついた実行可能なチェックです。公開文書では、生成文書の整合、リンク完全性、ソース証拠の存在、禁止ブランド表現スキャン、私有パス/secret スキャン、サイトビルド、デプロイ後の live URL 取得が有用です。主張する要件を覆わない green check は弱い証拠です。
+
+## アテステーション
+
+<a id="attestation"></a>
+
+アテステーションは、どのコマンドを実行したか、何を覆ったか、合否、ログの場所、どの受入 case を証明するかを記録するプロセス証拠です。RLL 提出で要求される `Test-Process`、`Test-Cases`、`Test-Results` 行は、証拠を再確認可能で反証可能にするためのものです。
+
+## 複雑度ゲート
+
+<a id="complexity-gates"></a>
+
+複雑度ゲートはリスクに応じて拡張します。文書のみの slice では、無関係な unit test が内容品質を証明すると見なしてはいけませんが、文書専用チェックは実行すべきです。コードを含む slice では、プロジェクト manifest と計画に対応する unit、integration、smoke、security、e2e の tier を含めます。
+
 <!-- section: source-evidence -->
 ## ソース上の根拠
 

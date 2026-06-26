@@ -26,6 +26,7 @@ CCL integrates Model Context Protocol servers for external tools, resources, pro
 - Relevant areas: `commands/mcp`, `services/mcp`, `tools/MCPTool`, `tools/ListMcpResourcesTool`, and `tools/ReadMcpResourceTool`.
 - MCP transports include stdio, SSE, streamable HTTP, WebSocket/control transports, and provider-proxy paths where configured.
 
+
 <!-- section: source-evidence -->
 ## Source evidence
 

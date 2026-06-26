@@ -74,6 +74,8 @@
     {
       "slug": "overview",
       "group": "Start",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "CCL Overview",
       "source_evidence": [
         "main.tsx",
@@ -92,6 +94,8 @@
     {
       "slug": "quickstart",
       "group": "Start",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Quickstart",
       "source_evidence": [
         "main.tsx",
@@ -110,6 +114,8 @@
     {
       "slug": "installation",
       "group": "Start",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Installation and Updates",
       "source_evidence": [
         "package.json",
@@ -126,6 +132,8 @@
     {
       "slug": "configuration",
       "group": "Configure",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Configuration and Settings",
       "source_evidence": [
         "tools/ConfigTool",
@@ -146,6 +154,8 @@
     {
       "slug": "env-vars",
       "group": "Configure",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Environment Variables",
       "source_evidence": [
         "bootstrap/envSync.ts",
@@ -166,6 +176,8 @@
     {
       "slug": "authentication",
       "group": "Configure",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Authentication",
       "source_evidence": [
         "commands/login/login.tsx",
@@ -188,6 +200,8 @@
     {
       "slug": "model-routing",
       "group": "Configure",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Gateway and Model Routing",
       "source_evidence": [
         "services/api/gatewayTransport.ts",
@@ -216,6 +230,8 @@
     {
       "slug": "interactive-sessions",
       "group": "Use",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Interactive Sessions and Print Mode",
       "source_evidence": [
         "main.tsx",
@@ -238,6 +254,8 @@
     {
       "slug": "cli-reference",
       "group": "Reference",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "CLI Reference",
       "source_evidence": [
         "main.tsx"
@@ -254,6 +272,8 @@
     {
       "slug": "commands",
       "group": "Use",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Interactive Commands",
       "source_evidence": [
         "commands",
@@ -275,6 +295,8 @@
     {
       "slug": "tools",
       "group": "Use",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Built-in Tools",
       "source_evidence": [
         "tools",
@@ -293,6 +315,8 @@
     {
       "slug": "agents",
       "group": "Extend",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Agents",
       "source_evidence": [
         "tools/AgentTool/builtInAgents.ts",
@@ -311,6 +335,8 @@
     {
       "slug": "sub-agents",
       "group": "Extend",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Subagents",
       "source_evidence": [
         "tools/AgentTool/loadAgentsDir.ts",
@@ -328,6 +354,8 @@
     {
       "slug": "mcp",
       "group": "Extend",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "MCP Servers and Tools",
       "source_evidence": [
         "commands/mcp",
@@ -346,6 +374,8 @@
     {
       "slug": "plugins",
       "group": "Extend",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Plugins",
       "source_evidence": [
         "commands/plugin",
@@ -364,6 +394,8 @@
     {
       "slug": "skills",
       "group": "Extend",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Skills",
       "source_evidence": [
         "tools/SkillTool",
@@ -384,6 +416,8 @@
     {
       "slug": "hooks",
       "group": "Extend",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Hooks",
       "source_evidence": [
         "commands/hooks",
@@ -404,6 +438,8 @@
     {
       "slug": "workflows",
       "group": "Automate",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Workflows",
       "source_evidence": [
         "commands/workflows",
@@ -420,6 +456,8 @@
     {
       "slug": "memory-sessions",
       "group": "Use",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Memory, Context, and Sessions",
       "source_evidence": [
         "commands/memory",
@@ -439,6 +477,8 @@
     {
       "slug": "permissions-security",
       "group": "Operate",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Permissions and Security",
       "source_evidence": [
         "commands/permissions",
@@ -459,6 +499,8 @@
     {
       "slug": "remote-automation",
       "group": "Operate",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Remote Sessions and Automation",
       "source_evidence": [
         "main.tsx",
@@ -481,6 +523,8 @@
     {
       "slug": "github-ci",
       "group": "Operate",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "GitHub and CI Workflows",
       "source_evidence": [
         "commands/install-github-app",
@@ -499,6 +543,8 @@
     {
       "slug": "ralph-lisa-loop",
       "group": "Govern",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Ralph-Lisa Loop",
       "source_evidence": [
         "AGENTS.md",
@@ -513,6 +559,8 @@
     {
       "slug": "clarify-and-planning",
       "group": "Govern",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Clarify and Planning",
       "source_evidence": [
         "tools/EnterPlanModeTool",
@@ -530,6 +578,8 @@
     {
       "slug": "gates-attestation",
       "group": "Govern",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Gates and Attestation",
       "source_evidence": [
         "AGENTS.md",
@@ -545,6 +595,8 @@
     {
       "slug": "public-docs",
       "group": "Operate",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Public Documentation Publishing",
       "source_evidence": [
         "docs/ccl-docs",
@@ -562,6 +614,8 @@
     {
       "slug": "troubleshooting",
       "group": "Operate",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Troubleshooting",
       "source_evidence": [
         "commands/doctor",
@@ -588,6 +642,8 @@
     {
       "slug": "how-ccl-works",
       "group": "Start",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "How CCL Works",
       "source_evidence": [
         "main.tsx",
@@ -607,6 +663,8 @@
     {
       "slug": "project-setup",
       "group": "Start",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Project Setup",
       "source_evidence": [
         "commands/init.ts",
@@ -626,6 +684,8 @@
     {
       "slug": "common-workflows",
       "group": "Use",
+      "page_type": "standard",
+      "nav_hidden": false,
       "title": "Common Workflows",
       "source_evidence": [
         "commands/workflows",
@@ -643,6 +703,8 @@
     {
       "slug": "getting-started-rll",
       "group": "Govern",
+      "page_type": "stub",
+      "nav_hidden": true,
       "title": "Getting Started with RLL",
       "source_evidence": [
         "AGENTS.md",
@@ -657,6 +719,8 @@
     {
       "slug": "complexity-system",
       "group": "Govern",
+      "page_type": "stub",
+      "nav_hidden": true,
       "title": "Complexity System",
       "source_evidence": [
         "AGENTS.md",
@@ -672,6 +736,8 @@
     {
       "slug": "gate-system",
       "group": "Govern",
+      "page_type": "stub",
+      "nav_hidden": true,
       "title": "Gate System",
       "source_evidence": [
         "AGENTS.md",
@@ -687,6 +753,8 @@
     {
       "slug": "attestation",
       "group": "Govern",
+      "page_type": "stub",
+      "nav_hidden": true,
       "title": "Attestation",
       "source_evidence": [
         "AGENTS.md",
@@ -701,6 +769,8 @@
     {
       "slug": "clarify-phase",
       "group": "Govern",
+      "page_type": "stub",
+      "nav_hidden": true,
       "title": "Clarify Phase",
       "source_evidence": [
         "AGENTS.md",
@@ -715,6 +785,8 @@
     {
       "slug": "cli-reference-ccl",
       "group": "Reference",
+      "page_type": "stub",
+      "nav_hidden": true,
       "title": "CCL CLI Compatibility Reference",
       "source_evidence": [
         "main.tsx"

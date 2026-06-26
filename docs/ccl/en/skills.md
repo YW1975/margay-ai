@@ -26,6 +26,7 @@ Skills are reusable instruction bundles that CCL can discover and apply when a t
 
 - Relevant modules: `tools/SkillTool`, `tools/DiscoverSkillsTool`, `skills/loadSkillsDir.ts`, `skills/bundledSkills.ts`, `services/skillSearch`, and `commands/skills`.
 
+
 <!-- section: source-evidence -->
 ## Source evidence
 

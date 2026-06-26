@@ -26,6 +26,24 @@ CCL agents are specialized execution contexts used for exploration, planning, ve
 - Run `ccl agents` to list configured agents. Use [Subagents](sub-agents.md) for definition format, scopes, MCP requirements, model selection, hooks, memory, and tool restrictions.
 - If an agent requires MCP servers, CCL waits briefly for pending matching servers and then reports missing authenticated tool surfaces instead of silently spawning the agent.
 
+## Choosing Between Agents And Subagents
+
+Use the Agents page to understand the registry, built-in roles, discovery order, and runtime behavior. Use [Delegated Task Agents](sub-agents.md) when you are writing or debugging an agent definition. This distinction is deliberate: `agents.md` is the product and runtime guide; `sub-agents.md` is the definition and delegation guide.
+
+## Built-In Agents
+
+| Agent role | When to use | Notes |
+| --- | --- | --- |
+| General-purpose | Open-ended delegated research or implementation support | Uses the normal agent execution path. |
+| Explore | Read-only investigation before deciding what to change | Available at runtime; no longer hidden behind the removed Explore/Plan feature gate. |
+| Plan | Create a focused plan without immediately editing files | Available at runtime with Explore. |
+| CCL guide | Answer user questions about CCL behavior, commands, settings, agents, workflows, MCP, plugins, and compatibility | The canonical type name remains compatibility-oriented in source, but the user-facing role is CCL guidance. |
+| Statusline setup / verification | Specialized setup or evidence-checking tasks | May depend on build flags or runtime conditions. |
+
+## Discovery And Filtering
+
+CCL starts with built-ins, then loads plugin and custom agent definitions. Active agents are deduplicated by `agentType`, with later source groups able to override earlier definitions according to the loader order. Required MCP servers are checked against available server names before an agent is exposed. If a required server is unavailable, the agent should be diagnosed as unavailable rather than silently assumed broken.
+
 <!-- section: source-evidence -->
 ## Source evidence
 

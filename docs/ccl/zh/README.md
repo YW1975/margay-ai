@@ -7,28 +7,24 @@
 - [CCL 概览](overview.md)
 - [快速开始](quickstart.md)
 - [安装与更新](installation.md)
-- [CCL 如何工作](how-ccl-works.md)
 - [项目设置](project-setup.md)
+- [CCL 如何工作](how-ccl-works.md)
 
 ## Configure
 
+- [认证](authentication.md)
 - [配置与设置](configuration.md)
 - [环境变量](env-vars.md)
-- [认证](authentication.md)
 - [网关与模型路由](model-routing.md)
 
 ## Use
 
 - [交互会话与 Print 模式](interactive-sessions.md)
 - [交互式命令](commands.md)
+- [CLI 参考](cli-reference.md)
 - [内置工具](tools.md)
 - [记忆、上下文与会话](memory-sessions.md)
 - [常用工作流](common-workflows.md)
-
-## Reference
-
-- [CLI 参考](cli-reference.md)
-- [CCL CLI 兼容参考](cli-reference-ccl.md)
 
 ## Extend
 
@@ -38,9 +34,6 @@
 - [插件](plugins.md)
 - [Skill](skills.md)
 - [Hook](hooks.md)
-
-## Automate
-
 - [工作流](workflows.md)
 
 ## Operate
@@ -56,8 +49,3 @@
 - [Ralph-Lisa 循环](ralph-lisa-loop.md)
 - [澄清与计划](clarify-and-planning.md)
 - [门禁与证明](gates-attestation.md)
-- [RLL 入门](getting-started-rll.md)
-- [复杂度系统](complexity-system.md)
-- [门禁系统](gate-system.md)
-- [证明记录](attestation.md)
-- [澄清阶段](clarify-phase.md)

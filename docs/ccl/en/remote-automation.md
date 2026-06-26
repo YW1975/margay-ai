@@ -26,6 +26,7 @@ CCL includes session server, open URL, SSH, assistant bridge, remote setup, remo
 - Relevant commands and tools: `server`, `open`, `ssh`, `assistant`, `remote-control`, `session`, `remote-setup`, `remote-env`, and `RemoteTriggerTool`.
 - `bridge-kick` is an internal diagnostic command for manually injecting bridge failure states; do not treat it as a stable public automation API.
 
+
 <!-- section: source-evidence -->
 ## Source evidence
 

@@ -5,24 +5,12 @@
 <!-- section: purpose -->
 ## 目的
 
-この互換リファレンスは以前の公開 slug を保ちつつ、現在の CCL CLI コマンド面と安定性ガイドへ案内します。
-
-<!-- section: capabilities -->
-## 機能範囲
-
-- 現在のコマンド一覧は [CLI リファレンス](cli-reference.md) を参照します。
-- 対話型 slash command は [コマンド](commands.md) を参照します。
-- server、open、SSH、bridge フローは [リモートセッションと自動化](remote-automation.md) を参照します。
-
-<!-- section: operational-model -->
-## 運用モデル
-
-- 互換ページはリンク切れを避けるために維持します。古いコマンド詳細を重複させないでください。
+CCL 互換メモは統合 CLI リファレンスへ移動しました。ターミナルコマンド、互換動作、安定性ガイドを一か所で扱います。
 
 <!-- section: configuration -->
 ## 設定とコマンド
 
-- 対象ビルドで `ccl --help` を実行し、正確な現在の構文を確認します。
+- [CLI リファレンス](cli-reference.md#ccl-compatibility)
 
 <!-- section: source-evidence -->
 ## ソース上の根拠
@@ -32,6 +20,4 @@
 <!-- section: related -->
 ## 関連ページ
 
-- [CLI リファレンス](cli-reference.md)
-- [対話型コマンド](commands.md)
-- [リモートセッションと自動化](remote-automation.md)
+- [CLI リファレンス](cli-reference.md#ccl-compatibility)

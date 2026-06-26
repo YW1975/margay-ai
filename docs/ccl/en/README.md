@@ -7,28 +7,24 @@
 - [CCL Overview](overview.md)
 - [Quickstart](quickstart.md)
 - [Installation and Updates](installation.md)
-- [How CCL Works](how-ccl-works.md)
 - [Project Setup](project-setup.md)
+- [How CCL Works](how-ccl-works.md)
 
 ## Configure
 
+- [Authentication](authentication.md)
 - [Configuration and Settings](configuration.md)
 - [Environment Variables](env-vars.md)
-- [Authentication](authentication.md)
 - [Gateway and Model Routing](model-routing.md)
 
 ## Use
 
 - [Interactive Sessions and Print Mode](interactive-sessions.md)
 - [Interactive Commands](commands.md)
+- [CLI Reference](cli-reference.md)
 - [Built-in Tools](tools.md)
 - [Memory, Context, and Sessions](memory-sessions.md)
 - [Common Workflows](common-workflows.md)
-
-## Reference
-
-- [CLI Reference](cli-reference.md)
-- [CCL CLI Compatibility Reference](cli-reference-ccl.md)
 
 ## Extend
 
@@ -38,9 +34,6 @@
 - [Plugins](plugins.md)
 - [Skills](skills.md)
 - [Hooks](hooks.md)
-
-## Automate
-
 - [Workflows](workflows.md)
 
 ## Operate
@@ -56,8 +49,3 @@
 - [Ralph-Lisa Loop](ralph-lisa-loop.md)
 - [Clarify and Planning](clarify-and-planning.md)
 - [Gates and Attestation](gates-attestation.md)
-- [Getting Started with RLL](getting-started-rll.md)
-- [Complexity System](complexity-system.md)
-- [Gate System](gate-system.md)
-- [Attestation](attestation.md)
-- [Clarify Phase](clarify-phase.md)

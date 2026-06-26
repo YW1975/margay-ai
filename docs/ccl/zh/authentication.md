@@ -27,6 +27,7 @@ CCL 支持登录、登出、OAuth 刷新、兼容部署中的长期 token 设置
 - 不要把密钥写入公开文档或仓库。provider 凭据应放在环境变量、安全的本地设置或托管密钥系统中。
 - 当 shell 中的 `CCL_GATEWAY_URL` 或 `CCL_GATEWAY_KEY` 与 `~/.ccl/gateway.json` 不一致时，shell 值优先；可使用 `/gateway doctor` 检测并解释这种遮蔽。
 
+
 <!-- section: source-evidence -->
 ## 源码依据
 

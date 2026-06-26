@@ -24,6 +24,22 @@ CCL governance supports explicit clarification, scope locking, planning, plan-mo
 
 - Relevant tools: `EnterPlanModeTool`, `ExitPlanModeTool`, `VerifyPlanExecutionTool`, planning commands, and RLL clarify artifacts.
 
+## Clarify Phase
+
+<a id="clarify-phase"></a>
+
+Use clarification when the task has real ambiguity: target repository, public/private boundary, acceptance criteria, negative scope, destructive actions, or deployment authority. A good clarify artifact records the user-accepted understanding, covered scope, negative scope, decisions, and risks. Do not ask ceremonial questions when the codebase and user instruction already determine the next move.
+
+## Complexity
+
+<a id="complexity"></a>
+
+Complexity classification is useful only when it changes verification. For documentation work, the most relevant checks are source accuracy, coverage, user-spec compliance, style, logical coherence, and public-safety audits. For code-bearing work, use the project gate manifest and accepted RLL policy.
+
+## Planning Output
+
+A useful plan names the user goal, the page or code areas touched, the acceptance cases, and the commands that will prove the work. For docs, the plan must also state how duplicates are merged and how live URLs remain valid.
+
 <!-- section: source-evidence -->
 ## Source evidence
 

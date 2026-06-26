@@ -24,6 +24,7 @@ CCL runs an agentic loop: gather project context, reason about the user request,
 
 - Use [Troubleshooting](troubleshooting.md) to map symptoms to layers, and [Tools](tools.md) plus [Permissions and Security](permissions-security.md) to understand execution boundaries.
 
+
 <!-- section: source-evidence -->
 ## Source evidence
 

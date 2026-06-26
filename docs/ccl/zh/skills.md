@@ -26,6 +26,7 @@ skill 是可复用的指令包，CCL 可在任务匹配 description 时发现并
 
 - 相关模块：`tools/SkillTool`、`tools/DiscoverSkillsTool`、`skills/loadSkillsDir.ts`、`skills/bundledSkills.ts`、`services/skillSearch` 和 `commands/skills`。
 
+
 <!-- section: source-evidence -->
 ## 源码依据
 

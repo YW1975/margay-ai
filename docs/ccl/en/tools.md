@@ -24,6 +24,7 @@ CCL tools are the executable capabilities available to the model and agents. The
 
 - Use tool allowlists, permission modes, hooks, and managed settings to constrain tool execution by project or environment.
 
+
 <!-- section: source-evidence -->
 ## Source evidence
 

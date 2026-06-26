@@ -5,24 +5,12 @@
 <!-- section: purpose -->
 ## 用途
 
-本兼容参考保留旧公开 slug，同时把读者引导到当前 CCL CLI 命令面和稳定性说明。
-
-<!-- section: capabilities -->
-## 能力范围
-
-- 当前命令列表见 [CLI 参考](cli-reference.md)。
-- 交互式 slash command 见 [命令](commands.md)。
-- server、open、SSH 和 bridge 流程见 [远程会话与自动化](remote-automation.md)。
-
-<!-- section: operational-model -->
-## 运行模型
-
-- 兼容页面用于避免断链，不应复制过期命令细节。
+CCL 兼容说明现在合并到统一 CLI 参考中，让终端命令、兼容行为和稳定性说明保持在同一处。
 
 <!-- section: configuration -->
 ## 配置与命令
 
-- 在目标构建中运行 `ccl --help` 查看精确当前语法。
+- [CLI 参考](cli-reference.md#ccl-compatibility)
 
 <!-- section: source-evidence -->
 ## 源码依据
@@ -32,6 +20,4 @@
 <!-- section: related -->
 ## 相关页面
 
-- [CLI 参考](cli-reference.md)
-- [交互式命令](commands.md)
-- [远程会话与自动化](remote-automation.md)
+- [CLI 参考](cli-reference.md#ccl-compatibility)

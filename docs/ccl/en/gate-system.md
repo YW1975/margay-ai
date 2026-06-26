@@ -5,24 +5,12 @@
 <!-- section: purpose -->
 ## Purpose
 
-The gate system turns policy into runnable checks that block unsafe or under-evidenced submissions before they become reviewed or published work.
-
-<!-- section: capabilities -->
-## Capabilities
-
-- Validate required submission sections and attest lines.
-- Run configured commands such as tests, docs checks, audits, and builds.
-- Capture failure logs so the next fix round starts from concrete evidence.
-
-<!-- section: operational-model -->
-## Operational model
-
-- A gate should be specific enough to fail for the right reason. Broad green checks are weak evidence when they do not cover the requirement being claimed.
+Gate mechanics are now documented with attestation because users usually need to know both the check and the evidence format that satisfies it.
 
 <!-- section: configuration -->
 ## Configuration and commands
 
-- For public docs, gate commands should include docs parity, links, translation-residue detection, source evidence, public audit, and site build.
+- [Gates and Attestation](gates-attestation.md#gates)
 
 <!-- section: source-evidence -->
 ## Source evidence
@@ -34,6 +22,4 @@ The gate system turns policy into runnable checks that block unsafe or under-evi
 <!-- section: related -->
 ## Related pages
 
-- [Gates and Attestation](gates-attestation.md)
-- [Public Documentation Publishing](public-docs.md)
-- [GitHub and CI Workflows](github-ci.md)
+- [Gates and Attestation](gates-attestation.md#gates)

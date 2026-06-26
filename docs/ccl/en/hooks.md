@@ -25,6 +25,7 @@ Hooks let CCL run policy or automation around tool execution and session events,
 
 - Relevant modules: `commands/hooks`, `schemas/hooks.ts`, `services/tools/toolHooks.ts`, `services/tools/toolExecution.ts`, `skills/loadSkillsDir.ts`, and plugin hook loading.
 
+
 <!-- section: source-evidence -->
 ## Source evidence
 

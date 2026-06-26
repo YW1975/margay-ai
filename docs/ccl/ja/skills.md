@@ -26,6 +26,7 @@ skill は再利用可能な指示バンドルで、CCL は task が description 
 
 - 関連モジュールは `tools/SkillTool`、`tools/DiscoverSkillsTool`、`skills/loadSkillsDir.ts`、`skills/bundledSkills.ts`、`services/skillSearch`、`commands/skills` です。
 
+
 <!-- section: source-evidence -->
 ## ソース上の根拠
 

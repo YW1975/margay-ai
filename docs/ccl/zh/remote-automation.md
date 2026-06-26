@@ -26,6 +26,7 @@ CCL 提供 session server、open URL、SSH、assistant bridge、remote setup、r
 - 相关命令和工具：`server`、`open`、`ssh`、`assistant`、`remote-control`、`session`、`remote-setup`、`remote-env` 和 `RemoteTriggerTool`。
 - `bridge-kick` 是用于手动注入 bridge 失败状态的内部诊断命令，不应视为稳定公开自动化 API。
 
+
 <!-- section: source-evidence -->
 ## 源码依据
 

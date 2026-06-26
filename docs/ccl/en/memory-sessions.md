@@ -24,6 +24,7 @@ CCL manages conversation state, session transcripts, memory extraction, compacti
 
 - Relevant commands and services: `memory`, `resume`, `session`, `compact`, `contextCollapse`, `SessionMemory`, `extractMemories`, and `agentMemory`.
 
+
 <!-- section: source-evidence -->
 ## Source evidence
 

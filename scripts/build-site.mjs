@@ -20,10 +20,44 @@ function inlineMarkdown(value, lang) {
   let html = escapeHtml(value)
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>')
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, href) => {
-    const safeHref = href.endsWith('.md') ? href.replace(/\.md(#.*)?$/, '.html$1') : href
+    const safeHref = /\.md(#.*)?$/.test(href) ? href.replace(/\.md(#.*)?$/, '.html$1') : href
     return `<a href="${escapeHtml(safeHref)}">${label}</a>`
   })
   return html
+}
+
+function splitTableRow(line) {
+  return line
+    .trim()
+    .replace(/^\|/, '')
+    .replace(/\|$/, '')
+    .split('|')
+    .map(cell => cell.trim())
+}
+
+function isTableDivider(line) {
+  const cells = splitTableRow(line)
+  return cells.length > 0 && cells.every(cell => /^:?-{3,}:?$/.test(cell))
+}
+
+function isTableRow(line) {
+  return /^\s*\|.+\|\s*$/.test(line)
+}
+
+function renderTable(rows, lang) {
+  const [header, , ...bodyRows] = rows
+  const headerCells = splitTableRow(header)
+  const body = bodyRows.map(row => splitTableRow(row))
+  return [
+    '<table>',
+    '<thead>',
+    `<tr>${headerCells.map(cell => `<th>${inlineMarkdown(cell, lang)}</th>`).join('')}</tr>`,
+    '</thead>',
+    '<tbody>',
+    ...body.map(row => `<tr>${row.map(cell => `<td>${inlineMarkdown(cell, lang)}</td>`).join('')}</tr>`),
+    '</tbody>',
+    '</table>',
+  ].join('\n')
 }
 
 function markdownToHtml(markdown, lang) {
@@ -38,7 +72,8 @@ function markdownToHtml(markdown, lang) {
     }
   }
 
-  for (const raw of lines) {
+  for (let index = 0; index < lines.length; index += 1) {
+    const raw = lines[index]
     const line = raw.trimEnd()
     if (line.startsWith('```')) {
       closeList()
@@ -57,6 +92,23 @@ function markdownToHtml(markdown, lang) {
     }
     if (!line || line.startsWith('<!--')) {
       closeList()
+      continue
+    }
+    if (/^<a id="[a-z0-9-]+"><\/a>$/.test(line.trim())) {
+      closeList()
+      html.push(line.trim())
+      continue
+    }
+    if (isTableRow(line) && lines[index + 1] && isTableDivider(lines[index + 1])) {
+      closeList()
+      const tableRows = [line, lines[index + 1]]
+      index += 2
+      while (index < lines.length && isTableRow(lines[index])) {
+        tableRows.push(lines[index])
+        index += 1
+      }
+      index -= 1
+      html.push(renderTable(tableRows, lang))
       continue
     }
     const heading = /^(#{1,3})\s+(.+)$/.exec(line)
@@ -117,6 +169,9 @@ function pageShell({ title, body, nav, lang }) {
     h3 { margin-top: 26px; }
     code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .92em; background: color-mix(in srgb, var(--line) 45%, transparent); padding: 1px 5px; border-radius: 4px; }
     pre { overflow: auto; padding: 16px; border: 1px solid var(--line); background: var(--panel); }
+    table { width: 100%; border-collapse: collapse; margin: 18px 0 28px; display: block; overflow-x: auto; }
+    th, td { border: 1px solid var(--line); padding: 9px 11px; text-align: left; vertical-align: top; }
+    th { background: color-mix(in srgb, var(--line) 32%, transparent); }
     blockquote { margin: 0 0 24px; padding: 12px 16px; border-left: 4px solid var(--line); color: var(--muted); background: color-mix(in srgb, var(--panel) 74%, transparent); }
     a { color: var(--link); }
     @media (max-width: 800px) { .layout { display: block; padding-top: 18px; } nav { border-right: 0; border-bottom: 1px solid var(--line); padding: 0 0 18px; margin-bottom: 24px; } .top { align-items: flex-start; flex-direction: column; } }
@@ -137,11 +192,27 @@ async function filesFor(lang) {
   return (await readdir(join(docsRoot, lang))).filter(name => name.endsWith('.md')).sort()
 }
 
+async function readInventory() {
+  const path = join(docsRoot, 'docs-inventory.json')
+  if (!existsSync(path)) return null
+  return JSON.parse(await readFile(path, 'utf8'))
+}
+
+function navFilesFor(files, inventory) {
+  if (!inventory?.pages) return files
+  const visible = inventory.pages
+    .filter(page => !page.nav_hidden)
+    .map(page => `${page.slug}.md`)
+    .filter(file => files.includes(file))
+  return ['README.md', ...visible.filter(file => file !== 'README.md')]
+}
+
 async function main() {
   if (!existsSync(docsRoot)) throw new Error(`Missing ${docsRoot}`)
   await rm(outRoot, { recursive: true, force: true })
   await mkdir(outRoot, { recursive: true })
 
+  const inventory = await readInventory()
   const filesByLang = Object.fromEntries(await Promise.all(langs.map(async lang => [lang, await filesFor(lang)])))
   const titles = {}
   for (const lang of langs) {
@@ -156,7 +227,7 @@ async function main() {
   for (const lang of langs) {
     const langOut = join(outRoot, lang)
     await mkdir(langOut, { recursive: true })
-    const nav = filesByLang[lang]
+    const nav = navFilesFor(filesByLang[lang], inventory)
       .map(file => {
         const href = file === 'README.md' ? 'index.html' : file.replace(/\.md$/, '.html')
         return `<a href="${href}">${escapeHtml(titles[lang][file])}</a>`

@@ -24,6 +24,16 @@ The Ralph-Lisa Loop is CCL project governance for turn-based developer and revie
 
 - Common commands: `ralph-lisa whose-turn`, `ralph-lisa read review.md`, and `ralph-lisa submit-ralph --file .dual-agent/submit.md`.
 
+## Getting Started
+
+<a id="getting-started"></a>
+
+The Ralph-Lisa Loop is a turn-based development and review protocol. Ralph plans and implements; Lisa reviews independently and can pass, request work, challenge, or reach consensus. In an active loop, always check whose turn it is before submitting work. In a standalone session, help normally and do not impersonate loop state.
+
+## Phase Boundaries
+
+Submit at real boundaries: plan, research, code, fix, and consensus. A code or fix submission should include the concrete files changed, the acceptance cases covered, and real test results. Do not move to publication or commit just because content exists; wait for the review checkpoint required by the active slice.
+
 <!-- section: source-evidence -->
 ## Source evidence
 

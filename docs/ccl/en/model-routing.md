@@ -29,6 +29,7 @@ CCL routes model requests through compatible providers and MargayAI gateway depl
 - Use gateway, endpoint, model, cost, context, and usage commands for inspection. Keep compatibility variable names documented as compatibility surfaces, not product names.
 - Do not assume provider prompt-cache savings or hit-rate accounting from CCL docs alone; cache-read and cache-write fields are meaningful only when the active transport or gateway returns verified usage data.
 
+
 <!-- section: source-evidence -->
 ## Source evidence
 

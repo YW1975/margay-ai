@@ -27,6 +27,7 @@ CCL supports login, logout, OAuth refresh, long-lived token setup for compatible
 - Keep secrets out of public docs and repositories. Store provider credentials in environment variables, secure local settings, or managed secret stores.
 - When shell `CCL_GATEWAY_URL` or `CCL_GATEWAY_KEY` values differ from `~/.ccl/gateway.json`, the shell values win; use `/gateway doctor` to detect and explain that shadowing.
 
+
 <!-- section: source-evidence -->
 ## Source evidence
 

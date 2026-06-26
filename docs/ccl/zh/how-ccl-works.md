@@ -24,6 +24,7 @@ CCL 运行 agentic loop：收集项目上下文，推理用户请求，在策略
 
 - 使用 [故障排查](troubleshooting.md) 把症状映射到层，并结合 [内置工具](tools.md) 与 [权限与安全](permissions-security.md) 理解执行边界。
 
+
 <!-- section: source-evidence -->
 ## 源码依据
 

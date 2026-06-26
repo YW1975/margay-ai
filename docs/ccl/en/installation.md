@@ -24,6 +24,7 @@ CCL is distributed as the `ccl` binary from the `@margay/ccl-core` package and i
 
 - Relevant commands: `install`, `update`, `upgrade`, `doctor`, and internal rollback helpers where enabled.
 
+
 <!-- section: source-evidence -->
 ## Source evidence
 

@@ -26,6 +26,7 @@ CCL は detached またはリモート制御セッション向けに、session s
 - 関連コマンドとツールは `server`、`open`、`ssh`、`assistant`、`remote-control`、`session`、`remote-setup`、`remote-env`、`RemoteTriggerTool` です。
 - `bridge-kick` は bridge failure state を手動注入する内部診断コマンドであり、安定した公開自動化 API として扱わないでください。
 
+
 <!-- section: source-evidence -->
 ## ソース上の根拠
 

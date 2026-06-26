@@ -24,6 +24,24 @@
 
 - 在 RLL 提交中使用 attest 行，并在适合时把日志保存在 `.dual-agent/harness-results`。
 
+## 门禁
+
+<a id="gates"></a>
+
+门禁是与具体声明绑定的可运行检查。对公开文档，有价值的门禁包括生成文档一致性、链接完整性、源码证据存在性、禁用品牌扫描、私有路径/密钥扫描、站点构建，以及部署后的 live URL 抓取。如果一个通过的命令没有覆盖所声明的要求，它就是弱证据。
+
+## 证明记录
+
+<a id="attestation"></a>
+
+证明记录说明过程证据：运行了什么命令、覆盖什么范围、是否通过、日志保存在哪里，以及它证明哪个验收 case。在 RLL 提交中，必需的 `Test-Process`、`Test-Cases` 和 `Test-Results` 行用于让证据可复核、可证伪。
+
+## 复杂度门禁
+
+<a id="complexity-gates"></a>
+
+复杂度门禁应随风险扩展。文档-only slice 不应假装无关单元测试能证明内容质量，但必须运行文档专用检查。涉及代码的 slice 应包含项目 manifest 和计划中对应的 unit、integration、smoke、security 或 e2e 层级。
+
 <!-- section: source-evidence -->
 ## 源码依据
 

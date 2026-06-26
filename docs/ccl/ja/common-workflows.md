@@ -24,6 +24,7 @@
 
 - 反復自動化には [ワークフロー](workflows.md)、レビュー付き納品には [Ralph-Lisa ループ](ralph-lisa-loop.md)、安全な文書公開には [公開ドキュメント公開](public-docs.md) を使います。
 
+
 <!-- section: source-evidence -->
 ## ソース上の根拠
 

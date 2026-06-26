@@ -27,6 +27,7 @@
 - 公開前に `scripts/audit-public-content.sh`、ドキュメントチェック、Pages ビルドを実行します。
 - docs-publisher skill は製品非依存に保ちます。CCL 固有のページ本文と証拠はこのリポジトリまたは task evidence bundle に置き、docs-reviewer が公開先を検証します。
 
+
 <!-- section: source-evidence -->
 ## ソース上の根拠
 

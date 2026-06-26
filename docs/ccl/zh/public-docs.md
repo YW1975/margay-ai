@@ -27,6 +27,7 @@
 - 发布前运行 `scripts/audit-public-content.sh`、文档检查和 Pages 构建。
 - docs-publisher skill 应保持产品中立；CCL 专属页面文案和证据放在本仓或任务证据包中，再由 docs-reviewer 验证发布目标。
 
+
 <!-- section: source-evidence -->
 ## 源码依据
 

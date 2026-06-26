@@ -22,6 +22,7 @@ rsync -a --delete \
   --exclude '.DS_Store' \
   --exclude '*.map' \
   --exclude '*.log' \
+  --exclude 'ia-audit-*.md' \
   "$source_dir/" "$target_dir/"
 
 "$root/scripts/audit-public-content.sh"

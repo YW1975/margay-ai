@@ -24,6 +24,24 @@ Gates and attestations make CCL delivery auditable by tying submitted work to te
 
 - Use attest lines in RLL submissions and keep logs under `.dual-agent/harness-results` when appropriate.
 
+## Gates
+
+<a id="gates"></a>
+
+A gate is a runnable check tied to a claim. For public docs, useful gates include generated-doc parity, link integrity, source-evidence existence, forbidden-branding scan, private-path/secret scan, site build, and live URL fetch after deployment. A broad passing command is weak evidence when it does not cover the claim being made.
+
+## Attestation
+
+<a id="attestation"></a>
+
+Attestation records the process evidence: what command ran, what it covered, whether it passed, where the log lives, and which acceptance case it proves. In RLL submissions, the required `Test-Process`, `Test-Cases`, and `Test-Results` lines are meant to make the evidence falsifiable.
+
+## Complexity Gates
+
+<a id="complexity-gates"></a>
+
+Complexity gates should scale with risk. A documentation-only slice should not pretend that unrelated unit tests prove content quality, but it should run documentation-specific checks. A code-bearing slice should include the relevant unit, integration, smoke, security, or e2e tiers from the project manifest and plan.
+
 <!-- section: source-evidence -->
 ## Source evidence
 

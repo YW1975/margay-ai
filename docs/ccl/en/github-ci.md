@@ -24,6 +24,7 @@ CCL includes GitHub app setup, commit and review commands, PR automation helpers
 
 - Relevant modules: `commands/install-github-app`, `commands/review`, `commands/security-review.ts`, `commands/autofix-pr`, and public repo workflows.
 
+
 <!-- section: source-evidence -->
 ## Source evidence
 

@@ -26,6 +26,27 @@ Subagents let a CCL session delegate focused work to a separate context with its
 - Use agent directories in user, project, or local scope. Use tool restrictions for least privilege, especially for shell, file write, and MCP access.
 - `requiredMcpServers` is matched against available MCP server names and only agents whose requirements are met are shown as active.
 
+## Scope Of This Page
+
+This page is for defining delegated task agents. It does not repeat the high-level agent registry model from [Agents](agents.md). Use it when you need to create, review, or debug a Markdown/JSON agent definition.
+
+## Definition Fields
+
+| Field | What it controls | When to use |
+| --- | --- | --- |
+| `description` | Routing signal shown to the host model | Always; make it precise and action-oriented. |
+| `tools` / `disallowedTools` | Allowed or blocked tool names | When the agent must be read-only or limited to specific actions. |
+| `skills` | Skills to preload | When the agent should use a repeatable procedure. |
+| `mcpServers` / `requiredMcpServers` | MCP configuration or availability requirements | When the agent depends on external tools. |
+| `model` / `effort` | Model preference and reasoning effort | When cost, latency, or task difficulty needs a different default. |
+| `permissionMode` | Tool approval behavior | When the agent needs stricter or narrower execution policy. |
+| `background` | Background execution | For long-running research or checks. |
+| `memory` | Persistent memory scope | Only when repeated work benefits from stored context. |
+
+## Safe Delegation Checklist
+
+Before adding a custom subagent, verify that the description says when to use it, tool access is no broader than necessary, MCP requirements are explicit, background behavior is intentional, and any persistent memory scope avoids secrets or project-private claims that should not be reused globally.
+
 <!-- section: source-evidence -->
 ## Source evidence
 

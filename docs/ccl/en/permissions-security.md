@@ -25,6 +25,7 @@ CCL protects execution through permission modes, tool allowlists, shell and path
 
 - Relevant modules: `commands/permissions`, `utils/settings/types.ts`, `tools/BashTool`, `tools/PowerShellTool`, `utils/sandbox`, `services/tools`, `services/teamMemorySync/secretScanner.ts`, and public audit scripts.
 
+
 <!-- section: source-evidence -->
 ## Source evidence
 

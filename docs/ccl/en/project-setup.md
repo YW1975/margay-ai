@@ -24,6 +24,7 @@ A CCL-ready project declares local instructions, settings, permissions, extensio
 
 - Use `init`, `config`, `permissions`, `mcp`, `agents`, `skills`, `hooks`, and workflow commands to make project behavior explicit.
 
+
 <!-- section: source-evidence -->
 ## Source evidence
 

@@ -25,6 +25,7 @@ CCL は権限モード、ツール allowlist、shell とパス検証、PowerShel
 
 - 関連モジュールは `commands/permissions`、`utils/settings/types.ts`、`tools/BashTool`、`tools/PowerShellTool`、`utils/sandbox`、`services/tools`、`services/teamMemorySync/secretScanner.ts`、公開監査スクリプトです。
 
+
 <!-- section: source-evidence -->
 ## ソース上の根拠
 

@@ -24,6 +24,7 @@
 
 - 使用 `init`、`config`、`permissions`、`mcp`、`agents`、`skills`、`hooks` 和工作流命令显式化项目行为。
 
+
 <!-- section: source-evidence -->
 ## 源码依据
 

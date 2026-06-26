@@ -25,6 +25,7 @@ Plugins package commands, MCP configuration, hooks, skills, components, marketpl
 
 - Use `ccl plugin` or `ccl plugins`. Public docs should not publish private marketplace URLs or tokens.
 
+
 <!-- section: source-evidence -->
 ## Source evidence
 
