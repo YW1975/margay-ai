@@ -10,7 +10,7 @@ Interactive commands control a running CCL session. They switch modes, manage co
 <!-- section: capabilities -->
 ## Capabilities
 
-- Core commands include help, config, model, permissions, memory, status, cost, context, compact, clear, resume, diff, commit, review, plan, and workflows.
+- Core commands include help, config, model, permissions, memory, status, cost, context, compact, clear, resume, diff, commit, review, plan, buddy, agents, and workflows.
 - Integration commands cover MCP, IDE, terminal setup, Chrome, GitHub app installation, remote setup, remote control, and plugins.
 - Diagnostic commands include doctor, endpoint, gateway, stats, insights, usage, and debug tool call helpers where present.
 
@@ -37,6 +37,7 @@ A command can be read-only, session-local, settings-writing, service-calling, or
 | First session | `/help`, `/init`, `/config`, `/permissions`, `/mcp`, `/agents` | Discover the available command surface, set project context, review tool policy, connect MCP servers, and confirm agent visibility. |
 | Before a task | `/plan`, `/model`, `/effort`, `/add-dir`, `/memory` | Choose planning depth, model behavior, extra directories, and relevant persistent context. |
 | During a task | `/files`, `/diff`, `/status`, `/cost`, `/context`, `/usage` | Inspect touched files, pending changes, runtime state, token/cost/context usage, and provider usage when available. |
+| During delegated work | `/buddy`, `/agents`, `/workflows` | Start a teammate-style helper, inspect agent availability, or run structured automation. |
 | When context is large | `/compact`, `/clear`, `/resume`, `/rewind`, `/rename` | Reduce context, start fresh, resume prior work, return to a checkpoint, or label the session. |
 | Before delivery | `/review`, `/security-review`, `/commit`, `/commit-push-pr`, `/pr-comments` | Review changes, inspect security-sensitive edits, and prepare GitHub handoff. |
 | Troubleshooting | `/doctor`, `/gateway doctor`, `/endpoint`, `/debug-tool-call`, `/feedback` | Diagnose installation, gateway, endpoint, tool-call, or product issues. |
@@ -77,6 +78,7 @@ Use `/gateway doctor` when shell variables and saved config disagree. In the cur
 | `/commit-push-pr` | Automates commit, push, and PR flow where enabled. | The repository policy allows automated GitHub handoff. | Requires correct branch, auth, and review discipline. |
 | `/mcp` | Manages MCP tool servers in-session. | External tools should be connected, inspected, or toggled. | Workspace trust matters; do not spawn untrusted stdio servers casually. |
 | `/agents` | Shows or manages active agent visibility. | You need to know which built-in/custom/plugin agents can be used. | MCP requirements or setting sources can hide an expected agent. |
+| `/buddy` | Starts a teammate or pair-agent path through the Agent tool with `team_name` and `name`. | A task benefits from a visible helper agent coordinated with the lead session. | It is an interactive prompt command; verify the spawned teammate and permissions before relying on its output. |
 | `/hooks` | Inspects hook configuration. | Tool behavior is being changed by policy automation. | Hooks can block or rewrite tool input; check event scope. |
 | `/workflows` | Creates, lists, runs, tails, or inspects workflow automation. | A repeatable multi-step operation needs structure and verification. | Workflow background runs need explicit follow-up via tail/inspect. |
 | `/endpoint` | Pins, inspects, or switches endpoint routing where configured. | A model route or endpoint compatibility issue is suspected. | Endpoint switching depends on configured registry data. |
@@ -98,6 +100,7 @@ Use `/cost`, `/context`, `/usage`, `/stats`, `/insights`, `/endpoint`, and `/gat
 - `commands/workflows/index.ts`
 - `commands/permissions/permissions.tsx`
 - `commands/hooks/hooks.tsx`
+- `commands/buddy/index.ts`
 
 <!-- section: related -->
 ## Related pages

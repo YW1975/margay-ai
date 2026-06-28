@@ -37,6 +37,7 @@
 | `ccl` 无法启动 | [安装](installation.md) | `ccl --version`、shell PATH、安装方式。 |
 | 登录或 gateway 失败 | [认证](authentication.md) | `/gateway doctor`、脱敏后的环境变量名、gateway URL 健康状态。 |
 | 模型或 provider 不对 | [网关与模型路由](model-routing.md) | 请求的模型、endpoint、usage 字段、路由配置。 |
+| 出现启动告警 | [环境变量](env-vars.md) | 告警文本、相关环境变量名、是否存在 `~/.ccl/gateway.json`、memory 文件大小。 |
 | 命令缺失 | [命令](commands.md) | 交互式 `/` 列表、构建版本、feature flag 或插件状态。 |
 | CLI flag 被拒绝 | [CLI 参考](cli-reference.md) | `ccl --help`、精确命令和 flag。 |
 | MCP 工具缺失 | [MCP Server 与工具](mcp.md) | `ccl mcp list`、server 配置、认证状态。 |
@@ -46,6 +47,10 @@
 ## Gateway 诊断
 
 修改多个凭据前先运行 `/gateway doctor`。它会检查 effective gateway、文件配置、shell 变量、OAuth/API-key 状态，并在可能时通过 `GET /auth/me` 检查可达性。如果只设置了 `CCL_GATEWAY_URL` 或 `CCL_GATEWAY_KEY` 中的一个，应把它视为损坏的原子配置对：要么两个都设置，要么两个都清理。
+
+## 启动告警诊断
+
+当 OAuth 与网关凭据同时用于拆分部署时，双通道说明是预期信息；确认这是有意配置后，再设置 `CCL_QUIET_DUAL_CHANNEL=1`。auth-conflict 告警表示 provider SDK 的 API-key 或 base-URL 变量正在与 OAuth 竞争；应从 CCL settings 或 shell 中移除冲突变量。大 memory 文件告警来自项目根目录中过大的指令文件，例如 `CCL.md`；应先精简或移出这些文件，不要先假设二进制包有问题。
 
 ## Agent 诊断
 

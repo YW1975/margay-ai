@@ -24,6 +24,12 @@ CCL is distributed as the `ccl` binary from the `@margay/ccl-core` package and i
 
 - Relevant commands: `install`, `update`, `upgrade`, `doctor`, and internal rollback helpers where enabled.
 
+## Package Version And Tarballs
+
+Current public CCL builds are published as `@margay/ccl-core`; the 1.2.23 package exposes the `ccl` binary and reports `1.2.23 (CCL)` from `ccl --version`.
+
+When a release is distributed as a tarball, install it with the package manager used by the target host, for example `npm install -g ./margay-ccl-core-1.2.23.tgz`. The tarball contains the compiled runtime and public package files; user settings such as `~/.ccl/settings.json`, `~/.ccl/gateway.json`, OAuth state, and project memory files remain host-local and are not fixed by repacking the binary.
+
 
 <!-- section: source-evidence -->
 ## Source evidence

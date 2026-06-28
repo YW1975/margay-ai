@@ -37,6 +37,7 @@ Troubleshooting CCL starts by identifying the failing layer: installation, authe
 | `ccl` does not start | [Installation](installation.md) | `ccl --version`, shell PATH, install method. |
 | Login or gateway fails | [Authentication](authentication.md) | `/gateway doctor`, redacted env names, gateway URL health. |
 | Wrong model or provider | [Gateway and Model Routing](model-routing.md) | requested model, endpoint, usage fields, route config. |
+| Startup warning appears | [Environment Variables](env-vars.md) | warning text, relevant env variable names, `~/.ccl/gateway.json` presence, memory file size. |
 | Command missing | [Commands](commands.md) | Interactive `/` list, build version, feature flags or plugin state. |
 | CLI flag rejected | [CLI Reference](cli-reference.md) | `ccl --help`, exact command and flags. |
 | MCP tool missing | [MCP Servers and Tools](mcp.md) | `ccl mcp list`, server config, auth status. |
@@ -46,6 +47,10 @@ Troubleshooting CCL starts by identifying the failing layer: installation, authe
 ## Gateway Diagnosis
 
 Run `/gateway doctor` before changing multiple credentials. It checks the effective gateway, file configuration, shell variables, OAuth/API-key state, and reachability through `GET /auth/me` when possible. If only one of `CCL_GATEWAY_URL` or `CCL_GATEWAY_KEY` is set, treat it as a broken atomic pair and set both or clear both.
+
+## Startup Warning Diagnosis
+
+Dual-channel notes are expected when OAuth and gateway credentials are both configured for a split deployment; set `CCL_QUIET_DUAL_CHANNEL=1` only after verifying that this is intended. Auth-conflict warnings mean provider SDK API-key or base-URL variables are competing with OAuth; remove the conflicting variables from CCL settings or the shell. Large memory-file warnings come from oversized root instruction files such as `CCL.md`; trim or move those files before assuming the binary package is at fault.
 
 ## Agent Diagnosis
 

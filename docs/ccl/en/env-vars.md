@@ -13,12 +13,14 @@ CCL reads CCL-prefixed environment variables for model selection, logging, permi
 - Use `CCL_MODEL` and model default variables to select the main or fast model for compatible deployments.
 - Use `CCL_GATEWAY_URL` and `CCL_GATEWAY_KEY` for Margay gateway routing; these variables are authoritative over `~/.ccl/gateway.json` when set.
 - Use `CCL_LOG`, `CCL_BETAS`, `CCL_CUSTOM_HEADERS`, and `CCL_PERMISSIONS_TEMPLATE` for diagnostics, beta flags, headers, and permission defaults.
+- Use `CCL_QUIET_DUAL_CHANNEL=1` to silence the expected OAuth-plus-gateway informational note when the deployment intentionally uses Claude through OAuth and third-party models through the gateway.
 
 <!-- section: operational-model -->
 ## Operational model
 
 - `bootstrap/envSync.ts` maps selected non-routing `CCL_*` variables to compatibility variables only when the compatibility variable is not already set. It explicitly excludes `CCL_BASE_URL` and `CCL_API_KEY` from sync to avoid accidental provider routing changes.
 - `bootstrap/gatewayConfig.ts` loads `~/.ccl/gateway.json` only when neither `CCL_GATEWAY_URL` nor `CCL_GATEWAY_KEY` is present. If either shell variable is present, the shell environment is authoritative as an atomic pair.
+- In dual-channel mode, Claude model calls use the local Claude auth channel when OAuth or first-party API-key auth is available, while non-Claude models such as DeepSeek or Kimi use the configured gateway. Do not put gateway credentials in provider SDK variables for this mode.
 
 <!-- section: configuration -->
 ## Configuration and commands
@@ -51,12 +53,17 @@ CCL reads CCL-prefixed environment variables for model selection, logging, permi
 | `CCL_MODEL` | Model selection | Synced to the compatibility model variable only if that target is unset. |
 | `CCL_SMALL_FAST_MODEL` | Fast/small model selection | Useful for deployments that split large and cheap tasks. |
 | `CCL_LOG` | Logging verbosity | Use temporary command-level overrides for diagnostics. |
+| `CCL_ROUTING_PRIORITY` | Smart routing priority | Use `cost` or `quality` when the gateway classifier returns a routing table. |
+| `CCL_AUTO_FALLBACK_MODEL` | Auto/smart fallback model | Used when the gateway classifier is unavailable and the selected model is still `auto` or `smart`. |
+| `CCL_QUIET_DUAL_CHANNEL` | Startup note control | Set to `1` to hide the informational dual-channel note. |
 | `CCL_CUSTOM_HEADERS` | Extra request headers | Treat as sensitive if it carries auth or routing metadata. |
 | `CCL_PERMISSIONS_TEMPLATE` | Permission defaults | Use with caution because it affects tool prompting behavior. |
 
 ## Troubleshooting Variables
 
 If `/gateway doctor` says the file and shell disagree, decide which source should win and remove the other. If a provider SDK appears to use an unexpected base URL, check whether compatibility variables were set outside CCL. If a variable appears ignored, confirm whether it is read at process startup and restart the shell/session.
+
+When using OAuth plus the Margay gateway, avoid setting provider SDK API-key or base-URL variables to gateway values. That can create an auth-conflict warning or cause provider SDK calls to use the wrong URL. Keep gateway state in `CCL_GATEWAY_*` or `~/.ccl/gateway.json`; use `CCL_QUIET_DUAL_CHANNEL=1` only to silence the expected informational note, not to hide a real credential conflict.
 
 <!-- section: source-evidence -->
 ## Source evidence

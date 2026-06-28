@@ -10,7 +10,7 @@
 <!-- section: capabilities -->
 ## 能力范围
 
-- 核心命令包括 help、config、model、permissions、memory、status、cost、context、compact、clear、resume、diff、commit、review、plan 和 workflows。
+- 核心命令包括 help、config、model、permissions、memory、status、cost、context、compact、clear、resume、diff、commit、review、plan、buddy、agents 和 workflows。
 - 集成命令覆盖 MCP、IDE、terminal setup、Chrome、GitHub app 安装、remote setup、remote control 和 plugin。
 - 诊断命令包括 doctor、endpoint、gateway、stats、insights、usage，以及存在时的 debug tool call 辅助命令。
 
@@ -37,6 +37,7 @@
 | 首次会话 | `/help`, `/init`, `/config`, `/permissions`, `/mcp`, `/agents` | 发现当前命令面，设置项目上下文，检查工具策略，连接 MCP server，确认 agent 可见性。 |
 | 任务开始前 | `/plan`, `/model`, `/effort`, `/add-dir`, `/memory` | 选择计划深度、模型行为、额外目录和相关持久上下文。 |
 | 任务进行中 | `/files`, `/diff`, `/status`, `/cost`, `/context`, `/usage` | 检查涉及文件、待提交变更、运行状态、token/成本/上下文用量，以及可用时的 provider usage。 |
+| 委派工作中 | `/buddy`, `/agents`, `/workflows` | 启动 teammate 风格 helper，检查 agent 可见性，或运行结构化自动化。 |
 | 上下文过大时 | `/compact`, `/clear`, `/resume`, `/rewind`, `/rename` | 压缩上下文、重新开始、恢复旧工作、回到 checkpoint 或标记会话。 |
 | 交付前 | `/review`, `/security-review`, `/commit`, `/commit-push-pr`, `/pr-comments` | 审阅变更、检查安全敏感编辑并准备 GitHub 交接。 |
 | 故障排查 | `/doctor`, `/gateway doctor`, `/endpoint`, `/debug-tool-call`, `/feedback` | 诊断安装、网关、endpoint、tool-call 或产品问题。 |
@@ -77,6 +78,7 @@
 | `/commit-push-pr` | 在启用时自动 commit、push、开 PR。 | 仓库策略允许自动 GitHub 交接时。 | 需要正确分支、认证和审阅纪律。 |
 | `/mcp` | 在会话内管理 MCP 工具 server。 | 需要连接、检查或切换外部工具时。 | workspace trust 很重要；不要随意启动不可信 stdio server。 |
 | `/agents` | 显示或管理 active agent 可见性。 | 需要知道哪些内置/自定义/插件 agent 可用时。 | MCP 要求或设置来源可能隐藏预期 agent。 |
+| `/buddy` | 通过 Agent 工具携带 `team_name` 和 `name` 启动 teammate 或 pair-agent 路径。 | 任务需要一个与主会话协作的可见 helper agent 时。 | 它是交互式 prompt 命令；依赖输出前应确认 teammate 已启动并检查权限。 |
 | `/hooks` | 检查 hook 配置。 | 工具行为被策略自动化改变时。 | hook 可阻止或改写工具输入；检查事件作用域。 |
 | `/workflows` | 创建、列出、运行、tail 或检查 workflow 自动化。 | 可重复多步骤操作需要结构和验证时。 | 后台 workflow run 需要明确 tail/inspect 跟进。 |
 | `/endpoint` | 在配置时 pin、检查或切换 endpoint 路由。 | 怀疑模型路由或 endpoint 兼容问题时。 | endpoint 切换依赖已配置 registry 数据。 |
@@ -98,6 +100,7 @@
 - `commands/workflows/index.ts`
 - `commands/permissions/permissions.tsx`
 - `commands/hooks/hooks.tsx`
+- `commands/buddy/index.ts`
 
 <!-- section: related -->
 ## 相关页面

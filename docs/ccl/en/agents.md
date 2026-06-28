@@ -10,15 +10,16 @@ CCL agents are specialized execution contexts used for exploration, planning, ve
 <!-- section: capabilities -->
 ## Capabilities
 
-- Built-in agents include Explore, Plan, verification, statusline setup, general-purpose, and the CCL guide role.
+- Built-in agents include general-purpose, code-reviewer, test-runner, Explore, Plan, verification, statusline setup, and the CCL guide role where enabled.
 - Custom and plugin agents are loaded from definition directories and can restrict tools, models, MCP requirements, hooks, permissions, memory, and background behavior.
-- Agents can run in the foreground or background and can be continued through messaging when supported.
+- Agents can run in the foreground, background, or teammate-style pair-agent paths and can be continued through messaging when supported.
 
 <!-- section: operational-model -->
 ## Operational model
 
 - Agent discovery starts from built-ins, plugin agents, and custom Markdown definitions, then filters active agents by MCP availability and permission rules before exposing them to the Agent tool prompt.
 - Treat built-in type names that exist for compatibility as routing identifiers. The product-facing documentation should describe the CCL role and behavior, not legacy branding.
+- The `/buddy` command is a convenience prompt around the Agent tool teammate path. It supplies a `team_name` and teammate `name` so a helper can coordinate with the lead session through the team channel.
 
 <!-- section: configuration -->
 ## Configuration and commands
@@ -35,6 +36,8 @@ Use the Agents page to understand the registry, built-in roles, discovery order,
 | Agent role | When to use | Notes |
 | --- | --- | --- |
 | General-purpose | Open-ended delegated research or implementation support | Uses the normal agent execution path. |
+| Code reviewer | Focused review of changes before commit, PR, or handoff | Use for bug-risk, regression, security, and missing-test review. |
+| Test runner | Focused execution and summarization of test commands or harness runs | Use when output may be long or when test evidence needs a concise pass/fail report. |
 | Explore | Read-only investigation before deciding what to change | Available at runtime; no longer hidden behind the removed Explore/Plan feature gate. |
 | Plan | Create a focused plan without immediately editing files | Available at runtime with Explore. |
 | CCL guide | Answer user questions about CCL behavior, commands, settings, agents, workflows, MCP, plugins, and compatibility | The canonical type name remains compatibility-oriented in source, but the user-facing role is CCL guidance. |
@@ -52,6 +55,7 @@ CCL starts with built-ins, then loads plugin and custom agent definitions. Activ
 - `tools/AgentTool/loadAgentsDir.ts`
 - `tools/AgentTool/AgentTool.tsx`
 - `tools/AgentTool/runAgent.ts`
+- `commands/buddy/index.ts`
 
 <!-- section: related -->
 ## Related pages

@@ -40,6 +40,8 @@ Use this path when you want to confirm that the binary, credentials, model route
 
 A healthy first run has three signals: the CLI starts without argument parsing errors, the model request reaches the configured provider or gateway, and the response arrives without asking for unexpected destructive permissions. If the response fails before model contact, check Installation and Environment Variables. If the response reaches a provider but fails authentication, check Authentication and Gateway and Model Routing. If a tool prompt appears unexpectedly, check Permissions and Security.
 
+For route verification, start with a debug file and inspect `[SmartRoute]` and `[Channel]` markers after the run. They show the classifier suggestion, final main-loop model, and whether the request used the gateway or local Claude auth channel.
+
 ## Common First-Run Problems
 
 | Symptom | Likely cause | Next step |
@@ -47,6 +49,9 @@ A healthy first run has three signals: the CLI starts without argument parsing e
 | `ccl` not found | Binary is not installed or shell path is stale | Run the install command for your package manager, then restart the shell or reload PATH. |
 | Gateway says not configured | No `CCL_GATEWAY_URL` / `CCL_GATEWAY_KEY` and no usable gateway file | Use `/gateway login URL API_KEY` or set both environment variables. |
 | Provider receives the wrong URL | Routing-critical variables were mixed up | Use `CCL_GATEWAY_*` for Margay gateway routing; do not use compatibility SDK variables for gateway credentials. |
+| Dual-channel note appears | OAuth and gateway are both configured intentionally | Set `CCL_QUIET_DUAL_CHANNEL=1` after confirming Claude should use OAuth and third-party models should use the gateway. |
+| Auth conflict appears | Provider SDK API-key or base-URL variables conflict with OAuth | Remove the conflicting provider SDK variables from the CCL settings or shell, then keep gateway credentials in `CCL_GATEWAY_*` or `~/.ccl/gateway.json`. |
+| Large memory-file warning appears | A root memory file such as `CCL.md` is above the startup threshold | Trim or move the file out of the project root, then keep only high-signal project instructions. |
 | Slash command unavailable in print mode | The command is interactive-only | Use the top-level CLI command or run an interactive session. |
 
 <!-- section: source-evidence -->
