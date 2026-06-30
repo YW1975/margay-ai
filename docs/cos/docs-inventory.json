@@ -12,10 +12,6 @@
       "nav_hidden": false
     },
     {
-      "slug": "overview",
-      "nav_hidden": true
-    },
-    {
       "slug": "quickstart"
     },
     {
