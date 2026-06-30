@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "generated_by": "manual (cos docs)",
+  "product": "诸葛喵 cos",
+  "publisher": "MargayAI",
+  "languages": [
+    "zh"
+  ],
+  "pages": [
+    {
+      "slug": "README",
+      "nav_hidden": false
+    },
+    {
+      "slug": "overview",
+      "nav_hidden": true
+    },
+    {
+      "slug": "quickstart"
+    },
+    {
+      "slug": "patrol"
+    },
+    {
+      "slug": "gate"
+    },
+    {
+      "slug": "setup"
+    },
+    {
+      "slug": "meeting-to-graph"
+    },
+    {
+      "slug": "architecture"
+    },
+    {
+      "slug": "governance"
+    },
+    {
+      "slug": "digital-employee"
+    },
+    {
+      "slug": "cli-reference"
+    },
+    {
+      "slug": "hosts"
+    },
+    {
+      "slug": "lark-boundary"
+    },
+    {
+      "slug": "why-cos"
+    }
+  ]
+}

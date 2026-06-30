@@ -1,0 +1,18 @@
+{
+  "productName": "cos",
+  "brandName": "MargayAI",
+  "docsBaseUrl": "/margay-ai/",
+  "publicUrl": "https://yw1975.github.io/margay-ai/",
+  "locales": ["zh"],
+  "sourceRoots": ["cos-docs"],
+  "forbiddenTerms": ["LegacyVendor"],
+  "publishRepo": "YW1975/margay-ai",
+  "privatePathPatterns": [
+    "/(?:home|Users)/[^/]+/(?:Myprojects|MyProjects)",
+    "sk-[A-Za-z0-9_-]{20,}",
+    "ghp_[A-Za-z0-9_]{20,}",
+    "QzLeb6[A-Za-z0-9]+",
+    "ou_[a-f0-9]{20,}",
+    "oc_[a-f0-9]{20,}"
+  ]
+}
