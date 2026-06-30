@@ -70,7 +70,7 @@ function checkText(text, file, lang) {
   if (/#\s*Claude Code/i.test(text) || /##\s*Claude Code/i.test(text) || /\bAnthropic\b/.test(text)) {
     fail(`${file}: forbidden public branding`)
   }
-  if (/\/Users\/[^/\s]+\/Myprojects\/(ccl|margay|margay-ai|margay-gateway|margay-studio)/.test(text)) {
+  if (/\/Users\/[^/\s]+\/Myprojects\/(ccl|margay|margay-ai|margay-studio|margay-gateway|cos|chief-of-staff|super-rll)/.test(text)) {
     fail(`${file}: private local path leaked`)
   }
   if (/\b(sk-[A-Za-z0-9_-]{12,}|gh[op]_[A-Za-z0-9_]{12,}|AKIA[0-9A-Z]{12,})\b/.test(text)) {

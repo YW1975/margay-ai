@@ -32,7 +32,7 @@ jobs:
         run: |
           test ! -e site/.DS_Store
           ! find site -name '*.map' -print -quit | grep .
-          ! rg -n '/Users/[^ ]+/Myprojects/(ccl|margay|margay-studio|margay-gateway)' site
+          ! rg -n '/Users/[^ ]+/Myprojects/(ccl|margay|margay-ai|margay-studio|margay-gateway|cos|chief-of-staff|super-rll)' site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
