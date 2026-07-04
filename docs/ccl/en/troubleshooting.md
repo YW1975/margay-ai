@@ -1,86 +1,91 @@
 # Troubleshooting
 
-> This page is generated from the CCL documentation inventory. Edit scripts/generate-ccl-docs.mjs, then regenerate.
+> This page is maintained as public documentation source. Troubleshooting records must be sanitized before they are shared.
 
 <!-- section: purpose -->
 ## Purpose
 
-Troubleshooting CCL starts by identifying the failing layer: installation, authentication, gateway routing, MCP, permissions, tools, agents, session state, remote control, or governance gates.
+Troubleshooting CCL starts by identifying the failing layer: installation, startup, settings, authentication, gateway routing, endpoint compatibility, context pressure, permissions, MCP, tools, agents, plugins, sessions, remote automation, GitHub integration, documentation publishing, or RLL governance. Changing several layers at once usually hides the cause.
 
 <!-- section: capabilities -->
 ## Capabilities
 
-- Use `ccl doctor` for environment health.
-- Use `/gateway status` and `/gateway doctor` for gateway credential, reachability, placeholder, and shell-env shadowing failures.
-- Use `/endpoint status` for endpoint pinning and context-fit diagnostics when endpoint registries are configured.
-- Use `/cost`, `/context`, and `/usage` to separate token/cost visibility from context-window pressure and plan-limit state where available.
-- Use MCP diagnostics, permission prompts, and remote eligibility errors to isolate external tool or remote-session failures.
+- Use `ccl doctor` for installation, updater, PATH, shell, package manager, sandbox, managed setting, alias, and ripgrep diagnostics.
+- Use `/gateway status` and `/gateway doctor` for gateway credential, placeholder, reachability, auth-conflict, and shell-env shadowing failures.
+- Use `/endpoint`, `/model`, `/priority`, `/effort`, `/cost`, `/usage`, and `/context` for model routing and context-window issues.
+- Use `/permissions`, `/allowed-tools`, and command-specific permission prompts for tool-denial issues.
+- Use `ccl mcp list`, `/mcp`, server config, auth status, and debug logs for MCP failures.
+- Use `ccl agents --setting-sources user,project,local`, `/agents`, `/skills`, `/plugins`, and `/hooks` for extension visibility issues.
+- Use remote precondition types for remote-session failures.
+- Use docs validation, public audit, site build, rendered HTML checks, and coverage matrix checks for official-documentation failures.
 
 <!-- section: operational-model -->
 ## Operational model
 
-- Prefer layer-specific evidence over broad retries. Capture exact commands, exit codes, logs, and build versions before changing configuration.
-- Gateway troubleshooting should distinguish CCL runtime issues from gateway service issues. Cache-hit accounting and provider usage fields belong to gateway evidence until CCL receives verified fields.
-- For public documentation failures, verify the generator source, generated Markdown, public repository sync, audit output, site build, and hosted destination separately.
+Collect evidence before changing configuration. A useful report contains the exact command, exit code, CCL version, install method, cwd trust state, relevant setting source, sanitized environment variable names, model/endpoint selection, and the last diagnostic output. Do not include tokens, private paths, full transcripts, or repository secrets.
+
+Layer routing is practical:
+
+- Startup failure: inspect install method, binary path, shell PATH, aliases, package manager, and updater state.
+- Auth failure: separate gateway config, direct API-key config, OAuth state, and MCP server auth.
+- Wrong model: inspect model selection precedence, endpoint pin, gateway config, classifier output, and debug route markers.
+- Tool denied: inspect permission mode, allow/deny/ask rules, managed policy, and tool-specific validation.
+- Extension missing: inspect setting sources, plugin-only policy, project trust, bare mode, and feature gates.
+- Remote failure: inspect typed preconditions rather than retrying the launch.
+- Docs failure: verify source Markdown, inventory, audits, build output, generated site, and hosted URL separately.
+
+Gateway troubleshooting should distinguish runtime bugs from gateway service behavior. Cache-hit accounting, provider-side pricing, and gateway usage fields are only authoritative when returned by the active transport or gateway.
 
 <!-- section: configuration -->
 ## Configuration and commands
 
-- Public issue records should separate CCL runtime issues from gateway or service issues, and should avoid private hostnames, paths, or secrets.
-- For stale gateway configuration, compare shell `CCL_GATEWAY_URL` / `CCL_GATEWAY_KEY` with `~/.ccl/gateway.json`; shell values intentionally win when present.
-- Remote-session failures should record the specific precondition type, such as policy blocked, not logged in, no remote environment, not in git repo, no git remote, or GitHub app missing.
+- Environment health: `ccl doctor`.
+- Gateway diagnosis: `/gateway doctor`.
+- Auth status: `ccl auth status`, `/status`, `/login`, `/logout`.
+- Model route: `/model`, `/endpoint`, `/priority`, `/effort`, `/gateway status`, debug file markers.
+- Context pressure: `/context`, `/compact`, `/memory`, `/usage`.
+- MCP: `ccl mcp list`, `/mcp`, `--mcp-config`, and MCP auth commands.
+- Agent visibility: `ccl agents --setting-sources user,project,local`.
+- Plugin/skill/hook visibility: `/plugins`, `/skills`, `/hooks`, `--plugin-dir`, `--bare`, and setting-source filters.
+- GitHub/CI: `gh auth status -a`, `/install-github-app`, `/review`, `/pr-comments`, `/security-review`, and CI logs.
+- Official docs: `node scripts/check-docs.mjs`, `bash scripts/audit-public-content.sh`, `node scripts/build-site.mjs`, and `node scripts/check-official-docs-coverage.mjs`.
 
 ## Symptom Routing
 
 | Symptom | Start here | Evidence to collect |
 | --- | --- | --- |
-| `ccl` does not start | [Installation](installation.md) | `ccl --version`, shell PATH, install method. |
-| Login or gateway fails | [Authentication](authentication.md) | `/gateway doctor`, redacted env names, gateway URL health. |
-| Wrong model or provider | [Gateway and Model Routing](model-routing.md) | requested model, endpoint, usage fields, route config. |
-| Startup warning appears | [Environment Variables](env-vars.md) | warning text, relevant env variable names, `~/.ccl/gateway.json` presence, memory file size. |
-| Command missing | [Commands](commands.md) | Interactive `/` list, build version, feature flags or plugin state. |
-| CLI flag rejected | [CLI Reference](cli-reference.md) | `ccl --help`, exact command and flags. |
-| MCP tool missing | [MCP Servers and Tools](mcp.md) | `ccl mcp list`, server config, auth status. |
-| Agent not visible | [Agents](agents.md) | `ccl agents --setting-sources user,project,local`, agent definition path. |
-| Docs page broken | [Public Documentation Publishing](public-docs.md) | local `node scripts/check-ccl-docs.mjs`, public URL, build log. |
+| CCL does not start | [Installation](installation.md) | `ccl --version`, invoked binary, shell PATH, install method, `ccl doctor`. |
+| Login or gateway fails | [Authentication](authentication.md) | `/gateway doctor`, redacted env names, `gateway.json` presence, `GET /auth/me` result if available. |
+| Wrong model or endpoint | [Gateway and Model Routing](model-routing.md) | requested model, endpoint pin, gateway config source, debug route markers, usage fields. |
+| Tool is denied | [Permissions and Security](permissions-security.md) | permission mode, allow/deny/ask rules, managed policy, exact tool input. |
+| MCP tool missing | [MCP Servers and Tools](mcp.md) | `ccl mcp list`, server scope, auth status, policy allow/deny result. |
+| Agent or skill not visible | [Agents](agents.md), [Skills](skills.md) | setting sources, project trust, plugin-only policy, bare mode, definition path. |
+| Remote session blocked | [Remote Sessions and Automation](remote-automation.md) | typed precondition, login state, remote env state, git remote, repository access. |
+| GitHub setup fails | [GitHub and CI Workflows](github-ci.md) | `gh --version`, `gh auth status -a`, repo permissions, workflow/secret existence. |
+| Docs page broken | [Public Documentation Publishing](public-docs.md) | local docs check, audit output, build log, rendered HTML path, hosted URL. |
 
-## Gateway Diagnosis
+## Escalation Checklist
 
-Run `/gateway doctor` before changing multiple credentials. It checks the effective gateway, file configuration, shell variables, OAuth/API-key state, and reachability through `GET /auth/me` when possible. If only one of `CCL_GATEWAY_URL` or `CCL_GATEWAY_KEY` is set, treat it as a broken atomic pair and set both or clear both.
-
-## Startup Warning Diagnosis
-
-Dual-channel notes are expected when OAuth and gateway credentials are both configured for a split deployment; set `CCL_QUIET_DUAL_CHANNEL=1` only after verifying that this is intended. Auth-conflict warnings mean provider SDK API-key or base-URL variables are competing with OAuth; remove the conflicting variables from CCL settings or the shell. Large memory-file warnings come from oversized root instruction files such as `CCL.md`; trim or move those files before assuming the binary package is at fault.
-
-## Agent Diagnosis
-
-Run `ccl agents --setting-sources user,project,local` to check visibility. If an agent requires MCP servers, confirm that the matching servers are configured and authenticated. For built-ins, remember that Explore and Plan are available at runtime, while some other agents may still depend on feature flags or entrypoint rules.
-
-## When To Escalate
-
-Escalate with a small reproduction: exact command, sanitized environment variable names, build version, expected behavior, actual behavior, and the last relevant diagnostic output. Do not include API keys, raw private paths, or full transcripts containing sensitive project content.
+Escalate only after collecting a small reproduction: exact command, CCL version, sanitized environment variable names, relevant settings source, expected behavior, actual behavior, exit code, and last diagnostic output. Include file paths only when they are repository-relative and safe to share.
 
 <!-- section: source-evidence -->
 ## Source evidence
 
-- `commands/doctor`
-- `commands/gateway/gateway.tsx`
-- `commands/endpoint/endpoint.tsx`
-- `commands/cost/index.ts`
-- `commands/context/index.ts`
-- `commands/usage/index.ts`
-- `services/gateway/gatewayDoctor.ts`
-- `services/api/errors.ts`
-- `utils/background/remote/remoteSession.ts`
-- `docs/ccl0622-runtime-issue-record.md`
+- `commands/doctor/doctor.tsx` and `utils/doctorDiagnostic.ts` implement doctor diagnostics and installation health checks.
+- `commands/gateway/gateway.tsx`, `commands/gateway/gateway-helpers.ts`, and `services/gateway/gatewayDoctor.ts` implement gateway status, doctor findings, placeholder detection, env shadowing, and reachability probing.
+- `utils/model/endpointCompat.ts`, `utils/model/model.ts`, `commands/model/model.tsx`, and `commands/endpoint/endpoint.tsx` implement route and endpoint diagnosis surfaces.
+- `services/mcp/config.ts`, `commands/mcp/mcp.tsx`, and `services/mcp/auth.ts` provide MCP diagnosis surfaces.
+- `utils/background/remote/remoteSession.ts` and `utils/background/remote/preconditions.ts` define remote-session failure categories.
+- `commands/install-github-app/install-github-app.tsx`, `commands/review.ts`, and `commands/pr_comments/index.ts` provide GitHub diagnosis and review surfaces.
+- `scripts/check-official-docs-coverage.mjs` and the public docs scripts in `margay-ai/scripts` provide official-documentation validation.
 
 <!-- section: related -->
 ## Related pages
 
+- [How CCL Works](how-ccl-works.md)
 - [Installation and Updates](installation.md)
 - [Authentication](authentication.md)
-- [Environment Variables](env-vars.md)
 - [Gateway and Model Routing](model-routing.md)
 - [MCP Servers and Tools](mcp.md)
 - [Remote Sessions and Automation](remote-automation.md)
-- [Public Documentation Publishing](public-docs.md)
+- [GitHub and CI Workflows](github-ci.md)

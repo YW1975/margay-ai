@@ -1,53 +1,59 @@
-# 確認と計画
+# Clarify と Planning
 
-> このページは CCL ドキュメント一覧から生成されています。scripts/generate-ccl-docs.mjs を編集してから再生成してください。
+> このページは公開ドキュメントのソースとして保守されています。Clarification と planning は risk を下げるためのもので、ceremony を増やすためではありません。
 
 <!-- section: purpose -->
-## 目的
+## Purpose
 
-CCL の統制は、明示的な確認、スコープ固定、計画、計画モードの開始と終了、計画された作業が実行されたことの検証を支えます。
+Clarification と planning は、作業が高コストまたは危険になる前に hidden assumptions を減らします。Scope が不明、user-only decisions が必要、destructive potential がある、publication risk がある、または moving parts が多く誤った仮定で rework が生じる場合に使います。
 
 <!-- section: capabilities -->
-## 機能範囲
+## Capabilities
 
-- 要件が曖昧または高リスクの場合は確認フローを使います。
-- 書き込み前の調査と提案には計画モードを使います。
-- 実装が受け入れ済み計画に合うか検証ツールで確認します。
+- `AskUserQuestion` tool で requirements、preferences、implementation choices を確認します。
+- `/plan` で plan mode に入り、current plan を確認し、または editor で plan file を開きます。
+- Written plan が approval ready になったら exit-plan-mode tool を使います。
+- Implementation 前に covered scope、negative scope、decisions、risks、verification expectations を記録します。
+- Runtime plan mode と RLL `[PLAN]` submissions を分けます。前者は permission mode、後者は Ralph-Lisa review artifact です。
 
 <!-- section: operational-model -->
-## 運用モデル
+## Operational model
 
-- 計画は不確実性を減らすためのものです。ユーザーが軽量な受入経路を明示した場合、儀式化させてはいけません。
+User input が本当に必要な場合に clarify します。Question は狭くし、answer が implementation または verification path を変える必要があります。`AskUserQuestion` で plan approval を求めてはいけません。その UI では user が plan を見られません。Plan approval には exit-plan-mode tool を使います。
+
+`/plan` は session permission mode を plan mode に変更します。Plan mode では CCL が editing ではなく planning のために permission context を準備します。Plan が既にある場合、`/plan` はそれを表示します。`/plan open` は configured editor で plan file を開きます。
+
+RLL planning は別の層です。Ralph `[PLAN]` は alignment のための review submission です。`[TDD-PLAN]` は test cases と quality gates を lock する gated development-start round です。Documentation-only work も evidence が必要ですが、docs-specific checks を使うべきであり、すべての page update を unit-test-driven code development と扱うべきではありません。
 
 <!-- section: configuration -->
-## 設定とコマンド
+## Configuration and commands
 
-- 関連ツールは `EnterPlanModeTool`、`ExitPlanModeTool`、`VerifyPlanExecutionTool`、planning コマンド、RLL clarify 成果物です。
+Useful planning surfaces:
 
-## 確認フェーズ
+| Surface | Use when | Boundary |
+| --- | --- | --- |
+| `AskUserQuestion` | User decision が scope、preference、trade-off を変える場合。 | Final plan approval には使いません。 |
+| `/plan` | Planning mode に入る、または current plan を表示する場合。 | Session permission mode を変更します。 |
+| `/plan open` | External editor で plan を編集する場合。 | Available editor path が必要です。 |
+| Exit plan mode tool | Written plan が approval ready の場合。 | Teammate policy が別処理しない限り plan mode が必要です。 |
+| RLL `[PLAN]` | Ralph と Lisa が architecture または scope alignment を行う場合。 | Review artifact であり runtime plan mode ではありません。 |
 
-<a id="clarify-phase"></a>
-
-対象リポジトリ、公開/非公開境界、受入条件、除外スコープ、破壊的操作、公開権限などに実際の曖昧さがある場合に確認を使います。良い確認成果物は、ユーザーが受け入れた理解、対象スコープ、除外スコープ、判断、リスクを記録します。コードベースとユーザー指示で次の動きが十分に決まっている場合、儀式的な質問は不要です。
-
-## 複雑度
-
-<a id="complexity"></a>
-
-複雑度分類は検証方法を変える場合にだけ価値があります。文書作業では、ソース正確性、範囲網羅、ユーザー仕様適合、スタイル、論理一貫性、公開安全監査が最も重要です。コードを含む作業では、プロジェクトの gate manifest と合意済み RLL policy を使います。
+Documentation work の強い plan は source pages、feature coverage、translation expectations、public-safety checks、rendered-site checks、reviewer evidence を挙げます。Code work の強い plan は behavior change、tests、rollback risk、success を証明する command を挙げます。
 
 <!-- section: source-evidence -->
-## ソース上の根拠
+## Source evidence
 
-- `tools/EnterPlanModeTool`
-- `tools/ExitPlanModeTool`
-- `tools/VerifyPlanExecutionTool`
-- `commands/plan`
-- `AGENTS.md`
+- `commands/plan/plan.tsx` は plan mode に入り、plan mode 用 permission context を準備し、current plan を表示し、`/plan open` を support します。
+- `tools/AskUserQuestionTool/prompt.ts` は clarification tool を定義し、plan approval には exit-plan-mode tool を使うべきだと明記します。
+- `tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts` は plan-approval tool を定義し、non-teammate sessions が plan mode か検証し、必要な場合 user confirmation を求めます。
+- `utils/plans.ts` は plan content と plan file paths を保存および取得します。
+- `AGENTS.md` は RLL の `[PLAN]` と `[TDD-PLAN]` の分離を定義します。
 
 <!-- section: related -->
-## 関連ページ
+## Related pages
 
-- [Ralph-Lisa ループ](ralph-lisa-loop.md)
-- [ゲートとアテステーション](gates-attestation.md)
-- [ワークフロー](workflows.md)
+- [Clarify Phase](clarify-phase.md)
+- [ゲートシステム](gate-system.md)
+- [ゲートと Attestation](gates-attestation.md)
+- [Ralph-Lisa Loop](ralph-lisa-loop.md)
+- [一般的なワークフロー](common-workflows.md)

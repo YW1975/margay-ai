@@ -1,61 +1,63 @@
 # Agents
 
-> This page is generated from the CCL documentation inventory. Edit scripts/generate-ccl-docs.mjs, then regenerate.
+> This page is maintained as public documentation source. Agent descriptions are routing contracts; keep them precise.
 
 <!-- section: purpose -->
 ## Purpose
 
-CCL agents are specialized execution contexts used for exploration, planning, verification, guidance, background work, and custom delegated tasks.
+CCL agents are specialized execution contexts used for exploration, planning, review, testing, verification, guidance, background research, and custom delegated tasks. They let a main session ask a focused worker to operate with its own instructions, model preference, tool rules, MCP requirements, hooks, memory scope, and optional background behavior.
 
 <!-- section: capabilities -->
 ## Capabilities
 
-- Built-in agents include general-purpose, code-reviewer, test-runner, Explore, Plan, verification, statusline setup, and the CCL guide role where enabled.
-- Custom and plugin agents are loaded from definition directories and can restrict tools, models, MCP requirements, hooks, permissions, memory, and background behavior.
-- Agents can run in the foreground, background, or teammate-style pair-agent paths and can be continued through messaging when supported.
+- Built-in agents include general-purpose, code-reviewer, test-runner, statusline setup, and feature-gated Explore, Plan, guide, and verification agents.
+- Custom agents are Markdown definitions loaded from user, project, local, managed, or CLI argument sources.
+- Plugin agents are loaded from installed plugin bundles and displayed as a distinct source.
+- Agents can declare `tools`, `disallowedTools`, `skills`, `mcpServers`, `hooks`, `model`, `effort`, `permissionMode`, `maxTurns`, `background`, `memory`, and isolation settings.
+- Agent availability can depend on configured MCP servers; missing required MCP servers hide the agent.
+- `/agents` and `ccl agents --setting-sources user,project,local` help inspect which agents are active and which source won.
 
 <!-- section: operational-model -->
 ## Operational model
 
-- Agent discovery starts from built-ins, plugin agents, and custom Markdown definitions, then filters active agents by MCP availability and permission rules before exposing them to the Agent tool prompt.
-- Treat built-in type names that exist for compatibility as routing identifiers. The product-facing documentation should describe the CCL role and behavior, not legacy branding.
-- The `/buddy` command is a convenience prompt around the Agent tool teammate path. It supplies a `team_name` and teammate `name` so a helper can coordinate with the lead session through the team channel.
+Agent discovery starts with built-ins, then adds plugin and custom definitions. Custom Markdown files require `name` and `description` frontmatter. Invalid agent attempts are skipped and recorded; JSON agents passed through `--agents` fail per-agent rather than discarding the whole batch.
+
+Active agents are deduplicated by `agentType` and source priority. Display code groups them as user, project, local, managed, plugin, CLI arg, and built-in agents, and annotates when one source overrides another. Simple mode keeps only built-ins.
+
+When an agent runs, CCL resolves its tool set, model, MCP tools, and lifecycle context. `SubagentStart` hooks can add context; agent frontmatter hooks are registered only when the source is trusted under plugin-only policy. Skills listed in agent frontmatter are preloaded if available. Background agents use an unlinked abort controller and non-interactive execution; synchronous agents share more parent session state.
 
 <!-- section: configuration -->
 ## Configuration and commands
 
-- Run `ccl agents` to list configured agents. Use [Subagents](sub-agents.md) for definition format, scopes, MCP requirements, model selection, hooks, memory, and tool restrictions.
-- If an agent requires MCP servers, CCL waits briefly for pending matching servers and then reports missing authenticated tool surfaces instead of silently spawning the agent.
+Minimal custom agent shape:
 
-## Choosing Between Agents And Subagents
+```markdown
+---
+name: repo-reviewer
+description: Use when a repository change needs an independent correctness review.
+tools: Read,Grep
+model: inherit
+maxTurns: 8
+---
+Review the changed files for correctness risks, missing tests, and unsafe assumptions.
+```
 
-Use the Agents page to understand the registry, built-in roles, discovery order, and runtime behavior. Use [Delegated Task Agents](sub-agents.md) when you are writing or debugging an agent definition. This distinction is deliberate: `agents.md` is the product and runtime guide; `sub-agents.md` is the definition and delegation guide.
+Operational guidance:
 
-## Built-In Agents
-
-| Agent role | When to use | Notes |
-| --- | --- | --- |
-| General-purpose | Open-ended delegated research or implementation support | Uses the normal agent execution path. |
-| Code reviewer | Focused review of changes before commit, PR, or handoff | Use for bug-risk, regression, security, and missing-test review. |
-| Test runner | Focused execution and summarization of test commands or harness runs | Use when output may be long or when test evidence needs a concise pass/fail report. |
-| Explore | Read-only investigation before deciding what to change | Available at runtime; no longer hidden behind the removed Explore/Plan feature gate. |
-| Plan | Create a focused plan without immediately editing files | Available at runtime with Explore. |
-| CCL guide | Answer user questions about CCL behavior, commands, settings, agents, workflows, MCP, plugins, and compatibility | The canonical type name remains compatibility-oriented in source, but the user-facing role is CCL guidance. |
-| Statusline setup / verification | Specialized setup or evidence-checking tasks | May depend on build flags or runtime conditions. |
-
-## Discovery And Filtering
-
-CCL starts with built-ins, then loads plugin and custom agent definitions. Active agents are deduplicated by `agentType`, with later source groups able to override earlier definitions according to the loader order. Required MCP servers are checked against available server names before an agent is exposed. If a required server is unavailable, the agent should be diagnosed as unavailable rather than silently assumed broken.
+- Keep `description` short and specific; it is the main routing signal.
+- Restrict `tools` to what the agent needs and use `disallowedTools` for explicit denials.
+- Declare required MCP servers when the agent depends on external tools.
+- Use `background: true` only for work that can safely continue while the main session moves on.
+- Use agent memory only for durable, non-secret knowledge that should survive across runs.
 
 <!-- section: source-evidence -->
 ## Source evidence
 
-- `tools/AgentTool/builtInAgents.ts`
-- `tools/AgentTool/built-in`
-- `tools/AgentTool/loadAgentsDir.ts`
-- `tools/AgentTool/AgentTool.tsx`
-- `tools/AgentTool/runAgent.ts`
-- `commands/buddy/index.ts`
+- `tools/AgentTool/builtInAgents.ts` defines built-in agent registration, feature gates, SDK disable behavior, and non-SDK guide-agent inclusion.
+- `tools/AgentTool/loadAgentsDir.ts` defines `AgentDefinition`, source types, frontmatter fields, MCP filtering, memory snapshot initialization, Markdown parsing, JSON parsing, and built-in fallback behavior.
+- `tools/AgentTool/runAgent.ts` resolves tools, model, MCP tools, hooks, skills, background behavior, abort controllers, and subagent context.
+- `commands/agents/agents.tsx` renders the agents menu using the current permission context and available tool set.
+- `tools/AgentTool/agentDisplay.ts` defines source group ordering, override annotation, and display model resolution.
 
 <!-- section: related -->
 ## Related pages
@@ -63,4 +65,5 @@ CCL starts with built-ins, then loads plugin and custom agent definitions. Activ
 - [Subagents](sub-agents.md)
 - [Built-in Tools](tools.md)
 - [Skills](skills.md)
+- [MCP Servers and Tools](mcp.md)
 - [Permissions and Security](permissions-security.md)

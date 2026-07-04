@@ -59,6 +59,31 @@ CCL は CCL 接頭辞の環境変数を読み取り、モデル選択、ログ�
 | `CCL_CUSTOM_HEADERS` | 追加 request header | 認証や routing metadata を含む場合は sensitive として扱います。 |
 | `CCL_PERMISSIONS_TEMPLATE` | 権限既定値 | tool prompting に影響するため慎重に使います。 |
 
+## 同期されるものとされないもの
+
+| CCL 変数ファミリー | 互換 target | ルーティングリスク |
+| --- | --- | --- |
+| `CCL_MODEL`, `CCL_SMALL_FAST_MODEL` | モデル選択互換変数 | target 変数が未設定なら安全に同期できます。 |
+| `CCL_LOG`, `CCL_BETAS`, `CCL_CUSTOM_HEADERS` | 診断/header 互換変数 | 同期できますが、header は sensitive metadata を含む場合があります。 |
+| `CCL_PERMISSIONS_TEMPLATE` | 権限テンプレート互換変数 | 同期できますが、tool prompting の既定値を変えます。 |
+| `CCL_DEFAULT_*_MODEL*`, `CCL_CUSTOM_MODEL_OPTION*` | モデルメニュー custom 変数 | モデル表示と選択のため安全に同期できます。 |
+| `CCL_BASE_URL`, `CCL_API_KEY` | 自動同期なし | provider routing 変数へコピーしてはいけません。Claude-channel call の乗っ取りや account auth conflict の原因になります。 |
+| `CCL_GATEWAY_URL`, `CCL_GATEWAY_KEY` | provider SDK へ同期しない | gateway routing は CCL namespace または gateway file に残します。 |
+
+## 運用変数
+
+| 変数 | 用途 |
+| --- | --- |
+| `CCL_PRINT_MAX_TURNS` | `--max-turns` がない print mode の既定最大 turn 数。 |
+| `CCL_ROUTING_PRIORITY` | gateway smart-routing preference。通常は `cost` または `quality`。 |
+| `CCL_GATEWAY_MAIN_MODEL` | gateway mode で明示 model がない場合の既定 main model。 |
+| `CCL_GATEWAY_SMALL_FAST_MODEL` | gateway mode の既定 small/fast model。 |
+| `CCL_HOOK_MAX_OUTPUT_BYTES` | hook output の retained buffer を切り詰める前の byte 数を調整します。 |
+| `CCL_JSONL_HEAP_HEADROOM_MB` | 大きな structured stream 用に JSONL heap headroom を上書きします。 |
+| `CCL_AUTO_HEAPDUMP_OFF` | automatic heap dump monitoring を無効化します。 |
+| `CCL_AUTO_HEAPDUMP_HIGH_MB`, `CCL_AUTO_HEAPDUMP_CRITICAL_MB` | high と critical の heap dump threshold を調整します。 |
+| `CCL_CONFIG_DIR` | CCL 設定を default config home から分離します。 |
+
 ## 環境変数のトラブルシューティング
 
 `/gateway doctor` がファイルと shell の不一致を示す場合、どちらを有効にするか決めてからもう一方を消します。provider SDK が予期しない base URL を使う場合、CCL 外部で互換変数が設定されていないか確認します。変数が無視されるように見える場合、その値がプロセス起動時だけ読まれるものか確認し、shell またはセッションを再起動します。

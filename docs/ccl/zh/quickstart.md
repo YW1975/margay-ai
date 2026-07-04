@@ -1,72 +1,70 @@
 # 快速开始
 
-> 本页由 CCL 文档清单生成。请修改 scripts/generate-ccl-docs.mjs 后重新生成。
+> 本页作为公开文档源维护。它描述从 shell 到可工作的 CCL session 的最短安全路径。
 
 <!-- section: purpose -->
-## 用途
+## Purpose
 
-安装 CCL，配置网关或兼容模型提供方，进入项目目录，然后使用交互式会话或 print 模式开始。
+使用快速开始时，按顺序验证五件事：`ccl` 二进制能解析，安装健康到足以运行，凭据或网关路由已经配置，print mode 能完成非变更请求，交互式 session 能在目标项目目录启动。
 
 <!-- section: capabilities -->
-## 能力范围
+## Capabilities
 
-- 运行 `ccl` 进入交互式会话。
-- 运行 `ccl -p "summarize this repo"` 获取非交互输出。
-- 认证、更新器或环境健康状态不明确时运行 `ccl doctor`。
+- 用 `ccl --version` 确认安装构建，用 `ccl --help` 查看可用命令面。
+- 当 `PATH`、更新器健康、workspace trust 或 shell 集成不清楚时，先运行 `ccl doctor`，再改设置。
+- 通过部署批准的路径配置凭据：账号登录、网关环境变量，或交互式 `/gateway login URL TOKEN`。
+- 在开放更多工具访问前，用 `ccl -p "..." --allowedTools ""` 做非变更 smoke test。
+- 在确认路由和响应行为后，再从 print mode 进入 `ccl` 交互模式。
+- 首跑行为需要精确证据时，用 `--debug-file <path>` 记录 authentication、model route 或 tool prompts。
 
 <!-- section: operational-model -->
-## 运行模型
+## Operational model
 
-- CCL 会加载设置、发现项目上下文、准备工具，然后通过配置好的 provider 路径路由模型请求。权限提示会保护文件编辑、shell 命令、MCP 工具和远程动作。
+快速开始不应从宽权限开始。首次运行只需要二进制、可信工作目录、凭据、通往已配置模型路径的路由，以及一个不需要文件编辑或 shell 命令的 prompt。只有在用户拿到 startup、auth 和 routing 正确的证据后，才应扩大工具访问。
+
+Print mode 和 interactive mode 共享大量运行时，但暴露面并不完全相同。Print mode 面向确定性的单次自动化，支持 `text`、`json` 和 `stream-json` 输出。Interactive mode 是普通 human-in-the-loop 表面，用于 slash commands、工具审批、session 导航和 context 检查。
+
+如果第一次模型请求失败，先按层分类，再改配置：binary resolution、doctor health、authentication、gateway configuration、endpoint/model compatibility、permission policy 或 project context。故障排查页面提供按层路由的检查表。
 
 <!-- section: configuration -->
-## 配置与命令
+## Configuration and commands
 
-- 根据部署方式使用 `ccl login` 或 provider 环境变量。
-- 基础会话可用后，使用 `ccl mcp` 添加外部工具 server。
-- 使用 `ccl agents` 确认内置和自定义 agent 可见。
+最小首次运行：
 
-## 最小首次运行
+1. 打开你希望 CCL 检查的项目目录。
+2. 运行 `ccl --version`，确认输出预期的 CCL 版本。
+3. 运行 `ccl --help`，确认当前构建包含 `-p, --print`、`--output-format`、`--model`、`--settings`、`--mcp-config` 和权限 flags。
+4. 如果安装、更新器、`PATH`、包管理器、shell、sandbox 或 workspace trust 不清楚，运行 `ccl doctor`。
+5. 通过批准的路径配置凭据。网关用户应优先使用 `CCL_GATEWAY_URL` 加 `CCL_GATEWAY_KEY`，或通过 `/gateway login URL TOKEN` 保存本地网关文件。
+6. 运行 `ccl -p "Summarize this repository in five bullets." --allowedTools ""` 作为非变更 smoke test。
+7. 如果需要路由证据，带 `--debug-file <path>` 重跑，并检查 route markers、model selection 和 gateway status。
+8. 非交互 smoke test 成功后，再运行 `ccl` 进入交互式 session。
 
-当你想确认二进制、凭据、模型路由和基础工具策略是否可用时，使用这条路径。
-1. 打开一个项目目录。
-2. 运行 `ccl --help`，确认二进制能被 shell 找到。
-3. 如果安装、更新器健康或 workspace trust 不明确，运行 `ccl doctor`。
-4. 按部署批准的方式配置凭据：`ccl login`、环境变量，或在交互会话中运行 `/gateway login URL API_KEY`。
-5. 需要非写入 smoke test 时，运行 `ccl -p "Summarize this repository in five bullets." --allowedTools ""`。
-6. 非交互路径可用后，再运行 `ccl` 进入交互式会话。
+常见首跑症状：
 
-## 如何确认成功
-
-健康的首次运行有三个信号：CLI 启动时没有参数解析错误；模型请求到达配置的 provider 或网关；响应返回时没有要求意外的破坏性权限。如果响应在接触模型前失败，先看安装和环境变量。如果请求到达 provider 但认证失败，先看认证、网关与模型路由。如果出现意外工具提示，检查权限与安全。
-
-验证路由时，可先开启 debug file，运行后检查 `[SmartRoute]` 和 `[Channel]` 标记。它们会显示 classifier 建议、最终 main-loop 模型，以及请求是走网关还是本地 Claude 认证通道。
-
-## 首次运行常见问题
-
-| 症状 | 可能原因 | 下一步 |
+| 症状 | 可能层 | 下一步 |
 | --- | --- | --- |
-| 找不到 `ccl` | 二进制未安装，或 shell PATH 仍是旧状态 | 按包管理器方式安装，然后重启 shell 或刷新 PATH。 |
-| Gateway 提示未配置 | 没有 `CCL_GATEWAY_URL` / `CCL_GATEWAY_KEY`，也没有可用 gateway 文件 | 使用 `/gateway login URL API_KEY`，或同时设置两个环境变量。 |
-| Provider 收到错误 URL | 路由关键变量混用了 | Margay 网关路由使用 `CCL_GATEWAY_*`；不要用兼容 SDK 变量保存网关凭据。 |
-| 出现双通道说明 | OAuth 与网关是有意同时配置的 | 确认 Claude 应走 OAuth、第三方模型应走网关后，设置 `CCL_QUIET_DUAL_CHANNEL=1`。 |
-| 出现 auth conflict | provider SDK 的 API-key 或 base-URL 变量与 OAuth 冲突 | 从 CCL settings 或 shell 中移除冲突的 provider SDK 变量，并把网关凭据保留在 `CCL_GATEWAY_*` 或 `~/.ccl/gateway.json`。 |
-| 出现大 memory 文件告警 | 项目根目录中的 `CCL.md` 等 memory 文件超过启动阈值 | 精简或移出该文件，只保留高信号项目指令。 |
-| Print 模式下 slash command 不可用 | 该命令仅支持交互模式 | 使用顶层 CLI 命令，或进入交互式会话。 |
+| `ccl` not found | 二进制或 shell `PATH` | 阅读[安装与更新](installation.md)，重装或重载 shell，再运行 `ccl --version`。 |
+| `ccl --help` 可用但模型调用失败 | 认证或网关路由 | 阅读[认证](authentication.md)和[网关与模型路由](model-routing.md)。 |
+| Gateway says not configured | 缺少网关 env/file | 同时设置 `CCL_GATEWAY_URL` 和 `CCL_GATEWAY_KEY`，或使用 `/gateway login URL TOKEN`。 |
+| 模型或 endpoint 不对 | 路由优先级 | 检查 `/model`、`/endpoint`、`/gateway status`、debug route markers 和 settings sources。 |
+| Smoke test 出现工具提示 | Prompt 或工具策略 | 非变更 smoke test 保持 `--allowedTools ""`，之后再有意扩大权限。 |
+| Print mode 下 slash command 不可用 | 表面不匹配 | 使用交互式 `ccl`，或使用存在的顶层 CLI 命令。 |
 
 <!-- section: source-evidence -->
-## 源码依据
+## Source evidence
 
-- `main.tsx`
-- `commands/login/login.tsx`
-- `commands/mcp/mcp.tsx`
-- `tools/AgentTool/builtInAgents.ts`
+- `main.tsx` 定义 `ccl [prompt]`、`-p/--print`、`--output-format`、debug flags、`--allowedTools`、`--tools`、`--disallowedTools`、`--permission-mode`、`--model`、`--settings`、`--mcp-config` 和 `--plugin-dir`。
+- `main.tsx` 在普通 print mode 中跳过子命令注册，因此 slash command 和 subcommand 行为必须与一次性 prompt execution 分开说明。
+- `commands/doctor/doctor.tsx` 将 `ccl doctor` 路由到 Doctor screen，用于安装和运行时诊断。
+- `bootstrap/gatewayConfig.ts` 与 `services/gateway/gatewayDoctor.ts` 提供快速开始故障排查引用的网关配置和诊断行为。
+- `commands/model/model.tsx`、`commands/endpoint/endpoint.tsx` 与 `utils/model/model.ts` 提供模型和 endpoint 检查或选择行为。
 
 <!-- section: related -->
-## 相关页面
+## Related pages
 
 - [安装与更新](installation.md)
 - [认证](authentication.md)
 - [网关与模型路由](model-routing.md)
-- [MCP Server 与工具](mcp.md)
-- [Agent](agents.md)
+- [交互式会话与 Print Mode](interactive-sessions.md)
+- [故障排查](troubleshooting.md)

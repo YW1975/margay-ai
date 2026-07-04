@@ -59,6 +59,31 @@ CCL 会读取 CCL 前缀环境变量，用于模型选择、日志、权限、�
 | `CCL_CUSTOM_HEADERS` | 额外请求 header | 如果包含认证或路由元数据，应视为敏感。 |
 | `CCL_PERMISSIONS_TEMPLATE` | 权限默认值 | 会影响工具提示行为，需谨慎使用。 |
 
+## 同步与不同步规则
+
+| CCL 变量族 | 兼容目标 | 路由风险 |
+| --- | --- | --- |
+| `CCL_MODEL`, `CCL_SMALL_FAST_MODEL` | 模型选择兼容变量 | 目标变量未设置时可安全同步。 |
+| `CCL_LOG`, `CCL_BETAS`, `CCL_CUSTOM_HEADERS` | 诊断/header 兼容变量 | 可同步，但 header 可能包含敏感元数据。 |
+| `CCL_PERMISSIONS_TEMPLATE` | 权限模板兼容变量 | 可同步，但会改变工具提示默认值。 |
+| `CCL_DEFAULT_*_MODEL*`, `CCL_CUSTOM_MODEL_OPTION*` | 模型菜单自定义变量 | 用于模型展示和选择时可安全同步。 |
+| `CCL_BASE_URL`, `CCL_API_KEY` | 不自动同步 | 不得复制到 provider routing 变量，否则可能劫持 Claude 通道调用或与账号认证冲突。 |
+| `CCL_GATEWAY_URL`, `CCL_GATEWAY_KEY` | 不同步到 provider SDK | 网关路由保留在 CCL 命名空间或 gateway file 中。 |
+
+## 运维变量
+
+| 变量 | 用途 |
+| --- | --- |
+| `CCL_PRINT_MAX_TURNS` | 未提供 `--max-turns` 时的 print mode 默认最大轮数。 |
+| `CCL_ROUTING_PRIORITY` | 网关 smart-routing 偏好，通常是 `cost` 或 `quality`。 |
+| `CCL_GATEWAY_MAIN_MODEL` | 网关模式且未显式指定模型时的默认主模型。 |
+| `CCL_GATEWAY_SMALL_FAST_MODEL` | 网关模式下的默认 small/fast 模型。 |
+| `CCL_HOOK_MAX_OUTPUT_BYTES` | 调高或调低 hook 输出截断前保留的字节数。 |
+| `CCL_JSONL_HEAP_HEADROOM_MB` | 为大型结构化流覆盖 JSONL heap headroom。 |
+| `CCL_AUTO_HEAPDUMP_OFF` | 关闭自动 heap dump 监控。 |
+| `CCL_AUTO_HEAPDUMP_HIGH_MB`, `CCL_AUTO_HEAPDUMP_CRITICAL_MB` | 调整 high 和 critical heap dump 阈值。 |
+| `CCL_CONFIG_DIR` | 将 CCL 配置与默认 config home 隔离。 |
+
 ## 环境变量故障排查
 
 如果 `/gateway doctor` 显示文件和 shell 不一致，先决定哪个来源应该生效，再清理另一个来源。如果 provider SDK 似乎使用了意外 base URL，检查 CCL 外部是否设置了兼容变量。如果变量看似被忽略，确认它是否只在进程启动时读取，并重启 shell 或会话。

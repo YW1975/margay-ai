@@ -454,6 +454,29 @@
       ]
     },
     {
+      "slug": "sdk",
+      "group": "Extend",
+      "page_type": "standard",
+      "nav_hidden": false,
+      "title": "SDK",
+      "source_evidence": [
+        "sdk/index.ts",
+        "sdk/README.md",
+        "sdk/API.md",
+        "sdk/query.ts",
+        "sdk/store.ts",
+        "sdk/transport.ts",
+        "sdk/types.ts"
+      ],
+      "related": [
+        "cli-reference",
+        "interactive-sessions",
+        "permissions-security",
+        "model-routing",
+        "configuration"
+      ]
+    },
+    {
       "slug": "memory-sessions",
       "group": "Use",
       "page_type": "standard",
@@ -872,6 +895,15 @@
       "source": [
         "commands/workflows",
         "tools/WorkflowTool"
+      ]
+    },
+    {
+      "id": "sdk",
+      "page": "sdk",
+      "source": [
+        "sdk/index.ts",
+        "sdk/query.ts",
+        "sdk/types.ts"
       ]
     },
     {

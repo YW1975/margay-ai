@@ -1,48 +1,68 @@
 # Ralph-Lisa Loop
 
-> This page is generated from the CCL documentation inventory. Edit scripts/generate-ccl-docs.mjs, then regenerate.
+> This page is maintained as public documentation source. RLL is a collaboration protocol, not a substitute for verification.
 
 <!-- section: purpose -->
 ## Purpose
 
-The Ralph-Lisa Loop is CCL project governance for turn-based developer and reviewer collaboration, explicit submissions, feedback rounds, and evidence-backed delivery.
+The Ralph-Lisa Loop is CCL project governance for turn-based developer and reviewer collaboration. Ralph leads planning and implementation; Lisa reviews direction, evidence, changed files, and test results. The loop creates an auditable trail of submissions, feedback, fixes, challenges, and consensus.
 
 <!-- section: capabilities -->
 ## Capabilities
 
-- Check whose turn it is before work or submission.
-- Submit plans, code, fixes, challenges, and consensus through files.
-- Record test results, attestations, and Lisa review outcomes.
+- Detect whether the current process is `ralph`, `lisa`, or `standalone` before adopting a role.
+- Check whose turn it is before work, review, or submission.
+- Submit work and reviews through files to avoid shell escaping problems.
+- Use explicit tags such as `[PLAN]`, `[TDD-PLAN]`, `[CODE]`, `[FIX]`, `[PASS]`, `[NEEDS_WORK]`, `[CHALLENGE]`, and `[CONSENSUS]`.
+- Preserve test results, attestations, Lisa review rationale, and mutual consensus.
+- Let Lisa reject off-direction work, missing evidence, rubber-stamp claims, or unaddressed review feedback.
 
 <!-- section: operational-model -->
 ## Operational model
 
-- RLL is a workflow discipline, not a replacement for tests. Its value is the preserved evidence trail around decisions, verification, and reviewer agreement.
+Every loop-aware session starts by checking `ralph-lisa session-role`. A direct standalone session should act as a normal assistant and should not run the turn protocol. A Ralph or Lisa loop seat must run `ralph-lisa whose-turn` before acting. When it is not that agent's turn, it must not submit work.
+
+Ralph submits plans, code, fixes, challenges, and consensus through `.dual-agent/submit.md` with `ralph-lisa submit-ralph --file`. Lisa reads Ralph's work, reviews against task direction and evidence, and submits with `ralph-lisa submit-lisa --file`. Inline submission is avoided because tags, quotes, shell expansion, and Markdown can break command arguments.
+
+RLL distinguishes architectural `[PLAN]` from gated `[TDD-PLAN]`. Documentation, planning, and process-only work still need proof, but their proof should be source accuracy, publication safety, language parity, rendered output, and coverage checks. They should not be forced into code-unit-test TDD unless the task actually changes code behavior.
 
 <!-- section: configuration -->
 ## Configuration and commands
 
-- Common commands: `ralph-lisa whose-turn`, `ralph-lisa read review.md`, and `ralph-lisa submit-ralph --file .dual-agent/submit.md`.
+Core loop commands:
 
-## Getting Started
+| Command | Purpose |
+| --- | --- |
+| `ralph-lisa session-role` | Determine whether the current process is Ralph, Lisa, or standalone. |
+| `ralph-lisa whose-turn` | Check whether Ralph or Lisa may act now. |
+| `ralph-lisa read review.md` | Ralph reads Lisa's latest feedback. |
+| `ralph-lisa read work.md` | Lisa reads Ralph's latest submission. |
+| `ralph-lisa submit-ralph --file .dual-agent/submit.md` | Ralph submits work and passes the turn to Lisa. |
+| `ralph-lisa submit-lisa --file .dual-agent/submit.md` | Lisa submits review and passes the turn to Ralph. |
+| `ralph-lisa status` | Inspect current round, step, turn, and watcher status. |
+| `ralph-lisa recap` | Recover state after context compaction. |
 
-<a id="getting-started"></a>
+Review discipline:
 
-The Ralph-Lisa Loop is a turn-based development and review protocol. Ralph plans and implements; Lisa reviews independently and can pass, request work, challenge, or reach consensus. In an active loop, always check whose turn it is before submitting work. In a standalone session, help normally and do not impersonate loop state.
-
-## Phase Boundaries
-
-Submit at real boundaries: plan, research, code, fix, and consensus. A code or fix submission should include the concrete files changed, the acceptance cases covered, and real test results. Do not move to publication or commit just because content exists; wait for the review checkpoint required by the active slice.
+- A substantive PASS cites files, lines, claims, and verification results.
+- Ralph should challenge a rubber-stamp PASS at most once.
+- A NEEDS_WORK response requires reasoning; Ralph should explain why Lisa is right or submit a challenge.
+- Consensus closes a reviewed slice only after both sides agree.
 
 <!-- section: source-evidence -->
 ## Source evidence
 
-- `AGENTS.md`
-- `.codex/skills/ralph-lisa-loop/SKILL.md`
+- `AGENTS.md` defines Ralph role detection, turn checks, file-based Ralph submission, tags, phase boundaries, PASS/NEEDS_WORK handling, test-result requirements, and the `[PLAN]` versus `[TDD-PLAN]` split.
+- `CODEX.md` defines Lisa role detection, turn checks, file-based Lisa submission, task-alignment review, WeCom feedback intake, PASS/NEEDS_WORK rules, and substantive-review requirements.
+- `AGENTS.md` documents that standalone sessions should not adopt the loop protocol and should tell users how to start RLL.
+- `AGENTS.md` documents that code/fix submissions require real test results and attestation lines.
+- `CODEX.md` documents Lisa's duty to review task alignment before code details.
 
 <!-- section: related -->
 ## Related pages
 
-- [Clarify and Planning](clarify-and-planning.md)
 - [Gates and Attestation](gates-attestation.md)
-- [GitHub and CI Workflows](github-ci.md)
+- [Gate System](gate-system.md)
+- [Clarify and Planning](clarify-and-planning.md)
+- [Clarify Phase](clarify-phase.md)
+- [Common Workflows](common-workflows.md)

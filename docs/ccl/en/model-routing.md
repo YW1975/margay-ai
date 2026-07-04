@@ -1,68 +1,67 @@
 # Gateway and Model Routing
 
-> This page is generated from the CCL documentation inventory. Edit scripts/generate-ccl-docs.mjs, then regenerate.
+> This page is maintained as public documentation source. Model names and gateway availability are deployment-dependent.
 
 <!-- section: purpose -->
 ## Purpose
 
-CCL routes model requests through compatible providers and MargayAI gateway deployments while preserving compatibility surfaces required by existing SDK types and wire formats.
+CCL separates model selection from provider transport. Users can choose aliases such as `sonnet`, `opus`, `haiku`, `best`, `auto`, or `smart`, or provide full model identifiers. The runtime then resolves the model, checks allowlists and endpoint compatibility, chooses the correct credential channel, and sends the request through direct client transport or Margay gateway transport.
+
+This separation lets a project use domestic gateway models by default while still supporting explicit direct-provider models, endpoint pins, compact transports, subagent models, and gateway classifier suggestions.
 
 <!-- section: capabilities -->
 ## Capabilities
 
-- Select models by short aliases or full provider model identifiers.
-- Route non-default model names through gateway transport where configured.
-- Pin, unpin, inspect, or switch endpoints with `/endpoint` when endpoint registries are configured.
-- Use compact and micro-compact transports for context management when enabled.
-- Inspect session cost, context usage, and plan-usage surfaces where the current deployment exposes the needed usage fields.
-- Use smart routing with gateway classifier results when the gateway returns `model_suggestion` and `routing_table` fields.
+- Select a model with `--model`, `/model`, settings `model`, or compatible environment variables.
+- Use model aliases, full model IDs, 1M-context aliases where supported, `auto`, and `smart`.
+- Default to gateway main-loop and small-fast models when a gateway is configured and no explicit model override wins.
+- Route third-party model requests through gateway transport with gateway credentials and SSE-compatible streaming.
+- Use endpoint pinning and compatibility checks so an endpoint can reject unavailable models or oversized active context.
+- Use `/endpoint`, `/priority`, `/effort`, `/advisor`, `/cost`, `/usage`, `/context`, and `/gateway doctor` as route inspection surfaces.
+- Use fallback handling for print-mode overloads and compatible streaming/non-streaming fallback paths.
+- Keep usage and cost accounting tied to returned usage fields; unknown model pricing is reported as less certain rather than invented.
 
 <!-- section: operational-model -->
 ## Operational model
 
-- Model routing happens below the tool and agent layers. Agents can request a model, but provider credentials and gateway policy decide how the request is executed.
-- Endpoint switching validates model compatibility where possible and can report context-fit information for configured endpoints.
-- CCL records input, output, cache-read, and cache-write token counters from response usage fields, then calculates per-session cost from configured model pricing. If a model cost is unknown, cost output is marked as potentially inaccurate.
-- Per-turn channel selection is model-specific. Non-Claude models route through the configured gateway when available. Claude models use local Claude auth when OAuth or first-party API-key auth is available; if no local Claude auth exists, a configured gateway may carry Claude requests.
-- In `auto` or `smart` mode, CCL asks the gateway classifier for the first model suggestion. Later turns can switch by intent when a routing table is present. If the classifier is unavailable and the model alias is still `auto` or `smart`, CCL falls back to the configured domestic fallback instead of silently resolving to a Claude default.
+Model selection precedence starts with in-session overrides, then startup flags, environment/settings values, and finally defaults. `utils/model/model.ts` resolves user-specified aliases and built-in defaults. When a gateway config exists, gateway-first defaults can choose a configured main model and a configured small-fast model before direct-provider defaults.
+
+Gateway config is resolved from explicit `CCL_GATEWAY_URL` / `CCL_GATEWAY_KEY`, loaded `gateway.json`, or fallback file lookup. A complete explicit environment pair wins; otherwise the persisted file can supply the route. Authentication state is not the same as route state: direct auth can exist while gateway credentials also exist.
+
+Endpoint compatibility is checked in layers. If an endpoint declares a model list, that list is checked first. Otherwise CCL may validate the model against the endpoint. If active messages are provided, context-window fit is checked against endpoint-declared or model-default context limits.
+
+Gateway transport bypasses the direct SDK path for gateway-routed calls. It sends a clean JSON request with bearer auth, CCL user-agent, optional trace tags for gateway logs, SSE parsing, retry on 429/5xx, non-retry on most 4xx, and abort normalization.
+
+Smart routing can use gateway classifier fields such as `model_suggestion`, escalation decisions, and routing tables. Non-escalating classifier replies can be streamed as normal text deltas so print-mode `stream-json` consumers still receive content events.
 
 <!-- section: configuration -->
 ## Configuration and commands
 
-- Use gateway, endpoint, model, cost, context, and usage commands for inspection. Keep compatibility variable names documented as compatibility surfaces, not product names.
-- Do not assume provider prompt-cache savings or hit-rate accounting from CCL docs alone; cache-read and cache-write fields are meaningful only when the active transport or gateway returns verified usage data.
-- Set `CCL_ROUTING_PRIORITY=cost` or `CCL_ROUTING_PRIORITY=quality` to choose which list from the gateway routing table should be preferred. Cost mode favors cheaper capable models; quality mode may select stronger Claude routes for tasks such as coding or debugging depending on gateway policy.
-
-## When Claude Is Used
-
-Claude is used when the user explicitly selects a Claude model, an endpoint pin only allows Claude models, the gateway classifier or routing table selects a Claude model, or a configured fallback model is Claude. Otherwise, the common dual-channel deployment keeps Claude calls on OAuth and sends DeepSeek, Kimi, and other third-party models through the Margay gateway.
-
-Use a debug file to verify the actual route for a session. The relevant markers are `[SmartRoute] model_suggestion=...`, `[SmartRoute] mainLoopModel=...`, `[INTENT-SWITCH] ...`, and `[Channel] 3P model=...` or `[Channel] Claude→gw ...`.
-
+- Choose a model: `ccl --model <model>`, `/model <model>`, or settings `model`.
+- Inspect or pin endpoints: `/endpoint`.
+- Select routing preference where supported: `/priority` or `CCL_ROUTING_PRIORITY=cost|quality`.
+- Set reasoning effort where supported: `--effort <low|medium|high|max>` or `/effort`.
+- Diagnose gateway setup: `/gateway status` and `/gateway doctor`.
+- Diagnose route and cost: `/model`, `/endpoint`, `/cost`, `/usage`, `/context`, and debug logs.
+- Use `--fallback-model <model>` in print mode when overload fallback is desired.
+- Do not infer route correctness from model display text alone; use debug markers, gateway logs, usage fields, and endpoint status.
 
 <!-- section: source-evidence -->
 ## Source evidence
 
-- `services/api/gatewayTransport.ts`
-- `services/api/client.ts`
-- `services/api/claude.ts`
-- `commands/gateway/gateway.tsx`
-- `commands/endpoint/endpoint.tsx`
-- `commands/model/model.tsx`
-- `commands/cost/index.ts`
-- `commands/context/index.ts`
-- `commands/context/context-noninteractive.ts`
-- `commands/usage/index.ts`
-- `cost-tracker.ts`
-- `utils/modelCost.ts`
-- `utils/model/endpointCompat.ts`
-- `services/compact`
+- `utils/model/model.ts` defines model override precedence, aliases, gateway-first default main-loop model, small-fast model behavior, and runtime model selection.
+- `utils/model/aliases.ts` defines supported model aliases including `auto` and `smart`.
+- `utils/model/providers.ts` resolves provider mode and gateway configuration.
+- `utils/model/endpointCompat.ts` validates model/endpoint pairing and active context fit.
+- `services/api/gatewayTransport.ts` implements gateway streaming, retries, bearer auth, SSE parsing, trace tags, and abort normalization.
+- `services/api/claude.ts` implements smart-route replies, usage handling, fallback paths, and gateway error routing.
+- `commands/model/model.tsx`, `commands/endpoint/endpoint.tsx`, `commands/priority/priority.tsx`, and `commands/effort/effort.tsx` expose user-facing routing controls.
 
 <!-- section: related -->
 ## Related pages
 
+- [Authentication](authentication.md)
 - [Configuration and Settings](configuration.md)
 - [Environment Variables](env-vars.md)
-- [Authentication](authentication.md)
-- [Agents](agents.md)
+- [Interactive Sessions and Print Mode](interactive-sessions.md)
 - [Troubleshooting](troubleshooting.md)

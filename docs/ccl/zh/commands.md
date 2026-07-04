@@ -30,6 +30,16 @@
 
 命令可能是只读、仅影响当前会话、写入设置、调用服务或启动外部进程。应把这种副作用类别视为命令契约的一部分。例如 `/status` 是检查命令，`/gateway login` 会写入网关凭据，workflow 或 remote 命令可能启动后台工作。
 
+## 副作用分类
+
+| 类别 | 示例 | 需要确认什么 |
+| --- | --- | --- |
+| 只读检查 | `/help`, `/status`, `/cost`, `/context`, `/usage`, `/files`, `/diff` | 输出只是信息，不代表已经应用修复。 |
+| 会话本地控制 | `/model`, `/effort`, `/plan`, `/compact`, `/clear`, `/resume`, `/rewind`, `/rename` | 变更作用于当前会话或所选 transcript 状态。 |
+| 设置或凭据写入 | `/config`, `/permissions`, `/memory`, `/gateway login`, `/gateway logout`, `/endpoint` | 确认目标来源：user、project、local、managed、gateway file 或 shell environment。 |
+| 外部集成 | `/mcp`, `/ide`, `/terminal-setup`, `/chrome`, `/install-github-app`, `/plugins` | 启用前确认 trust 和认证。 |
+| 进程或后台工作 | `/workflows`, `/buddy`, `/fork`, remote 命令、bridge 命令 | 后续使用 inspect、tail 或 status 命令确认结果，不要假设后台已经成功。 |
+
 ## 常见工作流中的命令
 
 | 时机 | 常用命令 | 用途 |
@@ -44,7 +54,7 @@
 
 ## Gateway 命令
 
-`/gateway status` 显示是否已配置网关，并在网关暴露余额字段时显示 token 余额。`/gateway login URL API_KEY` 会验证并保存网关 URL/key。`/gateway register URL INVITE_CODE [USERNAME] [EMAIL] [PHONE]` 通过邀请码创建并连接账号。`/gateway doctor` 会比较 shell 变量、gateway 文件设置、OAuth/API-key 状态和网关可达性。`/gateway logout` 会移除保存的 gateway 文件并清理当前进程变量。
+`/gateway status` 显示是否已配置网关，并在网关暴露余额字段时显示 token 余额。`/gateway login URL TOKEN` 会验证并保存网关 URL/token。`/gateway register URL INVITE_CODE [USERNAME] [EMAIL] [PHONE]` 通过邀请码创建并连接账号。`/gateway doctor` 会比较 shell 变量、gateway 文件设置、OAuth/API-key 状态和网关可达性。`/gateway logout` 会移除保存的 gateway 文件并清理当前进程变量。
 
 当 shell 变量和保存配置不一致时，先用 `/gateway doctor`。当前实现中，只要 shell 中存在 `CCL_GATEWAY_URL` 或 `CCL_GATEWAY_KEY`，shell 配置就作为原子配置对优先于文件。
 
@@ -83,6 +93,10 @@
 | `/workflows` | 创建、列出、运行、tail 或检查 workflow 自动化。 | 可重复多步骤操作需要结构和验证时。 | 后台 workflow run 需要明确 tail/inspect 跟进。 |
 | `/endpoint` | 在配置时 pin、检查或切换 endpoint 路由。 | 怀疑模型路由或 endpoint 兼容问题时。 | endpoint 切换依赖已配置 registry 数据。 |
 | `/gateway` | 管理 Margay 网关状态、登录、注册、doctor 和登出。 | 需要检查或修改网关凭据/可达性时。 | shell 变量可能遮蔽保存的 gateway 配置。 |
+
+## 隐藏与条件命令
+
+源码树中的命令模块多于普通用户实际看到的命令。CCL 会按构建类型、feature flag、用户类型、插件可用性、MCP 状态和交互模式过滤命令。公开文档应把隐藏或条件命令描述为实现或诊断面，除非它们在当前命令面板中可见，或文档同时说明启用条件。
 
 ## 诊断与成本
 

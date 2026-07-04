@@ -1,68 +1,67 @@
 # 网关与模型路由
 
-> 本页由 CCL 文档清单生成。请修改 scripts/generate-ccl-docs.mjs 后重新生成。
+> 本页作为公开文档源维护。模型名称和 gateway 可用性取决于部署。
 
 <!-- section: purpose -->
-## 用途
+## Purpose
 
-CCL 会通过兼容 provider 与 MargayAI 网关部署路由模型请求，同时保留现有 SDK 类型和 wire format 所需的兼容层。
+CCL 将模型选择和 provider transport 分离。用户可以选择 `sonnet`、`opus`、`haiku`、`best`、`auto`、`smart` 等别名，也可以提供完整模型标识符。运行时随后解析模型，检查 allowlist 和 endpoint compatibility，选择正确凭据通道，并通过 direct client transport 或 Margay gateway transport 发送请求。
+
+这种分离让项目可以默认使用国内 gateway 模型，同时保留显式 direct-provider 模型、endpoint pin、compact transports、subagent models 和 gateway classifier suggestions。
 
 <!-- section: capabilities -->
-## 能力范围
+## Capabilities
 
-- 通过短别名或完整 provider 模型 ID 选择模型。
-- 在配置后将非默认模型名路由到网关 transport。
-- 配置 endpoint registry 后，可用 `/endpoint` 固定、取消固定、查看或切换 endpoint。
-- 启用时使用 compact 与 micro-compact transport 管理上下文。
-- 当当前部署暴露所需 usage 字段时，可检查会话成本、上下文用量和 plan usage 入口。
-- 当网关 classifier 返回 `model_suggestion` 和 `routing_table` 字段时，可使用智能路由。
+- 通过 `--model`、`/model`、settings `model` 或兼容环境变量选择模型。
+- 使用模型别名、完整模型 ID、受支持的 1M context 别名、`auto` 和 `smart`。
+- 当 gateway 已配置且没有显式模型覆盖时，默认使用 gateway main-loop model 和 small-fast model。
+- 将 third-party 模型请求通过 gateway transport、gateway credentials 和兼容 SSE 的 streaming 发送。
+- 用 endpoint pinning 与 compatibility checks 让 endpoint 拒绝不可用模型或过大的活动 context。
+- 使用 `/endpoint`、`/priority`、`/effort`、`/advisor`、`/cost`、`/usage`、`/context` 和 `/gateway doctor` 作为路由检查入口。
+- 支持 print-mode overload fallback，以及兼容 streaming/non-streaming fallback 路径。
+- usage 和 cost accounting 只基于返回的 usage fields；未知模型价格会标记为不确定，而不是编造。
 
 <!-- section: operational-model -->
-## 运行模型
+## Operational model
 
-- 模型路由位于工具和 agent 层之下。agent 可以请求某个模型，但请求如何执行由 provider 凭据和网关策略决定。
-- endpoint 切换会尽可能验证模型兼容性，并可为已配置 endpoint 报告上下文适配信息。
-- CCL 会根据响应 usage 字段记录 input、output、cache-read 与 cache-write token 计数，再按已配置模型价格计算会话成本。如果模型价格未知，成本输出会标记为可能不准确。
-- 每轮 channel 选择按模型决定。非 Claude 模型在有网关时走配置的网关；Claude 模型在本地有 OAuth 或 first-party API-key auth 时走本地 Claude 认证通道；如果没有本地 Claude auth，已配置网关也可以承载 Claude 请求。
-- 在 `auto` 或 `smart` 模式下，CCL 会先向网关 classifier 请求首轮模型建议。后续轮如果存在 routing table，可按 intent 切换模型。如果 classifier 不可用且模型别名仍是 `auto` 或 `smart`，CCL 会落到配置的国产 fallback，而不是静默解析到 Claude 默认模型。
+模型选择优先级从会话内 override 开始，然后是启动 flags、环境/settings 值，最后是默认值。`utils/model/model.ts` 解析用户指定别名和内置默认值。当 gateway config 存在时，gateway-first 默认值可以先选择配置的 main model 和 small-fast model，再进入 direct-provider 默认值。
+
+Gateway config 从显式 `CCL_GATEWAY_URL` / `CCL_GATEWAY_KEY`、已加载 `gateway.json` 或 fallback 文件读取。一组完整显式环境变量优先；否则持久化文件可以提供 route。认证状态不等于 route 状态：direct auth 和 gateway credentials 可以同时存在。
+
+Endpoint compatibility 按层检查。如果 endpoint 声明了模型列表，先检查该列表。否则 CCL 可以对 endpoint 做模型校验。提供 active messages 时，会根据 endpoint 声明或模型默认 context limit 检查当前上下文是否能放下。
+
+Gateway transport 对 gateway-routed calls 绕过 direct SDK path。它发送干净 JSON 请求，带 bearer auth、CCL user-agent、可选 trace tags、SSE parsing、429/5xx retry、多数 4xx 不 retry，以及 abort normalization。
+
+Smart routing 可以使用 gateway classifier 返回的 `model_suggestion`、escalation decision 和 routing table。非升级的 classifier reply 也会被包装成普通 text deltas，因此 print-mode `stream-json` consumer 仍能收到内容事件。
 
 <!-- section: configuration -->
-## 配置与命令
+## Configuration and commands
 
-- 使用 gateway、endpoint、model、cost、context 和 usage 命令做检查。兼容变量名应解释为兼容层，不应作为产品名称使用。
-- 不要仅根据 CCL 文档假设 provider prompt-cache 节省或命中率计量；cache-read 与 cache-write 字段只有在当前 transport 或网关返回可验证 usage 数据时才有意义。
-- 设置 `CCL_ROUTING_PRIORITY=cost` 或 `CCL_ROUTING_PRIORITY=quality` 可选择优先使用网关 routing table 中的哪组列表。cost 模式偏向便宜且能完成任务的模型；quality 模式可能按网关策略在 coding 或 debugging 等任务中选择更强 Claude 路由。
-
-## 什么时候使用 Claude
-
-当用户显式选择 Claude 模型、endpoint pin 只允许 Claude 模型、网关 classifier 或 routing table 选中 Claude、或配置的 fallback model 是 Claude 时，会使用 Claude。除此之外，常见双通道部署会让 Claude 调用走 OAuth，并让 DeepSeek、Kimi 等第三方模型走 Margay 网关。
-
-可用 debug file 验证一次会话的真实路由。相关标记包括 `[SmartRoute] model_suggestion=...`、`[SmartRoute] mainLoopModel=...`、`[INTENT-SWITCH] ...`，以及 `[Channel] 3P model=...` 或 `[Channel] Claude→gw ...`。
-
+- 选择模型：`ccl --model <model>`、`/model <model>` 或 settings `model`。
+- 检查或固定 endpoint：`/endpoint`。
+- 选择路由偏好：`/priority` 或 `CCL_ROUTING_PRIORITY=cost|quality`。
+- 设置 reasoning effort：`--effort <low|medium|high|max>` 或 `/effort`。
+- 诊断 gateway：`/gateway status` 和 `/gateway doctor`。
+- 诊断 route 和 cost：`/model`、`/endpoint`、`/cost`、`/usage`、`/context` 和 debug logs。
+- print mode 需要 overload fallback 时，使用 `--fallback-model <model>`。
+- 不要只根据模型显示文本判断 route 正确性；应看 debug markers、gateway logs、usage fields 和 endpoint status。
 
 <!-- section: source-evidence -->
-## 源码依据
+## Source evidence
 
-- `services/api/gatewayTransport.ts`
-- `services/api/client.ts`
-- `services/api/claude.ts`
-- `commands/gateway/gateway.tsx`
-- `commands/endpoint/endpoint.tsx`
-- `commands/model/model.tsx`
-- `commands/cost/index.ts`
-- `commands/context/index.ts`
-- `commands/context/context-noninteractive.ts`
-- `commands/usage/index.ts`
-- `cost-tracker.ts`
-- `utils/modelCost.ts`
-- `utils/model/endpointCompat.ts`
-- `services/compact`
+- `utils/model/model.ts` 定义模型 override 优先级、别名、gateway-first 默认 main-loop model、small-fast model 行为和 runtime model selection。
+- `utils/model/aliases.ts` 定义支持的模型别名，包括 `auto` 和 `smart`。
+- `utils/model/providers.ts` 解析 provider mode 和 gateway configuration。
+- `utils/model/endpointCompat.ts` 校验 model/endpoint 配对和 active context fit。
+- `services/api/gatewayTransport.ts` 实现网关流式响应、重试、Bearer 认证、SSE 解析、追踪标签和中止错误归一化。
+- `services/api/claude.ts` 实现智能路由响应、用量处理、回退路径和网关错误分流。
+- `commands/model/model.tsx`、`commands/endpoint/endpoint.tsx`、`commands/priority/priority.tsx` 与 `commands/effort/effort.tsx` 暴露用户路由控制入口。
 
 <!-- section: related -->
-## 相关页面
+## Related pages
 
+- [认证](authentication.md)
 - [配置与设置](configuration.md)
 - [环境变量](env-vars.md)
-- [认证](authentication.md)
-- [Agent](agents.md)
+- [交互式会话与 Print Mode](interactive-sessions.md)
 - [故障排查](troubleshooting.md)

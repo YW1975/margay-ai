@@ -57,6 +57,9 @@ function checkText(text, file, lang) {
   if (/\b(sk-[A-Za-z0-9_-]{12,}|gh[op]_[A-Za-z0-9_]{12,}|AKIA[0-9A-Z]{12,})\b/.test(text)) {
     fail(`${file}: secret-looking token leaked`)
   }
+  if (/\b1\.2\.(22|23)\b/.test(text)) {
+    fail(`${file}: stale CCL version reference`)
+  }
   const cleaned = stripCode(text)
   if (/\b(TODO|TBD)\b|untranslated|machine translation pending/.test(cleaned)) {
     fail(`${file}: translation placeholder marker`)

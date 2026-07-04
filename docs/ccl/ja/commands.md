@@ -30,6 +30,16 @@
 
 コマンドには、読み取り専用、セッション内のみ、設定書き込み、サービス呼び出し、外部プロセス起動といった副作用の種類があります。この副作用分類もコマンド契約の一部として扱います。たとえば `/status` は検査コマンド、`/gateway login` はゲートウェイ資格情報を書き込み、workflow や remote コマンドはバックグラウンド作業を起動することがあります。
 
+## 副作用の分類
+
+| 分類 | 例 | 確認すること |
+| --- | --- | --- |
+| 読み取り専用検査 | `/help`, `/status`, `/cost`, `/context`, `/usage`, `/files`, `/diff` | 出力は情報であり、修正が適用されたことを意味しません。 |
+| セッション内制御 | `/model`, `/effort`, `/plan`, `/compact`, `/clear`, `/resume`, `/rewind`, `/rename` | 変更が現在セッションまたは選択された transcript 状態に作用します。 |
+| 設定または資格情報の書き込み | `/config`, `/permissions`, `/memory`, `/gateway login`, `/gateway logout`, `/endpoint` | 対象 source が user、project、local、managed、gateway file、shell environment のどれか確認します。 |
+| 外部統合 | `/mcp`, `/ide`, `/terminal-setup`, `/chrome`, `/install-github-app`, `/plugins` | 有効化前に trust と認証を確認します。 |
+| プロセスまたはバックグラウンド作業 | `/workflows`, `/buddy`, `/fork`, remote command、bridge command | background success を仮定せず、inspect、tail、status で追跡します。 |
+
 ## 通常ワークフローで使うコマンド
 
 | 場面 | 便利なコマンド | 用途 |
@@ -44,7 +54,7 @@
 
 ## Gateway コマンド
 
-`/gateway status` はゲートウェイ設定の有無を表示し、ゲートウェイが残高フィールドを公開している場合は token 残高も表示します。`/gateway login URL API_KEY` はゲートウェイ URL/key ペアを検証して保存します。`/gateway register URL INVITE_CODE [USERNAME] [EMAIL] [PHONE]` は招待フローでアカウントを作成し接続します。`/gateway doctor` は shell 変数、gateway ファイル設定、OAuth/API-key 状態、ゲートウェイ到達性を比較します。`/gateway logout` は保存済み gateway ファイルを削除し、現在プロセスの変数を消します。
+`/gateway status` はゲートウェイ設定の有無を表示し、ゲートウェイが残高フィールドを公開している場合は token 残高も表示します。`/gateway login URL TOKEN` はゲートウェイ URL/token ペアを検証して保存します。`/gateway register URL INVITE_CODE [USERNAME] [EMAIL] [PHONE]` は招待フローでアカウントを作成し接続します。`/gateway doctor` は shell 変数、gateway ファイル設定、OAuth/API-key 状態、ゲートウェイ到達性を比較します。`/gateway logout` は保存済み gateway ファイルを削除し、現在プロセスの変数を消します。
 
 shell 変数と保存設定が食い違う場合は `/gateway doctor` を使います。現在の実装では、shell に `CCL_GATEWAY_URL` または `CCL_GATEWAY_KEY` のどちらかが存在すれば、shell 設定が原子的なペアとしてファイルより優先されます。
 
@@ -83,6 +93,10 @@ shell 変数と保存設定が食い違う場合は `/gateway doctor` を使い�
 | `/workflows` | workflow 自動化を作成、一覧、実行、tail、inspect します。 | 反復可能な多段階操作に構造と検証が必要な時。 | background run は tail/inspect で明示的に追跡してください。 |
 | `/endpoint` | 設定済みの場合 endpoint routing を pin、確認、切替します。 | モデル経路や endpoint 互換性が疑わしい時。 | endpoint 切替は設定済み registry データに依存します。 |
 | `/gateway` | Margay ゲートウェイ状態、login、register、doctor、logout を管理します。 | ゲートウェイ資格情報や到達性を確認・変更する時。 | shell 変数が保存済み gateway 設定を上書きすることがあります。 |
+
+## Hidden と条件付きコマンド
+
+ソースツリーには、通常の利用者が見る数より多くの command module があります。CCL は build type、feature flag、user type、plugin availability、MCP 状態、interactive mode によって command を絞り込みます。公開文書では、hidden または条件付き command は、実行中の command palette に表示されるか有効化条件を書ける場合を除き、実装または診断 surface として扱います。
 
 ## 診断とコスト
 

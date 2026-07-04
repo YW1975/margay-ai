@@ -30,6 +30,16 @@ Interactive commands are entered at the start of a message with `/`. The availab
 
 A command can be read-only, session-local, settings-writing, service-calling, or process-spawning. Treat that side effect class as part of the command contract. For example, `/status` is an inspection command, `/gateway login` writes gateway credentials, and workflow or remote commands may launch background work.
 
+## Side-Effect Classes
+
+| Class | Examples | What to verify |
+| --- | --- | --- |
+| Read-only inspection | `/help`, `/status`, `/cost`, `/context`, `/usage`, `/files`, `/diff` | Output is informational and does not imply a fix was applied. |
+| Session-local control | `/model`, `/effort`, `/plan`, `/compact`, `/clear`, `/resume`, `/rewind`, `/rename` | The change applies to the current session or selected transcript state. |
+| Settings or credential writes | `/config`, `/permissions`, `/memory`, `/gateway login`, `/gateway logout`, `/endpoint` | Confirm the target source: user, project, local, managed, gateway file, or shell environment. |
+| External integrations | `/mcp`, `/ide`, `/terminal-setup`, `/chrome`, `/install-github-app`, `/plugins` | Verify trust and authentication before enabling the integration. |
+| Process or background work | `/workflows`, `/buddy`, `/fork`, remote commands, bridge commands | Follow up with inspect, tail, or status commands rather than assuming background success. |
+
 ## Commands Across A Normal Workflow
 
 | Moment | Useful commands | What they are for |
@@ -44,7 +54,7 @@ A command can be read-only, session-local, settings-writing, service-calling, or
 
 ## Gateway Commands
 
-`/gateway status` shows whether a gateway is configured and may show token balance when the gateway exposes it. `/gateway login URL API_KEY` validates and saves a gateway URL/key pair. `/gateway register URL INVITE_CODE [USERNAME] [EMAIL] [PHONE]` creates and connects an account through an invite flow. `/gateway doctor` compares shell variables, gateway file settings, OAuth/API-key state, and gateway reachability. `/gateway logout` removes the saved gateway file and clears current process variables.
+`/gateway status` shows whether a gateway is configured and may show token balance when the gateway exposes it. `/gateway login URL TOKEN` validates and saves a gateway URL/token pair. `/gateway register URL INVITE_CODE [USERNAME] [EMAIL] [PHONE]` creates and connects an account through an invite flow. `/gateway doctor` compares shell variables, gateway file settings, OAuth/API-key state, and gateway reachability. `/gateway logout` removes the saved gateway file and clears current process variables.
 
 Use `/gateway doctor` when shell variables and saved config disagree. In the current implementation, shell `CCL_GATEWAY_URL` or `CCL_GATEWAY_KEY` wins over the file as an atomic pair.
 
@@ -83,6 +93,10 @@ Use `/gateway doctor` when shell variables and saved config disagree. In the cur
 | `/workflows` | Creates, lists, runs, tails, or inspects workflow automation. | A repeatable multi-step operation needs structure and verification. | Workflow background runs need explicit follow-up via tail/inspect. |
 | `/endpoint` | Pins, inspects, or switches endpoint routing where configured. | A model route or endpoint compatibility issue is suspected. | Endpoint switching depends on configured registry data. |
 | `/gateway` | Manages Margay gateway status, login, registration, doctor, and logout. | Gateway credentials or reachability need inspection or change. | Shell variables can shadow saved gateway config. |
+
+## Hidden And Conditional Commands
+
+The source tree contains more command modules than a normal user sees. CCL filters commands by build type, feature flags, user type, plugin availability, MCP state, and interactive mode. Public documentation should describe hidden or conditional commands as implementation or diagnostic surfaces unless they are visible in the running command palette or documented with their enabling condition.
 
 ## Diagnostics And Cost
 

@@ -1,60 +1,60 @@
 # CCL Overview
 
-> This page is generated from the CCL documentation inventory. Edit scripts/generate-ccl-docs.mjs, then regenerate.
+> This page is maintained as public documentation source. It is the top-level map for CCL capabilities and points each workflow to the authoritative detail page.
 
 <!-- section: purpose -->
 ## Purpose
 
-CCL is the MargayAI command-line agent runtime for interactive coding, non-interactive automation, multi-agent delegation, MCP integrations, plugins, skills, workflows, and governed delivery loops.
+CCL is the MargayAI command-line agent runtime for interactive coding, non-interactive automation, repository-aware tools, multi-agent delegation, MCP integrations, plugins, skills, workflows, remote automation, and governed delivery loops. The official docs should help a user choose the right entry point without overstating deployment-specific behavior.
 
 <!-- section: capabilities -->
 ## Capabilities
 
-- Interactive terminal sessions and print-mode automation.
-- Built-in tools for files, shell, search, web, LSP, tasks, goals, teams, MCP, workflows, and review artifacts.
-- Extension layers for commands, hooks, skills, plugins, MCP servers, and custom agents.
+- Start an interactive terminal session with `ccl` or run deterministic print-mode automation with `ccl -p`.
+- Load project context from instructions, settings, command definitions, skills, agents, MCP configuration, hooks, plugins, memories, and attachments.
+- Route model requests through the configured direct or gateway path, then execute approved tools under permission and policy controls.
+- Extend CCL through MCP servers, custom agents, workflows, hooks, plugins, and skills while keeping supply-chain and permission boundaries explicit.
+- Persist and resume sessions, compact large conversations, track usage, and delegate work to specialized agents or Ralph-Lisa review loops.
+- Publish official docs through sanitized Markdown, language parity checks, public-content scans, site builds, and coverage-matrix validation.
 
 <!-- section: operational-model -->
 ## Operational model
 
-- Use this page as the top-level map. Start with Quickstart, then move to configuration, commands, tools, and extension guides according to the task you need to run.
+Use this page as the navigation hub. New users should read Quickstart first, then Installation if the binary is missing or stale. Operators should start with Configuration, Environment Variables, Authentication, Gateway and Model Routing, Permissions and Security, and Troubleshooting. Developers extending CCL should start with Agents, Delegated Task Agents, MCP, Plugins, Skills, Hooks, and Workflow Automation. Teams using the Ralph-Lisa Loop should start with the governance pages.
+
+CCL is a runtime, not just a wrapper around a model call. Startup resolves CLI flags, settings, project trust, authentication, context, extensions, and permission policy before the main loop can safely run. During a turn, model output is streamed, tool requests are validated, hooks may observe or block work, and results are persisted for resume or audit.
+
+The public docs are intentionally conservative. If a behavior depends on a feature flag, gateway response field, managed setting, account channel, or internal deployment, the docs must say so directly or link to a narrower page. Do not infer provider behavior from CCL source unless CCL itself exposes, validates, or records that behavior.
 
 <!-- section: configuration -->
 ## Configuration and commands
 
-- CLI entry point: `ccl [prompt]`, `ccl -p`, and the top-level subcommands listed in [CLI Reference](cli-reference.md).
-
-## Use The Docs By Job
-
-CCL documentation is organized around the job a user is trying to do. New users should read Quickstart first, then Installation if the binary is not already available. Operators should start with Configuration, Environment Variables, Authentication, and Gateway and Model Routing. Developers extending CCL should start with Agents, Delegated Task Agents, MCP, Plugins, Skills, Hooks, and Workflow Automation. Teams using the Ralph-Lisa Loop should start with the governance pages.
-
 | Need | Start with | Then read |
 | --- | --- | --- |
 | Run CCL once in a project | [Quickstart](quickstart.md) | [Interactive Sessions](interactive-sessions.md), [Commands](commands.md) |
-| Debug setup or credentials | [Authentication](authentication.md) | [Environment Variables](env-vars.md), [Troubleshooting](troubleshooting.md) |
-| Understand model/provider behavior | [Gateway and Model Routing](model-routing.md) | [Configuration](configuration.md), [Cost and context commands in Commands](commands.md#diagnostics-and-cost) |
-| Delegate work to agents | [Agents](agents.md) | [Delegated Task Agents](sub-agents.md), [Built-in Tools](tools.md) |
-| Publish or maintain docs | [Public Documentation Publishing](public-docs.md) | [Gates and Attestation](gates-attestation.md) |
+| Install or update the binary | [Installation and Updates](installation.md) | [Troubleshooting](troubleshooting.md) |
+| Debug credentials or route selection | [Authentication](authentication.md) | [Environment Variables](env-vars.md), [Gateway and Model Routing](model-routing.md) |
+| Control tools and shell access | [Permissions and Security](permissions-security.md) | [Built-in Tools](tools.md), [Hooks](hooks.md) |
+| Delegate work to agents | [Agents](agents.md) | [Delegated Task Agents](sub-agents.md), [Workflow Automation](workflows.md) |
+| Publish or maintain docs | [Public Documentation Publishing](public-docs.md) | [Gates and Attestation](gates-attestation.md), [GitHub and CI Workflows](github-ci.md) |
+| Understand the runtime | [How CCL Works](how-ccl-works.md) | [Memory and Session Management](memory-sessions.md), [Model Routing](model-routing.md) |
 
-## What CCL Is And Is Not
-
-CCL is a command-line agent runtime. It coordinates a model, local project context, tools, permissions, settings, extensions, and optional governance loops. It is not a standalone documentation site, a generic chatbot wrapper, or a replacement for the gateway. Gateway and provider behavior should be documented only when CCL source or verified runtime evidence shows how CCL observes it.
-
-The public docs must be conservative about claims. If a behavior depends on a gateway response field, a feature flag, a managed setting, or a deployment-specific command, the page should say that directly instead of presenting it as universal.
+The top-level CLI entry point is `ccl [prompt]`. Use `ccl --help` for the exact command surface in the installed build, `ccl doctor` for environment health, and `ccl -p "..." --output-format json` or `stream-json` for scriptable automation.
 
 <!-- section: source-evidence -->
 ## Source evidence
 
-- `main.tsx`
-- `tools`
-- `commands`
-- `services`
+- `main.tsx` defines the `ccl` command, print mode, output formats, debug flags, permission flags, settings flags, model flags, session flags, and subcommand registration.
+- `query.ts`, `services/api/claude.ts`, `services/tools/toolExecution.ts`, and `services/tools/toolOrchestration.ts` implement the model loop, streaming events, tool execution path, and orchestration.
+- `utils/settings/types.ts`, `utils/config.ts`, and `bootstrap/gatewayConfig.ts` define settings, project configuration, gateway configuration, and runtime configuration loading.
+- `utils/sessionStorage.ts`, `services/compact/compact.ts`, and `services/SessionMemory/sessionMemory.ts` implement session persistence, compaction, and memory behavior.
+- `scripts/check-official-docs-coverage.mjs`, `scripts/check-docs.mjs`, `scripts/audit-public-content.sh`, and `scripts/build-site.mjs` provide the public-docs validation path.
 
 <!-- section: related -->
 ## Related pages
 
 - [Quickstart](quickstart.md)
 - [Installation and Updates](installation.md)
+- [How CCL Works](how-ccl-works.md)
 - [CLI Reference](cli-reference.md)
-- [Built-in Tools](tools.md)
-- [Agents](agents.md)
+- [Troubleshooting](troubleshooting.md)

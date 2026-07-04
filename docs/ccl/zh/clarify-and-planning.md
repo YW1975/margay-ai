@@ -1,53 +1,63 @@
 # 澄清与计划
 
-> 本页由 CCL 文档清单生成。请修改 scripts/generate-ccl-docs.mjs 后重新生成。
+> 本页作为公开文档源维护。澄清与计划应降低风险，而不是增加仪式。
 
 <!-- section: purpose -->
-## 用途
+## Purpose
 
-CCL 治理支持显式澄清、范围锁定、计划、进入和退出计划模式，以及验证计划中的工作是否实际执行。
+Clarification 和 planning 帮助 CCL 在工作变昂贵或危险前消除隐藏假设。当任务范围不清、需要用户独有决策、存在破坏性、存在发布风险，或涉及多个移动部件且错误假设会造成返工时，应使用它们。
 
 <!-- section: capabilities -->
-## 能力范围
+## Capabilities
 
-- 需求不明确或高风险时使用澄清流程。
-- 使用计划模式先检查和提出方案，再写入。
-- 使用验证工具检查实现是否符合已接受计划。
+- 使用 `AskUserQuestion` tool 询问 requirements、preferences 和 implementation choices。
+- 使用 `/plan` 进入 plan mode、查看当前 plan，或在 editor 中打开 plan file。
+- 当 written plan 准备好审批时，使用 exit-plan-mode tool。
+- 在 implementation 前记录 covered scope、negative scope、decisions、risks 和 verification expectations。
+- 区分 runtime plan mode 与 RLL `[PLAN]` submissions：前者是权限模式，后者是 Ralph-Lisa review artifact。
 
 <!-- section: operational-model -->
-## 运行模型
+## Operational model
 
-- 计划应降低不确定性。用户明确选择轻量验收路径时，计划不应变成仪式。
+确实需要用户输入时先澄清。问题应足够窄，回答会改变 implementation 或 verification path。不要通过 `AskUserQuestion` 让用户审批 plan；该 UI 中用户看不到 plan。Plan approval 应使用 exit-plan-mode tool。
+
+`/plan` 会把 session permission mode 切换到 plan mode。在 plan mode 中，CCL 为计划而不是编辑准备 permission context。如果已有 plan，`/plan` 会显示它；`/plan open` 会在配置的 editor 中打开 plan file。
+
+RLL planning 是另一层。Ralph `[PLAN]` 是用于 alignment 的 review submission。`[TDD-PLAN]` 是 gated development-start round，用来锁定 test cases 和 quality gates。文档工作仍需要 evidence，但应使用 docs-specific checks，而不是假装每次页面更新都是 unit-test-driven code development。
+
+澄清结果应写成可复核的决定，而不是临时聊天结论。好的澄清记录会说明用户确认的理解、覆盖范围、明确不覆盖的范围、已经选择的 trade-off，以及剩余风险。这样 Lisa 或后续 session 可以判断实现是否偏离原始目标。
 
 <!-- section: configuration -->
-## 配置与命令
+## Configuration and commands
 
-- 相关工具：`EnterPlanModeTool`、`ExitPlanModeTool`、`VerifyPlanExecutionTool`、计划命令和 RLL clarify 产物。
+有用的 planning surfaces：
 
-## 澄清阶段
+| 表面 | 何时使用 | 边界 |
+| --- | --- | --- |
+| `AskUserQuestion` | 用户决策会改变 scope、preference 或 trade-off。 | 不用于最终 plan approval。 |
+| `/plan` | 需要进入 planning mode 或显示当前 plan。 | 它会改变 session permission mode。 |
+| `/plan open` | 需要在外部 editor 中编辑 plan。 | 需要可用 editor path。 |
+| Exit plan mode tool | Written plan 已准备好审批。 | 除 teammate policy 另行处理外，需要处于 plan mode。 |
+| RLL `[PLAN]` | Ralph 和 Lisa 需要 architecture 或 scope alignment。 | 它是 review artifact，不等同 runtime plan mode。 |
 
-<a id="clarify-phase"></a>
+文档任务的强计划应列出 source pages、feature coverage、translation expectations、public-safety checks、rendered-site checks 和 reviewer evidence。代码任务的强计划应列出 behavior change、tests、rollback risk 和证明成功的 command。
 
-当任务存在真实不确定性时使用澄清：目标仓库、公开/私有边界、验收标准、负范围、破坏性动作或发布权限。好的澄清产物应记录用户接受的理解、覆盖范围、负范围、决策和风险。当代码库和用户指令已经足够明确时，不应提出仪式性问题。
-
-## 复杂度
-
-<a id="complexity"></a>
-
-复杂度分类只有在会改变验证方式时才有价值。对文档工作，最相关的检查是源码准确性、覆盖度、用户要求符合度、风格、逻辑一致性和公开安全审计。对涉及代码的工作，应使用项目 gate manifest 和已接受的 RLL policy。
+如果任务范围已经被用户说清楚，计划应尽量短，直接列出要改的文件、验证命令和交付标准。过度询问会降低效率；缺少必要问题则会把风险推迟到实现或发布阶段。
 
 <!-- section: source-evidence -->
-## 源码依据
+## Source evidence
 
-- `tools/EnterPlanModeTool`
-- `tools/ExitPlanModeTool`
-- `tools/VerifyPlanExecutionTool`
-- `commands/plan`
-- `AGENTS.md`
+- `commands/plan/plan.tsx` 进入 plan mode，为 plan mode 准备 permission context，显示当前 plan，并支持 `/plan open`。
+- `tools/AskUserQuestionTool/prompt.ts` 定义 clarification tool，并明确 plan approval 应使用 exit-plan-mode tool。
+- `tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts` 定义 plan-approval tool，校验非 teammate session 是否处于 plan mode，并在需要时询问用户确认。
+- `utils/plans.ts` 存储并读取 plan content 和 plan file paths。
+- `AGENTS.md` 定义 RLL 中 `[PLAN]` 与 `[TDD-PLAN]` 的拆分。
 
 <!-- section: related -->
-## 相关页面
+## Related pages
 
-- [Ralph-Lisa 循环](ralph-lisa-loop.md)
-- [门禁与证明](gates-attestation.md)
-- [工作流](workflows.md)
+- [澄清阶段](clarify-phase.md)
+- [门禁系统](gate-system.md)
+- [门禁与 Attestation](gates-attestation.md)
+- [Ralph-Lisa Loop](ralph-lisa-loop.md)
+- [常见工作流](common-workflows.md)

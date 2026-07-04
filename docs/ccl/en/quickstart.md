@@ -1,66 +1,64 @@
 # Quickstart
 
-> This page is generated from the CCL documentation inventory. Edit scripts/generate-ccl-docs.mjs, then regenerate.
+> This page is maintained as public documentation source. It describes the shortest safe path from a shell to a working CCL session.
 
 <!-- section: purpose -->
 ## Purpose
 
-Install CCL, configure the gateway or compatible model provider, open a project directory, and start with either an interactive session or a print-mode request.
+Use Quickstart to verify five things in order: the `ccl` binary resolves, the installation is healthy enough to run, credentials or gateway routing are configured, print mode can complete a non-mutating request, and the interactive session can start in the intended project directory.
 
 <!-- section: capabilities -->
 ## Capabilities
 
-- Run `ccl` for an interactive session.
-- Run `ccl -p "summarize this repo"` for non-interactive output.
-- Run `ccl doctor` when authentication, updater, or environment health is unclear.
+- Confirm the installed build with `ccl --version` and the available command surface with `ccl --help`.
+- Run `ccl doctor` before changing settings when PATH, updater health, workspace trust, or shell integration is unclear.
+- Configure credentials through the deployment-approved path: account login, gateway environment variables, or an interactive `/gateway login URL TOKEN`.
+- Run `ccl -p "..." --allowedTools ""` for a non-mutating smoke test before enabling broader tool access.
+- Move from print mode to `ccl` interactive mode after route and response behavior are known.
+- Use `--debug-file <path>` when first-run behavior needs exact evidence for authentication, model route, or tool prompts.
 
 <!-- section: operational-model -->
 ## Operational model
 
-- CCL loads settings, discovers project context, prepares tools, then routes model requests through the configured provider path. Permission prompts protect file edits, shell commands, MCP tools, and remote actions.
+Quickstart should not begin with broad permissions. A first run only needs the binary, a trusted working directory, credentials, a route to the configured model path, and a prompt that does not require file edits or shell commands. Tool access can be expanded after the user has evidence that startup, auth, and routing are correct.
+
+Print mode and interactive mode share much of the runtime, but they do not expose exactly the same surface. Print mode is for deterministic single-shot automation and supports `text`, `json`, and `stream-json` output. Interactive mode is the normal human-in-the-loop surface for slash commands, tool approval, session navigation, and context inspection.
+
+If the first model request fails, classify the layer before changing anything: binary resolution, doctor health, authentication, gateway configuration, endpoint/model compatibility, permission policy, or project context. The Troubleshooting page has the layer-routed checklist.
 
 <!-- section: configuration -->
 ## Configuration and commands
 
-- Use `ccl login` or provider environment variables as appropriate for the deployment.
-- Use `ccl mcp` to add external tool servers after the base session works.
-- Use `ccl agents` to confirm built-in and custom agents are visible.
+Minimal first run:
 
-## A Minimal First Run
+1. Open the project directory you intend CCL to inspect.
+2. Run `ccl --version`; confirm it prints the expected CCL version.
+3. Run `ccl --help`; confirm `-p, --print`, `--output-format`, `--model`, `--settings`, `--mcp-config`, and permission flags are available in your build.
+4. Run `ccl doctor` if installation, updater, PATH, package-manager, shell, sandbox, or workspace trust state is unclear.
+5. Configure credentials through your approved path. Gateway users should prefer `CCL_GATEWAY_URL` plus `CCL_GATEWAY_KEY`, or save a gateway file through `/gateway login URL TOKEN`.
+6. Run `ccl -p "Summarize this repository in five bullets." --allowedTools ""` for a non-mutating smoke test.
+7. If route evidence is needed, rerun with `--debug-file <path>` and inspect route markers, model selection, and gateway status.
+8. Run `ccl` for the interactive session after the non-interactive smoke test works.
 
-Use this path when you want to confirm that the binary, credentials, model route, and basic tool policy are working.
-1. Open a project directory.
-2. Run `ccl --help` to confirm the binary resolves.
-3. Run `ccl doctor` if setup, updater health, or workspace trust is unclear.
-4. Configure credentials through the deployment-approved path: `ccl login`, environment variables, or `/gateway login URL API_KEY` in an interactive session.
-5. Run `ccl -p "Summarize this repository in five bullets." --allowedTools ""` when you need a non-mutating smoke test.
-6. Run `ccl` for an interactive session after the non-interactive path works.
+Common first-run symptoms:
 
-## How To Know It Worked
-
-A healthy first run has three signals: the CLI starts without argument parsing errors, the model request reaches the configured provider or gateway, and the response arrives without asking for unexpected destructive permissions. If the response fails before model contact, check Installation and Environment Variables. If the response reaches a provider but fails authentication, check Authentication and Gateway and Model Routing. If a tool prompt appears unexpectedly, check Permissions and Security.
-
-For route verification, start with a debug file and inspect `[SmartRoute]` and `[Channel]` markers after the run. They show the classifier suggestion, final main-loop model, and whether the request used the gateway or local Claude auth channel.
-
-## Common First-Run Problems
-
-| Symptom | Likely cause | Next step |
+| Symptom | Likely layer | Next step |
 | --- | --- | --- |
-| `ccl` not found | Binary is not installed or shell path is stale | Run the install command for your package manager, then restart the shell or reload PATH. |
-| Gateway says not configured | No `CCL_GATEWAY_URL` / `CCL_GATEWAY_KEY` and no usable gateway file | Use `/gateway login URL API_KEY` or set both environment variables. |
-| Provider receives the wrong URL | Routing-critical variables were mixed up | Use `CCL_GATEWAY_*` for Margay gateway routing; do not use compatibility SDK variables for gateway credentials. |
-| Dual-channel note appears | OAuth and gateway are both configured intentionally | Set `CCL_QUIET_DUAL_CHANNEL=1` after confirming Claude should use OAuth and third-party models should use the gateway. |
-| Auth conflict appears | Provider SDK API-key or base-URL variables conflict with OAuth | Remove the conflicting provider SDK variables from the CCL settings or shell, then keep gateway credentials in `CCL_GATEWAY_*` or `~/.ccl/gateway.json`. |
-| Large memory-file warning appears | A root memory file such as `CCL.md` is above the startup threshold | Trim or move the file out of the project root, then keep only high-signal project instructions. |
-| Slash command unavailable in print mode | The command is interactive-only | Use the top-level CLI command or run an interactive session. |
+| `ccl` not found | Binary or shell PATH | Read [Installation and Updates](installation.md), reinstall or reload the shell, then rerun `ccl --version`. |
+| `ccl --help` works but model calls fail | Authentication or gateway route | Read [Authentication](authentication.md) and [Gateway and Model Routing](model-routing.md). |
+| Gateway says not configured | Missing gateway env/file | Set both `CCL_GATEWAY_URL` and `CCL_GATEWAY_KEY`, or use `/gateway login URL TOKEN`. |
+| Wrong model or endpoint | Route precedence | Check `/model`, `/endpoint`, `/gateway status`, debug route markers, and settings sources. |
+| Tool prompt appears in smoke test | Prompt or tool policy | Keep `--allowedTools ""` for non-mutating smoke tests, then expand permissions deliberately. |
+| Slash command unavailable in print mode | Surface mismatch | Use interactive `ccl`, or use the matching top-level CLI command when one exists. |
 
 <!-- section: source-evidence -->
 ## Source evidence
 
-- `main.tsx`
-- `commands/login/login.tsx`
-- `commands/mcp/mcp.tsx`
-- `tools/AgentTool/builtInAgents.ts`
+- `main.tsx` defines `ccl [prompt]`, `-p/--print`, `--output-format`, debug flags, `--allowedTools`, `--tools`, `--disallowedTools`, `--permission-mode`, `--model`, `--settings`, `--mcp-config`, and `--plugin-dir`.
+- `main.tsx` skips subcommand registration in ordinary print mode, so slash-command and subcommand behavior must be documented separately from one-shot prompt execution.
+- `commands/doctor/doctor.tsx` routes `ccl doctor` to the Doctor screen for installation and runtime diagnostics.
+- `bootstrap/gatewayConfig.ts` and `services/gateway/gatewayDoctor.ts` provide gateway configuration and diagnosis behavior referenced by first-run troubleshooting.
+- `commands/model/model.tsx`, `commands/endpoint/endpoint.tsx`, and `utils/model/model.ts` provide model and endpoint inspection or selection behavior.
 
 <!-- section: related -->
 ## Related pages
@@ -68,5 +66,5 @@ For route verification, start with a debug file and inspect `[SmartRoute]` and `
 - [Installation and Updates](installation.md)
 - [Authentication](authentication.md)
 - [Gateway and Model Routing](model-routing.md)
-- [MCP Servers and Tools](mcp.md)
-- [Agents](agents.md)
+- [Interactive Sessions and Print Mode](interactive-sessions.md)
+- [Troubleshooting](troubleshooting.md)

@@ -1,72 +1,70 @@
 # クイックスタート
 
-> このページは CCL ドキュメント一覧から生成されています。scripts/generate-ccl-docs.mjs を編集してから再生成してください。
+> このページは公開ドキュメントのソースとして保守されています。Shell から動作する CCL session までの最短で安全な経路を説明します。
 
 <!-- section: purpose -->
-## 目的
+## Purpose
 
-CCL をインストールし、ゲートウェイまたは互換モデルプロバイダーを設定し、プロジェクトディレクトリで対話セッションまたは print モードを開始します。
+Quickstart では順番に 5 つを確認します。`ccl` binary が解決できること、installation が実行可能な健康状態であること、credentials または gateway routing が設定済みであること、print mode が非変更リクエストを完了できること、interactive session が目的の project directory で起動できることです。
 
 <!-- section: capabilities -->
-## 機能範囲
+## Capabilities
 
-- `ccl` で対話セッションを開始します。
-- `ccl -p "summarize this repo"` で非対話出力を得ます。
-- 認証、アップデーター、環境状態が不明な場合は `ccl doctor` を実行します。
+- `ccl --version` で installed build を確認し、`ccl --help` で利用可能な command surface を確認します。
+- `PATH`、updater health、workspace trust、shell integration が不明な場合、設定変更の前に `ccl doctor` を実行します。
+- Deployment で承認された方法により credentials を設定します。Account login、gateway environment variables、または interactive `/gateway login URL TOKEN` です。
+- 広い tool access を有効にする前に、`ccl -p "..." --allowedTools ""` で非変更 smoke test を実行します。
+- Route と response behavior を確認してから、print mode から `ccl` interactive mode へ移ります。
+- 初回実行の evidence が必要な場合は `--debug-file <path>` を使い、authentication、model route、tool prompts を記録します。
 
 <!-- section: operational-model -->
-## 運用モデル
+## Operational model
 
-- CCL は設定を読み込み、プロジェクト文脈を検出し、ツールを準備してから、設定済みの provider 経路へモデル要求を送ります。権限確認はファイル編集、shell コマンド、MCP ツール、リモート操作を保護します。
+Quickstart は広い権限から始めるべきではありません。初回実行に必要なのは binary、信頼した作業ディレクトリ、credentials、設定済み model path への route、file edit や shell command を必要としない prompt だけです。Startup、auth、routing が正しい証拠を得てから tool access を広げます。
+
+Print mode と interactive mode は多くの runtime を共有しますが、表面は完全には同じではありません。Print mode は deterministic な one-shot automation 用で、`text`、`json`、`stream-json` output をサポートします。Interactive mode は slash commands、tool approval、session navigation、context inspection のための通常の human-in-the-loop surface です。
+
+最初の model request が失敗したら、設定を変える前に層を分類します。Binary resolution、doctor health、authentication、gateway configuration、endpoint/model compatibility、permission policy、project context のどれかです。Troubleshooting ページには layer-routed checklist があります。
 
 <!-- section: configuration -->
-## 設定とコマンド
+## Configuration and commands
 
-- 導入方式に応じて `ccl login` または provider 環境変数を使います。
-- 基本セッションが動いたら `ccl mcp` で外部ツールサーバーを追加します。
-- `ccl agents` で組み込みおよびカスタムエージェントが見えることを確認します。
+最小の初回実行:
 
-## 最小の初回実行
+1. CCL に確認させたい project directory を開きます。
+2. `ccl --version` を実行し、期待する CCL version が表示されることを確認します。
+3. `ccl --help` を実行し、現在の build に `-p, --print`、`--output-format`、`--model`、`--settings`、`--mcp-config`、permission flags があることを確認します。
+4. Installation、updater、`PATH`、package manager、shell、sandbox、workspace trust が不明な場合は `ccl doctor` を実行します。
+5. 承認済みの方法で credentials を設定します。Gateway users は `CCL_GATEWAY_URL` と `CCL_GATEWAY_KEY`、または `/gateway login URL TOKEN` による local gateway file を使います。
+6. 非変更 smoke test として `ccl -p "Summarize this repository in five bullets." --allowedTools ""` を実行します。
+7. Route evidence が必要なら `--debug-file <path>` を付けて再実行し、route markers、model selection、gateway status を確認します。
+8. Non-interactive smoke test が成功したら、`ccl` で interactive session を開始します。
 
-バイナリ、資格情報、モデルルート、基本ツール方針が動くか確認したい場合は、この手順を使います。
-1. プロジェクトディレクトリを開きます。
-2. `ccl --help` を実行し、バイナリが解決できることを確認します。
-3. セットアップ、アップデーター状態、workspace trust が不明な場合は `ccl doctor` を実行します。
-4. デプロイで承認された方法で資格情報を設定します。`ccl login`、環境変数、または対話セッション内の `/gateway login URL API_KEY` を使います。
-5. 書き込みなしの smoke test が必要な場合は `ccl -p "Summarize this repository in five bullets." --allowedTools ""` を実行します。
-6. 非対話パスが動いたら、`ccl` で対話セッションを開始します。
+よくある初回症状:
 
-## 成功を確認する方法
-
-健全な初回実行には三つの信号があります。CLI が引数解析エラーなしに起動すること、モデル要求が設定済み provider またはゲートウェイへ届くこと、予期しない破壊的権限を求めずに応答が返ることです。モデル接続前に失敗する場合はインストールと環境変数を確認します。provider へ届いた後に認証で失敗する場合は認証とゲートウェイ/モデルルーティングを確認します。予期しないツールプロンプトが出る場合は権限とセキュリティを確認します。
-
-route verification では debug file を有効にし、実行後に `[SmartRoute]` と `[Channel]` marker を確認します。classifier suggestion、最終 main-loop model、request が gateway と local Claude auth channel のどちらを使ったかが分かります。
-
-## 初回実行のよくある問題
-
-| 症状 | 考えられる原因 | 次の手順 |
+| 症状 | 可能な層 | 次の手順 |
 | --- | --- | --- |
-| `ccl` が見つからない | バイナリ未導入、または shell の PATH が古い | 利用しているパッケージ管理方法でインストールし、shell を再起動するか PATH を更新します。 |
-| Gateway が未設定と表示される | `CCL_GATEWAY_URL` / `CCL_GATEWAY_KEY` がなく、利用可能な gateway ファイルもない | `/gateway login URL API_KEY` を使うか、二つの環境変数を両方設定します。 |
-| Provider が間違った URL を受け取る | ルーティング重要変数を混同している | Margay ゲートウェイルーティングには `CCL_GATEWAY_*` を使い、互換 SDK 変数にゲートウェイ資格情報を入れないでください。 |
-| dual-channel note が出る | OAuth と gateway が意図的に同時設定されている | Claude は OAuth、third-party model は gateway を使うべきことを確認してから `CCL_QUIET_DUAL_CHANNEL=1` を設定します。 |
-| auth conflict が出る | provider SDK の API-key または base-URL 変数が OAuth と衝突している | CCL settings または shell から衝突する provider SDK 変数を消し、gateway credential は `CCL_GATEWAY_*` または `~/.ccl/gateway.json` に置きます。 |
-| large memory-file warning が出る | project root の `CCL.md` などの memory file が startup threshold を超えている | ファイルを短くするか root から移動し、高信号な project instruction だけを残します。 |
-| print モードで slash command が使えない | そのコマンドは対話専用 | トップレベル CLI コマンドを使うか、対話セッションを開始します。 |
+| `ccl` not found | Binary または shell `PATH` | [インストールと更新](installation.md)を読み、再インストールまたは shell reload 後に `ccl --version` を再実行します。 |
+| `ccl --help` は動くが model call が失敗する | 認証または gateway route | [認証](authentication.md)と[ゲートウェイとモデルルーティング](model-routing.md)を読みます。 |
+| Gateway says not configured | Gateway env/file がない | `CCL_GATEWAY_URL` と `CCL_GATEWAY_KEY` を両方設定するか、`/gateway login URL TOKEN` を使います。 |
+| Model または endpoint が違う | Route precedence | `/model`、`/endpoint`、`/gateway status`、debug route markers、settings sources を確認します。 |
+| Smoke test で tool prompt が出る | Prompt または tool policy | 非変更 smoke test では `--allowedTools ""` を維持し、その後意図的に permissions を広げます。 |
+| Print mode で slash command が使えない | Surface mismatch | Interactive `ccl` を使うか、対応する top-level CLI command を使います。 |
 
 <!-- section: source-evidence -->
-## ソース上の根拠
+## Source evidence
 
-- `main.tsx`
-- `commands/login/login.tsx`
-- `commands/mcp/mcp.tsx`
-- `tools/AgentTool/builtInAgents.ts`
+- `main.tsx` は `ccl [prompt]`、`-p/--print`、`--output-format`、debug flags、`--allowedTools`、`--tools`、`--disallowedTools`、`--permission-mode`、`--model`、`--settings`、`--mcp-config`、`--plugin-dir` を定義します。
+- `main.tsx` は通常の print mode で subcommand registration を省くため、slash-command と subcommand behavior は one-shot prompt execution と分けて説明する必要があります。
+- `commands/doctor/doctor.tsx` は `ccl doctor` を Doctor screen に接続し、installation と runtime diagnostics を提供します。
+- `bootstrap/gatewayConfig.ts` と `services/gateway/gatewayDoctor.ts` は first-run troubleshooting が参照する gateway configuration と diagnosis behavior を提供します。
+- `commands/model/model.tsx`、`commands/endpoint/endpoint.tsx`、`utils/model/model.ts` は model と endpoint の inspection/selection behavior を提供します。
 
 <!-- section: related -->
-## 関連ページ
+## Related pages
 
 - [インストールと更新](installation.md)
 - [認証](authentication.md)
 - [ゲートウェイとモデルルーティング](model-routing.md)
-- [MCP サーバーとツール](mcp.md)
-- [エージェント](agents.md)
+- [インタラクティブセッションと Print Mode](interactive-sessions.md)
+- [トラブルシューティング](troubleshooting.md)

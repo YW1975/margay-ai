@@ -59,6 +59,31 @@ CCL reads CCL-prefixed environment variables for model selection, logging, permi
 | `CCL_CUSTOM_HEADERS` | Extra request headers | Treat as sensitive if it carries auth or routing metadata. |
 | `CCL_PERMISSIONS_TEMPLATE` | Permission defaults | Use with caution because it affects tool prompting behavior. |
 
+## Sync And Non-Sync Rules
+
+| CCL variable family | Compatibility target | Routing risk |
+| --- | --- | --- |
+| `CCL_MODEL`, `CCL_SMALL_FAST_MODEL` | Model selection compatibility variables | Safe to sync when the target variable is unset. |
+| `CCL_LOG`, `CCL_BETAS`, `CCL_CUSTOM_HEADERS` | Diagnostic/header compatibility variables | Safe to sync, but headers may contain sensitive metadata. |
+| `CCL_PERMISSIONS_TEMPLATE` | Permission-template compatibility variable | Safe to sync, but it changes tool prompting defaults. |
+| `CCL_DEFAULT_*_MODEL*`, `CCL_CUSTOM_MODEL_OPTION*` | Model menu customization variables | Safe to sync for model presentation and selection. |
+| `CCL_BASE_URL`, `CCL_API_KEY` | No automatic sync | Must not be copied into provider routing variables because that can hijack Claude-channel calls or conflict with account auth. |
+| `CCL_GATEWAY_URL`, `CCL_GATEWAY_KEY` | No provider SDK sync | Gateway routing stays in the CCL namespace or gateway file. |
+
+## Operational Variables
+
+| Variable | Use |
+| --- | --- |
+| `CCL_PRINT_MAX_TURNS` | Default max turns for print mode when `--max-turns` is not provided. |
+| `CCL_ROUTING_PRIORITY` | Gateway smart-routing preference, normally `cost` or `quality`. |
+| `CCL_GATEWAY_MAIN_MODEL` | Default main model when gateway mode selects a gateway-backed model and no explicit model is set. |
+| `CCL_GATEWAY_SMALL_FAST_MODEL` | Default small/fast model in gateway mode. |
+| `CCL_HOOK_MAX_OUTPUT_BYTES` | Raises or lowers retained hook output before truncation. |
+| `CCL_JSONL_HEAP_HEADROOM_MB` | Overrides JSONL heap headroom for large structured streams. |
+| `CCL_AUTO_HEAPDUMP_OFF` | Disables automatic heap dump monitoring. |
+| `CCL_AUTO_HEAPDUMP_HIGH_MB`, `CCL_AUTO_HEAPDUMP_CRITICAL_MB` | Tune high and critical heap dump thresholds. |
+| `CCL_CONFIG_DIR` | Isolates CCL configuration from the default config home. |
+
 ## Troubleshooting Variables
 
 If `/gateway doctor` says the file and shell disagree, decide which source should win and remove the other. If a provider SDK appears to use an unexpected base URL, check whether compatibility variables were set outside CCL. If a variable appears ignored, confirm whether it is read at process startup and restart the shell/session.

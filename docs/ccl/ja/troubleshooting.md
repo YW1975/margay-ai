@@ -1,86 +1,91 @@
 # トラブルシューティング
 
-> このページは CCL ドキュメント一覧から生成されています。scripts/generate-ccl-docs.mjs を編集してから再生成してください。
+> このページは公開ドキュメントのソースとして保守されています。Troubleshooting records は共有前に sanitize してください。
 
 <!-- section: purpose -->
-## 目的
+## Purpose
 
-CCL のトラブルシューティングでは、まず失敗層を特定します。インストール、認証、ゲートウェイルーティング、MCP、権限、ツール、エージェント、セッション状態、リモート制御、統制ゲートです。
+CCL の troubleshooting は failing layer の特定から始まります。Installation、startup、settings、authentication、gateway routing、endpoint compatibility、context pressure、permissions、MCP、tools、agents、plugins、sessions、remote automation、GitHub integration、documentation publishing、RLL governance です。複数 layer を一度に変更すると原因が隠れます。
 
 <!-- section: capabilities -->
-## 機能範囲
+## Capabilities
 
-- `ccl doctor` で環境状態を確認します。
-- `/gateway status` と `/gateway doctor` で、ゲートウェイ資格情報、到達性、プレースホルダー、shell 環境変数によるシャドーイングを調査します。
-- endpoint registry が設定されている場合、`/endpoint status` で endpoint 固定と文脈適合を診断します。
-- 利用可能な場合、`/cost`、`/context`、`/usage` で token/cost 可視性、文脈ウィンドウ圧迫、plan limit 状態を分けます。
-- MCP 診断、権限プロンプト、remote eligibility エラーで外部 tool または remote session の失敗を切り分けます。
+- `ccl doctor` で installation、updater、PATH、shell、package manager、sandbox、managed setting、alias、ripgrep diagnostics を確認できます。
+- `/gateway status` と `/gateway doctor` で gateway credential、placeholder、reachability、auth-conflict、shell-env shadowing を確認できます。
+- `/endpoint`、`/model`、`/priority`、`/effort`、`/cost`、`/usage`、`/context` で model routing と context-window issues を確認できます。
+- `/permissions`、`/allowed-tools`、command-specific permission prompts で tool-denial issues を確認できます。
+- `ccl mcp list`、`/mcp`、server config、auth status、debug logs で MCP failures を切り分けます。
+- `ccl agents --setting-sources user,project,local`、`/agents`、`/skills`、`/plugins`、`/hooks` で extension visibility issues を確認できます。
+- Remote-session failures は remote precondition types を使って分類します。
+- Official-documentation failures は docs validation、public audit、site build、rendered HTML checks、coverage matrix checks で確認します。
 
 <!-- section: operational-model -->
-## 運用モデル
+## Operational model
 
-- 広範な再試行より、層ごとの証拠を優先します。設定変更前に正確なコマンド、終了コード、ログ、ビルドバージョンを記録してください。
-- ゲートウェイトラブルシューティングでは、CCL 実行時の問題とゲートウェイサービスの問題を分けて扱います。cache ヒット計測と provider usage フィールドは、CCL が検証済みフィールドを受け取るまではゲートウェイ側の証拠です。
-- 公開ドキュメントの失敗では、generator source、生成 Markdown、公開リポジトリ同期、audit 出力、site build、ホスト先を別々に検証します。
+Configuration を変更する前に evidence を集めます。良い report には exact command、exit code、CCL version、install method、cwd trust state、relevant setting source、sanitized environment variable names、model/endpoint selection、last diagnostic output が含まれます。Tokens、private paths、full transcripts、repository secrets は含めません。
+
+Layer routing は実用的です。
+
+- Startup failure: install method、binary path、shell PATH、aliases、package manager、updater state を確認します。
+- Auth failure: gateway config、direct API-key config、OAuth state、MCP server auth を分けて確認します。
+- Wrong model: model selection precedence、endpoint pin、gateway config、classifier output、debug route markers を確認します。
+- Tool denied: permission mode、allow/deny/ask rules、managed policy、tool-specific validation を確認します。
+- Extension missing: setting sources、plugin-only policy、project trust、bare mode、feature gates を確認します。
+- Remote failure: launch を繰り返す前に typed preconditions を確認します。
+- Docs failure: source Markdown、inventory、audits、build output、generated site、hosted URL を別々に検証します。
+
+Gateway troubleshooting では runtime bugs と gateway service behavior を分けます。Cache-hit accounting、provider-side pricing、gateway usage fields は active transport または gateway が返した場合だけ authoritative evidence です。
 
 <!-- section: configuration -->
-## 設定とコマンド
+## Configuration and commands
 
-- 公開 issue 記録では CCL 実行時問題とゲートウェイまたはサービス問題を分け、私有 hostname、パス、secret を避けてください。
-- 古いゲートウェイ設定を調べる場合、shell の `CCL_GATEWAY_URL` / `CCL_GATEWAY_KEY` と `~/.ccl/gateway.json` を比較します。shell 値がある場合は意図的に優先されます。
-- remote-session 失敗では、policy blocked、not logged in、no remote environment、not in git repo、no git remote、GitHub app missing など具体的な precondition type を記録してください。
+- Environment health: `ccl doctor`。
+- Gateway diagnosis: `/gateway doctor`。
+- Auth status: `ccl auth status`、`/status`、`/login`、`/logout`。
+- Model route: `/model`、`/endpoint`、`/priority`、`/effort`、`/gateway status`、debug file markers。
+- Context pressure: `/context`、`/compact`、`/memory`、`/usage`。
+- MCP: `ccl mcp list`、`/mcp`、`--mcp-config`、MCP auth commands。
+- Agent visibility: `ccl agents --setting-sources user,project,local`。
+- Plugin/skill/hook visibility: `/plugins`、`/skills`、`/hooks`、`--plugin-dir`、`--bare`、setting-source filters。
+- GitHub/CI: `gh auth status -a`、`/install-github-app`、`/review`、`/pr-comments`、`/security-review`、CI logs。
+- Official docs: `node scripts/check-docs.mjs`、`bash scripts/audit-public-content.sh`、`node scripts/build-site.mjs`、`node scripts/check-official-docs-coverage.mjs`。
 
-## 症状別ルーティング
+## Symptom Routing
 
-| 症状 | 最初に見る | 集める証拠 |
+| Symptom | Start here | Evidence to collect |
 | --- | --- | --- |
-| `ccl` が起動しない | [インストール](installation.md) | `ccl --version`、shell PATH、インストール方法。 |
-| login または gateway が失敗する | [認証](authentication.md) | `/gateway doctor`、redact 済み環境変数名、gateway URL health。 |
-| モデルまたは provider が違う | [ゲートウェイとモデルルーティング](model-routing.md) | 要求モデル、endpoint、usage フィールド、route config。 |
-| startup warning が出る | [環境変数](env-vars.md) | warning text、関連 env variable 名、`~/.ccl/gateway.json` の有無、memory file size。 |
-| コマンドが見つからない | [コマンド](commands.md) | 対話 `/` list、build version、feature flag または plugin 状態。 |
-| CLI flag が拒否される | [CLI リファレンス](cli-reference.md) | `ccl --help`、正確な command と flag。 |
-| MCP tool が見つからない | [MCP サーバーとツール](mcp.md) | `ccl mcp list`、server config、auth status。 |
-| Agent が見えない | [エージェント](agents.md) | `ccl agents --setting-sources user,project,local`、agent definition path。 |
-| ドキュメントページが壊れている | [公開ドキュメント公開](public-docs.md) | local `node scripts/check-ccl-docs.mjs`、public URL、build log。 |
+| CCL が起動しない | [インストール](installation.md) | `ccl --version`、invoked binary、shell PATH、install method、`ccl doctor`。 |
+| Login または gateway が失敗する | [認証](authentication.md) | `/gateway doctor`、sanitized env names、`gateway.json` presence、可能なら `GET /auth/me` result。 |
+| Model または endpoint が違う | [ゲートウェイとモデルルーティング](model-routing.md) | requested model、endpoint pin、gateway config source、debug route markers、usage fields。 |
+| Tool が拒否される | [権限とセキュリティ](permissions-security.md) | permission mode、allow/deny/ask rules、managed policy、exact tool input。 |
+| MCP tool がない | [MCP サーバーとツール](mcp.md) | `ccl mcp list`、server scope、auth status、policy allow/deny result。 |
+| Agent または skill が見えない | [Agents](agents.md)、[Skills](skills.md) | setting sources、project trust、plugin-only policy、bare mode、definition path。 |
+| Remote session が block される | [リモートセッションと自動化](remote-automation.md) | typed precondition、login state、remote env state、git remote、repository access。 |
+| GitHub setup が失敗する | [GitHub と CI ワークフロー](github-ci.md) | `gh --version`、`gh auth status -a`、repo permissions、workflow/secret existence。 |
+| Docs page が壊れている | [公開ドキュメント公開](public-docs.md) | local docs check、audit output、build log、rendered HTML path、hosted URL。 |
 
-## Gateway 診断
+## Escalation Checklist
 
-複数の資格情報を変更する前に `/gateway doctor` を実行します。effective gateway、file configuration、shell variables、OAuth/API-key state、可能な場合は `GET /auth/me` による到達性を確認します。`CCL_GATEWAY_URL` と `CCL_GATEWAY_KEY` の片方だけが設定されている場合、壊れた原子的ペアとして扱い、両方を設定するか両方を消します。
-
-## 起動時 warning 診断
-
-OAuth と gateway credential を split deployment で併用している場合、dual-channel note は想定された情報です。意図した構成であることを確認してから `CCL_QUIET_DUAL_CHANNEL=1` を設定します。auth-conflict warning は provider SDK の API-key または base-URL variable が OAuth と競合していることを示します。CCL settings または shell から衝突 variable を消してください。large memory-file warning は project root の大きすぎる instruction file、たとえば `CCL.md` から出ます。binary package の問題と考える前に、ファイルを短くするか移動してください。
-
-## Agent 診断
-
-`ccl agents --setting-sources user,project,local` を実行して可視性を確認します。agent が MCP server を要求する場合、対応 server が設定済みで認証済みか確認します。組み込み agent では Explore と Plan は runtime で利用できますが、他の一部 agent は feature flag や entrypoint rule に依存することがあります。
-
-## エスカレーションする時
-
-エスカレーション時は小さな再現を添えます。正確なコマンド、redact 済み環境変数名、build version、期待動作、実際の動作、最後の関連診断出力を含めます。API key、生の私有パス、機密プロジェクト内容を含む完全 transcript は含めないでください。
+Escalation の前に小さな reproduction を用意します。Exact command、CCL version、sanitized environment variable names、relevant settings source、expected behavior、actual behavior、exit code、last diagnostic output です。File paths は repository-relative かつ共有可能な場合だけ含めます。
 
 <!-- section: source-evidence -->
-## ソース上の根拠
+## Source evidence
 
-- `commands/doctor`
-- `commands/gateway/gateway.tsx`
-- `commands/endpoint/endpoint.tsx`
-- `commands/cost/index.ts`
-- `commands/context/index.ts`
-- `commands/usage/index.ts`
-- `services/gateway/gatewayDoctor.ts`
-- `services/api/errors.ts`
-- `utils/background/remote/remoteSession.ts`
-- `docs/ccl0622-runtime-issue-record.md`
+- `commands/doctor/doctor.tsx` と `utils/doctorDiagnostic.ts` は doctor diagnostics と installation health checks を実装します。
+- `commands/gateway/gateway.tsx`、`commands/gateway/gateway-helpers.ts`、`services/gateway/gatewayDoctor.ts` は gateway status、doctor findings、placeholder detection、env shadowing、reachability probing を実装します。
+- `utils/model/endpointCompat.ts`、`utils/model/model.ts`、`commands/model/model.tsx`、`commands/endpoint/endpoint.tsx` は route と endpoint diagnosis surfaces を実装します。
+- `services/mcp/config.ts`、`commands/mcp/mcp.tsx`、`services/mcp/auth.ts` は MCP diagnosis surfaces を提供します。
+- `utils/background/remote/remoteSession.ts` と `utils/background/remote/preconditions.ts` は remote-session failure categories を定義します。
+- `commands/install-github-app/install-github-app.tsx`、`commands/review.ts`、`commands/pr_comments/index.ts` は GitHub diagnosis と review surfaces を提供します。
+- `scripts/check-official-docs-coverage.mjs` と `margay-ai/scripts` の public docs scripts は official-documentation validation を提供します。
 
 <!-- section: related -->
-## 関連ページ
+## Related pages
 
+- [CCL の仕組み](how-ccl-works.md)
 - [インストールと更新](installation.md)
 - [認証](authentication.md)
-- [環境変数](env-vars.md)
 - [ゲートウェイとモデルルーティング](model-routing.md)
 - [MCP サーバーとツール](mcp.md)
 - [リモートセッションと自動化](remote-automation.md)
-- [公開ドキュメント公開](public-docs.md)
+- [GitHub と CI ワークフロー](github-ci.md)

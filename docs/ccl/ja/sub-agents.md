@@ -1,64 +1,61 @@
 # サブエージェント
 
-> このページは CCL ドキュメント一覧から生成されています。scripts/generate-ccl-docs.mjs を編集してから再生成してください。
+> このページは公開ドキュメントのソースとして保守されています。Subagents は separate execution contexts であり、permission bypass ではありません。
 
 <!-- section: purpose -->
-## 目的
+## Purpose
 
-サブエージェントにより、CCL セッションは専用指示、ツール制限、モデル選択、任意のメモリ動作を持つ別コンテキストへ作業を委任できます。
+Subagents は CCL session から focused work を別 context に委任します。その context は独自の system prompt、model selection、tool pool、permission mode、MCP clients、hooks、memory behavior、run limits を持てます。Separation が品質を上げる場合に使います。Independent review、parallel research、test execution、scoped exploration、specialist procedure などです。
 
 <!-- section: capabilities -->
-## 機能範囲
+## Capabilities
 
-- frontmatter 付き Markdown でカスタムエージェントを定義します。
-- `name`、`description`、`tools`、`disallowedTools`、`skills`、`mcpServers`、`hooks`、`model`、`effort`、`permissionMode`、`maxTurns`、`background`、`memory`、指示本文を制御します。
-- 長時間の調査やチェックにはバックグラウンドエージェントを使い、メインセッションを進められます。
+- Agent tool、built-in agents、plugin agents、custom agent definitions から subagent を開始できます。
+- Parent callbacks の一部を共有する synchronous agents、または独立して継続する background agents を実行できます。
+- Execution 前に agent-specific tools と MCP tools を解決します。
+- Frontmatter skills を agent context に preload します。
+- `SubagentStart` hooks を実行し、agent stop hooks を `SubagentStop` に変換します。
+- 設定されている場合、in-process teammate-style agents の viewable transcripts と tool results を保持します。
+- 対応する routing では background または in-process agents を message routing で resume できます。
 
 <!-- section: operational-model -->
-## 運用モデル
+## Operational model
 
-- サブエージェントの description はルーティング信号です。具体的で短く、そのエージェントをいつ使うかに集中させます。
-- エージェント単位のツールルールと権限モードは worker ツールプールに反映されますが、CCL の権限方針を公開 bypass するものではありません。
+Subagent execution は parent session が agent definition を選んだ後に始まります。CCL は agent model、tool list、MCP clients、additional working directories、system prompt を解決します。Agent は独自の context と messages を受け取り、parent authority を無制限に継承するわけではありません。
+
+Synchronous agents は parent state と abort behavior をより多く共有します。Background agents は separate abort controller を持ち、non-interactive execution として扱われるため parent session は続行できます。Fork-style agents は fork feature 有効時により多くの context を継承できますが、recursive uncontrolled spawning を防ぐ guard があります。
+
+Permissions は引き続き有効です。Agent-level `tools`、`disallowedTools`、`permissionMode`、MCP requirements は worker surface を形作りますが、unsafe task を safe に変えるものではありません。Hooks と plugin-only policy も agent lifecycle behavior を block または limit できます。
 
 <!-- section: configuration -->
-## 設定とコマンド
+## Configuration and commands
 
-- ユーザー、プロジェクト、ローカルの各スコープにある agent ディレクトリを使います。shell、ファイル書き込み、MCP には最小権限のツール制限を適用してください。
-- `requiredMcpServers` は利用可能な MCP サーバー名と照合され、要件を満たすエージェントだけが active agent として表示されます。
+次の場合に subagents を使います。
 
-## このページの範囲
+| Situation | Recommended agent pattern |
+| --- | --- |
+| 広い repository exploration | Read/search-only agent で write authority を下げます。 |
+| Independent code review | Reviewer agent に source-reading tools を与え、edit tools は与えません。 |
+| Test execution | Test-runner agent に command execution を許し、短い pass/fail output を返させます。 |
+| Long-running research | Background agent に bounded tools と明確な return artifact を与えます。 |
+| Workflow step | Workflow agent adapter に explicit workflow params と expected artifacts を渡します。 |
 
-このページは委任 task agent の定義に使います。[エージェント](agents.md) の高レベル registry model は繰り返しません。Markdown/JSON agent definition を作成、レビュー、デバッグする場合に使ってください。
-
-## 定義フィールド
-
-| フィールド | 制御するもの | 使う場面 |
-| --- | --- | --- |
-| `description` | host model に見せる routing signal | 常に必要です。具体的で action-oriented にします。 |
-| `tools` / `disallowedTools` | 許可または禁止する tool name | agent を読み取り専用または特定 action に制限したい時。 |
-| `skills` | preload する skill | agent が反復可能な手順を使うべき時。 |
-| `mcpServers` / `requiredMcpServers` | MCP 設定または availability requirement | agent が外部 tool に依存する時。 |
-| `model` / `effort` | モデル preference と reasoning effort | コスト、遅延、task 難易度で別 default が必要な時。 |
-| `permissionMode` | tool approval behavior | agent により厳しい、または狭い execution policy が必要な時。 |
-| `background` | background execution | 長時間の調査やチェックに使います。 |
-| `memory` | persistent memory scope | 反復作業が保存文脈から実際に利益を得る場合だけ使います。 |
-
-## 安全な委任チェックリスト
-
-カスタム subagent を追加する前に、description がいつ使うかを説明していること、tool access が必要以上に広くないこと、MCP requirements が明示されていること、background behavior が意図されたものであること、persistent memory scope に secret やグローバル再利用すべきでない project-private claim が入らないことを確認します。
+Custom subagent を追加する前に、`description` が使用条件を示すこと、tool access が必要最小限であること、MCP dependencies が明示されていること、background behavior が意図的であること、memory が secrets を避けること、isolation mode が repository risk に合うことを確認します。
 
 <!-- section: source-evidence -->
-## ソース上の根拠
+## Source evidence
 
-- `tools/AgentTool/loadAgentsDir.ts`
-- `tools/AgentTool/AgentTool.tsx`
-- `tools/AgentTool/agentMemory.ts`
-- `tools/AgentTool/agentMemorySnapshot.ts`
+- `tools/AgentTool/runAgent.ts` は agent-specific options を作り、tools と MCP tools を解決し、sync/background abort behavior を処理し、`SubagentStart` hooks を実行し、agent frontmatter hooks を登録し、skills を preload し、subagent context を作成します。
+- `tools/AgentTool/loadAgentsDir.ts` は tools、disallowed tools、skills、MCP servers、hooks、model、effort、permission mode、max turns、background、memory、isolation などの agent fields を parse します。
+- `tools/AgentTool/forkSubagent.ts` は fork-subagent behavior と implicit forks の guard を定義します。
+- `tools/AgentTool/resumeAgent.ts` は routing が対応する場合に viewable または background subagent sessions を reconstruct/resume します。
+- `tools/WorkflowTool/agentAdapter.ts` は workflow execution を agent-backed work に接続します。
 
 <!-- section: related -->
-## 関連ページ
+## Related pages
 
-- [エージェント](agents.md)
+- [Agents](agents.md)
+- [ワークフロー自動化](workflows.md)
 - [組み込みツール](tools.md)
-- [Skill](skills.md)
-- [メモリ、文脈、セッション](memory-sessions.md)
+- [権限とセキュリティ](permissions-security.md)
+- [Memory と Session 管理](memory-sessions.md)

@@ -1,66 +1,70 @@
-# Agent
+# Agents
 
-> 本页由 CCL 文档清单生成。请修改 scripts/generate-ccl-docs.mjs 后重新生成。
+> 本页作为公开文档源维护。Agent description 是路由契约，必须精确。
 
 <!-- section: purpose -->
-## 用途
+## Purpose
 
-CCL agent 是专用执行上下文，用于探索、计划、验证、指南、后台工作和自定义委派任务。
+CCL agents 是专门执行上下文，用于探索、计划、审查、测试、验证、指导、后台研究和自定义委派任务。主 session 可以让一个聚焦 worker 带着自己的 instructions、model preference、tool rules、MCP requirements、hooks、memory scope 和可选 background behavior 工作。
 
 <!-- section: capabilities -->
-## 能力范围
+## Capabilities
 
-- 内置 agent 包括 general-purpose、code-reviewer、test-runner、Explore、Plan、verification、statusline setup，以及启用时的 CCL guide 角色。
-- 自定义和插件 agent 从定义目录加载，可限制工具、模型、MCP 要求、hook、权限、记忆和后台行为。
-- agent 可以前台、后台或 teammate 风格 pair-agent 路径运行，并在支持时通过消息继续交互。
+- 内置 agents 包括 general-purpose、code-reviewer、test-runner、statusline setup，以及受 feature gate 控制的 Explore、Plan、guide 和 verification agents。
+- 自定义 agents 是 Markdown definitions，可从 user、project、local、managed 或 CLI argument sources 加载。
+- Plugin agents 从已安装 plugin bundles 加载，并以单独 source 显示。
+- Agents 可声明 `tools`、`disallowedTools`、`skills`、`mcpServers`、`hooks`、`model`、`effort`、`permissionMode`、`maxTurns`、`background`、`memory` 和 isolation settings。
+- Agent 可用性可以取决于已配置 MCP servers；缺少 required MCP servers 时，该 agent 会隐藏。
+- `/agents` 和 `ccl agents --setting-sources user,project,local` 用于检查 active agents 和胜出的 source。
 
 <!-- section: operational-model -->
-## 运行模型
+## Operational model
 
-- agent 发现会从内置、插件 agent 和自定义 Markdown 定义开始，然后按 MCP 可用性与权限规则过滤 active agent，再暴露给 Agent 工具 prompt。
-- 兼容保留的内置 type name 应视为路由标识。面向产品的文档应描述 CCL 角色和行为，而不是旧品牌。
-- `/buddy` 命令是 Agent 工具 teammate 路径上的便利 prompt。它会提供 `team_name` 和 teammate `name`，让 helper 通过 team channel 与主会话协作。
+Agent discovery 先加载 built-ins，再加入 plugin 和 custom definitions。自定义 Markdown 文件必须有 `name` 和 `description` frontmatter。无效 agent attempts 会被跳过并记录；通过 `--agents` 传入的 JSON agents 是逐个失败，不会因为一个坏定义丢弃整批。
+
+Active agents 按 `agentType` 与 source priority 去重。显示逻辑把它们分成 user、project、local、managed、plugin、CLI arg 和 built-in agents，并标注哪个 source 覆盖了另一个。Simple mode 只保留 built-ins。
+
+Agent 运行时，CCL 会解析 tool set、model、MCP tools 和 lifecycle context。`SubagentStart` hooks 可以追加 context；agent frontmatter hooks 只有在 source 符合 plugin-only policy 的信任要求时才注册。Frontmatter 中列出的 skills 会在可用时预加载。Background agents 使用不关联的 abort controller 和非交互执行；同步 agents 会共享更多父 session 状态。
 
 <!-- section: configuration -->
-## 配置与命令
+## Configuration and commands
 
-- 运行 `ccl agents` 查看已配置 agent。定义格式、作用域、MCP 要求、模型选择、hook、记忆和工具限制见 [子 agent](sub-agents.md)。
-- 如果 agent 要求 MCP server，CCL 会短暂等待匹配的 pending server；若仍缺少已认证工具面，会报告缺失项，而不是静默启动 agent。
+最小自定义 agent 形状：
 
-## Agent 与子 Agent 的区别
+```markdown
+---
+name: repo-reviewer
+description: Use when a repository change needs an independent correctness review.
+tools: Read,Grep
+model: inherit
+maxTurns: 8
+---
+Review the changed files for correctness risks, missing tests, and unsafe assumptions.
+```
 
-使用 Agent 页面理解 registry、内置角色、发现顺序和运行时行为。编写或调试 agent 定义时，使用 [子 Agent](sub-agents.md)。这个区分是有意设计的：`agents.md` 是产品和运行时指南；`sub-agents.md` 是定义和委派指南。
+操作建议：
 
-## 内置 Agent
-
-| Agent 角色 | 何时使用 | 说明 |
-| --- | --- | --- |
-| General-purpose | 开放式委派研究或实现支持 | 使用常规 agent 执行路径。 |
-| Code reviewer | commit、PR 或交接前对变更做聚焦审查 | 用于 bug 风险、回归、安全和缺失测试审查。 |
-| Test runner | 聚焦执行并总结测试命令或 harness run | 当输出可能很长，或测试证据需要简洁 pass/fail 报告时使用。 |
-| Explore | 修改前的只读调查 | 运行时可用；不再受已移除的 Explore/Plan feature gate 隐藏。 |
-| Plan | 在不立即编辑文件的情况下生成聚焦计划 | 与 Explore 一起在运行时可用。 |
-| CCL guide | 回答 CCL 行为、命令、设置、agent、workflow、MCP、plugin 和兼容行为问题 | 源码中的 canonical type name 为兼容保留，但用户面向角色是 CCL guidance。 |
-| Statusline setup / verification | 专门的设置或证据检查任务 | 可能依赖构建 flag 或运行时条件。 |
-
-## 发现与过滤
-
-CCL 先从内置 agent 开始，再加载插件和自定义 agent 定义。Active agent 按 `agentType` 去重，后续来源组可根据 loader 顺序覆盖较早定义。Required MCP server 会在 agent 暴露前按可用 server 名称检查。如果 required server 不可用，应诊断为 agent 不可用，而不是静默假设 agent 损坏。
+- 保持描述简短具体；它是主要路由信号。
+- 工具列表只授予真正需要的能力。
+- 显式列出不应使用的工具。
+- 如果 agent 依赖外部工具，应声明必需的 MCP 服务。
+- 只有工作能安全地在主会话继续时，才使用后台运行设置。
+- Agent 记忆只保存持久、非密钥、适合跨运行复用的知识。
 
 <!-- section: source-evidence -->
-## 源码依据
+## Source evidence
 
-- `tools/AgentTool/builtInAgents.ts`
-- `tools/AgentTool/built-in`
-- `tools/AgentTool/loadAgentsDir.ts`
-- `tools/AgentTool/AgentTool.tsx`
-- `tools/AgentTool/runAgent.ts`
-- `commands/buddy/index.ts`
+- `tools/AgentTool/builtInAgents.ts` 定义内置 agent 注册、功能门禁、SDK 禁用行为和非 SDK 入口的 guide agent 加载。
+- `tools/AgentTool/loadAgentsDir.ts` 定义 `AgentDefinition`、来源类型、frontmatter 字段、MCP 过滤、记忆快照初始化、Markdown/JSON 解析和内置 agent 回退行为。
+- `tools/AgentTool/runAgent.ts` 解析工具、模型、MCP 工具、hooks、skills、后台行为、中止控制器和子 agent 上下文。
+- `commands/agents/agents.tsx` 使用当前权限上下文和可用工具集合渲染 agents menu。
+- `tools/AgentTool/agentDisplay.ts` 定义来源分组顺序、覆盖标注和显示模型解析。
 
 <!-- section: related -->
-## 相关页面
+## Related pages
 
-- [子 Agent](sub-agents.md)
+- [子 Agents](sub-agents.md)
 - [内置工具](tools.md)
-- [Skill](skills.md)
+- [Skills](skills.md)
+- [MCP 服务器与工具](mcp.md)
 - [权限与安全](permissions-security.md)
