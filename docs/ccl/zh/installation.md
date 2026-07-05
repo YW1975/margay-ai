@@ -39,7 +39,7 @@ Install 命令会解析目标 channel 或明确版本，运行 native installer�
 | 诊断环境 | `ccl doctor` | 修改 `PATH`、shell aliases 或 package-manager 状态前先收集输出。 |
 | 安装 tarball | `npm install -g ./margay-ccl-core-<version>.tgz` | 使用适合目标主机和 artifact 的 package manager。 |
 
-当前公开 package metadata 标识包名为 `@margay/ccl-core`，版本为 `1.3.0`。不要在 setup scripts 中硬编码更旧版本；诊断用户机器时，以已安装的 `ccl --version` 为准。
+当前公开 package metadata 标识包名为 `@margay/ccl-core`，版本为 `1.3.1`。不要在 setup scripts 中硬编码更旧版本；诊断用户机器时，以已安装的 `ccl --version` 为准。
 
 <!-- section: source-evidence -->
 ## Source evidence

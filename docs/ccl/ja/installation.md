@@ -39,7 +39,7 @@ Command が起動しない、誤った executable に解決される、shell ご
 | Environment を diagnose | `ccl doctor` | `PATH`、shell aliases、package-manager state を変える前に output を集めます。 |
 | Tarball を install | `npm install -g ./margay-ccl-core-<version>.tgz` | Host と artifact に合う package manager を使います。 |
 
-現在の public package metadata は package name `@margay/ccl-core`、version `1.3.0` を示しています。Setup scripts に古い version を hard-code しないでください。User machine を診断するときは installed `ccl --version` を確認します。
+現在の public package metadata は package name `@margay/ccl-core`、version `1.3.1` を示しています。Setup scripts に古い version を hard-code しないでください。User machine を診断するときは installed `ccl --version` を確認します。
 
 <!-- section: source-evidence -->
 ## Source evidence

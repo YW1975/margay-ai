@@ -39,7 +39,7 @@ The install command resolves a target channel or explicit version, runs the nati
 | Diagnose environment | `ccl doctor` | Collect its output before changing PATH, shell aliases, or package-manager state. |
 | Install tarball | `npm install -g ./margay-ccl-core-<version>.tgz` | Use the package manager appropriate for the host and artifact. |
 
-Current public package metadata identifies the package as `@margay/ccl-core` and version `1.3.0`. Do not hard-code an older version in setup scripts; verify with the installed `ccl --version` when diagnosing a user machine.
+Current public package metadata identifies the package as `@margay/ccl-core` and version `1.3.1`. Do not hard-code an older version in setup scripts; verify with the installed `ccl --version` when diagnosing a user machine.
 
 <!-- section: source-evidence -->
 ## Source evidence
