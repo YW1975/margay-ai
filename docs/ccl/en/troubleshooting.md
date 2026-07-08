@@ -64,6 +64,14 @@ Gateway troubleshooting should distinguish runtime bugs from gateway service beh
 | GitHub setup fails | [GitHub and CI Workflows](github-ci.md) | `gh --version`, `gh auth status -a`, repo permissions, workflow/secret existence. |
 | Docs page broken | [Public Documentation Publishing](public-docs.md) | local docs check, audit output, build log, rendered HTML path, hosted URL. |
 
+## Known Limitations
+
+These are honest, current-build limitations, not configuration errors:
+
+- Background session subcommands are not available yet. `ccl ps`, `ccl logs`, `ccl attach`, `ccl kill`, and the `--bg`/`--background` flags exit with a clear "not available in this build yet" message. The background session registry itself works; only the ps/logs/attach/kill CLI surface is still a stub.
+- The message actions menu (Shift+Up on a message) requires fullscreen mode. Outside fullscreen the menu keybindings are not wired, so the menu does not open; this is expected, not a broken terminal.
+- The Debug agent's probe supports terminal (full) and web (minimal, requires a local browser automation dependency); desktop probing is not yet supported and returns a clear error.
+
 ## Escalation Checklist
 
 Escalate only after collecting a small reproduction: exact command, CCL version, sanitized environment variable names, relevant settings source, expected behavior, actual behavior, exit code, and last diagnostic output. Include file paths only when they are repository-relative and safe to share.

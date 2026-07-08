@@ -70,6 +70,20 @@ CCL reads CCL-prefixed environment variables for model selection, logging, permi
 | `CCL_BASE_URL`, `CCL_API_KEY` | No automatic sync | Must not be copied into provider routing variables because that can hijack Claude-channel calls or conflict with account auth. |
 | `CCL_GATEWAY_URL`, `CCL_GATEWAY_KEY` | No provider SDK sync | Gateway routing stays in the CCL namespace or gateway file. |
 
+## Dual-Read Variables (CCL Name First, Legacy Fallback)
+
+For a set of behavior toggles, CCL reads the `CCL_*` name first and falls back to the legacy compatibility name only when the `CCL_*` name is unset. Set the `CCL_*` form in new deployments; existing scripts using the legacy names keep working.
+
+| CCL variable (wins when set) | Legacy fallback | Purpose |
+| --- | --- | --- |
+| `CCL_SIMPLE` | `CLAUDE_CODE_SIMPLE` | Bare/minimal runtime mode (same effect as `--bare`). |
+| `CCL_MAX_OUTPUT_TOKENS` | `CLAUDE_CODE_MAX_OUTPUT_TOKENS` | Explicit max-output-token override; when set, the automatic output-token escalation is skipped. |
+| `CCL_REMOTE_MEMORY_DIR` | `CLAUDE_CODE_REMOTE_MEMORY_DIR` | Overrides the base directory for memory files in remote/containerized runs. |
+| `CCL_SKIP_PROMPT_HISTORY` | `CLAUDE_CODE_SKIP_PROMPT_HISTORY` | Skips writing prompts to the command history (used by spawned verification sessions to avoid polluting real history). |
+| `CCL_DISABLE_CLAUDE_MDS` | `CLAUDE_CODE_DISABLE_CLAUDE_MDS` | Disables loading of project/user memory instruction files. |
+
+`CCL_CONFIG_DIR` follows the same idea with an OR chain: the config home resolves to `CCL_CONFIG_DIR`, then `CLAUDE_CONFIG_DIR`, then the home directory default. The first non-empty value wins.
+
 ## Operational Variables
 
 | Variable | Use |
@@ -82,7 +96,7 @@ CCL reads CCL-prefixed environment variables for model selection, logging, permi
 | `CCL_JSONL_HEAP_HEADROOM_MB` | Overrides JSONL heap headroom for large structured streams. |
 | `CCL_AUTO_HEAPDUMP_OFF` | Disables automatic heap dump monitoring. |
 | `CCL_AUTO_HEAPDUMP_HIGH_MB`, `CCL_AUTO_HEAPDUMP_CRITICAL_MB` | Tune high and critical heap dump thresholds. |
-| `CCL_CONFIG_DIR` | Isolates CCL configuration from the default config home. |
+| `CCL_CONFIG_DIR` | Isolates CCL configuration from the default config home; wins over the legacy `CLAUDE_CONFIG_DIR`, which wins over the home-directory default. |
 
 ## Troubleshooting Variables
 
@@ -95,6 +109,8 @@ When using OAuth plus the Margay gateway, avoid setting provider SDK API-key or 
 
 - `bootstrap/envSync.ts`
 - `bootstrap/gatewayConfig.ts`
+- `utils/env.ts` (config-dir resolution chain)
+- `utils/envUtils.ts`, `history.ts`, `memdir/paths.ts`, `tools/AgentTool/agentMemory.ts`, `context.ts`, `query.ts` (dual-read call sites)
 - `commands/gateway/gateway.tsx`
 - `commands/gateway/gateway-helpers.ts`
 - `commands/endpoint/endpoint.tsx`

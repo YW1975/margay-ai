@@ -70,6 +70,20 @@ CCL 会读取 CCL 前缀环境变量，用于模型选择、日志、权限、�
 | `CCL_BASE_URL`, `CCL_API_KEY` | 不自动同步 | 不得复制到 provider routing 变量，否则可能劫持 Claude 通道调用或与账号认证冲突。 |
 | `CCL_GATEWAY_URL`, `CCL_GATEWAY_KEY` | 不同步到 provider SDK | 网关路由保留在 CCL 命名空间或 gateway file 中。 |
 
+## 双读变量（CCL 名优先，遗留名回退）
+
+对一组行为开关，CCL 先读 `CCL_*` 名字，只有 `CCL_*` 未设置时才回退到遗留兼容名。新部署应设置 `CCL_*` 形式；使用遗留名的既有脚本继续有效。
+
+| CCL 变量（设置即生效） | 遗留回退名 | 用途 |
+| --- | --- | --- |
+| `CCL_SIMPLE` | `CLAUDE_CODE_SIMPLE` | Bare/精简运行时模式（等效于 `--bare`）。 |
+| `CCL_MAX_OUTPUT_TOKENS` | `CLAUDE_CODE_MAX_OUTPUT_TOKENS` | 显式最大输出 token 覆盖；设置后跳过自动输出 token 升级。 |
+| `CCL_REMOTE_MEMORY_DIR` | `CLAUDE_CODE_REMOTE_MEMORY_DIR` | 覆盖远程/容器化运行中记忆文件的基础目录。 |
+| `CCL_SKIP_PROMPT_HISTORY` | `CLAUDE_CODE_SKIP_PROMPT_HISTORY` | 跳过把 prompt 写入命令历史（派生的验证会话用它避免污染真实历史）。 |
+| `CCL_DISABLE_CLAUDE_MDS` | `CLAUDE_CODE_DISABLE_CLAUDE_MDS` | 禁用项目/用户记忆指令文件的加载。 |
+
+`CCL_CONFIG_DIR` 遵循同样思路，但用 OR 链：config home 依次解析 `CCL_CONFIG_DIR`、`CLAUDE_CONFIG_DIR`、home 目录默认值，第一个非空值胜出。
+
 ## 运维变量
 
 | 变量 | 用途 |
@@ -82,7 +96,7 @@ CCL 会读取 CCL 前缀环境变量，用于模型选择、日志、权限、�
 | `CCL_JSONL_HEAP_HEADROOM_MB` | 为大型结构化流覆盖 JSONL heap headroom。 |
 | `CCL_AUTO_HEAPDUMP_OFF` | 关闭自动 heap dump 监控。 |
 | `CCL_AUTO_HEAPDUMP_HIGH_MB`, `CCL_AUTO_HEAPDUMP_CRITICAL_MB` | 调整 high 和 critical heap dump 阈值。 |
-| `CCL_CONFIG_DIR` | 将 CCL 配置与默认 config home 隔离。 |
+| `CCL_CONFIG_DIR` | 将 CCL 配置与默认 config home 隔离；优先于遗留的 `CLAUDE_CONFIG_DIR`，后者优先于 home 目录默认值。 |
 
 ## 环境变量故障排查
 
@@ -95,6 +109,8 @@ CCL 会读取 CCL 前缀环境变量，用于模型选择、日志、权限、�
 
 - `bootstrap/envSync.ts`
 - `bootstrap/gatewayConfig.ts`
+- `utils/env.ts`（config-dir 解析链）
+- `utils/envUtils.ts`、`history.ts`、`memdir/paths.ts`、`tools/AgentTool/agentMemory.ts`、`context.ts`、`query.ts`（双读调用点）
 - `commands/gateway/gateway.tsx`
 - `commands/gateway/gateway-helpers.ts`
 - `commands/endpoint/endpoint.tsx`

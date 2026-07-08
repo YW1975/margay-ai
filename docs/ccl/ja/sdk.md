@@ -10,8 +10,9 @@ CCL SDK は `@margay/ccl-core/sdk` の import path を公開し、host process �
 <!-- section: capabilities -->
 ## 機能範囲
 
-- `query(prompt, options)` で managed CCL subprocess を開始します。
-- `query(prompt, { resume: sessionId })` で通常 session を再開します。
+- `query({ prompt, options })` で managed CCL subprocess を開始し、`Query` handle（event stream + session 制御メソッド）を受け取ります。
+- `query({ prompt, options: { resume: sessionId } })` で通常 session を再開します。
+- `interrupt`、`setModel`、`setPermissionMode`、`rewindFiles` などの制御メソッドで、event stream を止めずに実行中の session を操作します。
 - `resumeWithDecision(sessionId, decision, options)` で suspend した approval flow を再開します。
 - `canUseTool` で tool use を intercept し、`allow`、`deny`、`pending` を返します。
 - `SessionStore` interface で pending approval と accumulated usage を永続化します。
@@ -31,13 +32,15 @@ CCL SDK は `@margay/ccl-core/sdk` の import path を公開し、host process �
 - `@margay/ccl-core/sdk` から import します。
 - host が特定の CLI build を指す必要がある場合は `CCL_SDK_CLI_PATH` を設定します。
 - pending approval と usage を host 管理の永続化にしたい場合は、`CCL_SDK_STORE_DIR` を設定するか custom `SessionStore` を渡します。
-- CCL gateway compatible route には `provider: { type: 'openai-compatible', baseUrl, apiKey }` を使えます。CLI に設定済みの gateway と account state を継承することもできます。
+- CCL gateway compatible route には `provider: { type: 'openai-compatible', baseUrl, apiKey }` を使います。これは CCL gateway channel（`CCL_GATEWAY_URL` / `CCL_GATEWAY_KEY`）に対応し、gateway は tool calling を正規化し、native function calling のないモデルを黙って劣化させず明確に拒否します。
+- direct provider protocol を話す endpoint には `provider: { type: 'anthropic', baseUrl?, apiKey? }` を使います。これは `--base-url` / `--api-key` に対応します。
+- `provider` を省略すると、CLI に設定済みの gateway と account state を継承します。
 
 ## 公開 exports
 
 | Export | 目的 |
 | --- | --- |
-| `query` | 1 つの prompt を実行し、`result`、`suspended`、fatal `error` まで SDK events を stream します。 |
+| `query` | 1 つの prompt を実行して `Query` handle を返します。`result`、`suspended`、fatal `error` まで SDK events を stream し、session 制御メソッドも公開します。 |
 | `queryWithTransport` | caller supplied transport seam で実行します。tests や advanced hosts 向けです。 |
 | `resumeWithDecision` | pending approval で suspend した session を再開します。 |
 | `buildCliArgs` | SDK options を CLI arguments に変換します。 |
@@ -48,6 +51,37 @@ CCL SDK は `@margay/ccl-core/sdk` の import path を公開し、host process �
 | `getSessionUsage` | store から session の accumulated usage を読みます。 |
 | `fileSessionStore` | file-backed `SessionStore` 実装です。 |
 | `defaultStoreDir` | default SDK store directory です。 |
+
+## Query handle と制御メソッド
+
+`query({ prompt, options })` は `Query` handle を返します。SDK events の async iterable であると同時に、CLI 制御 protocol を話す制御メソッド群を持ちます。位置引数形式 `query(prompt, options)` はまだ動きますが deprecated です。新しいコードはオブジェクト形式を使ってください。
+
+handle は下層の event loop を先行して pump するため、host が events を iterate しなくても制御メソッドは resolve します。events はバッファされて iterator に順序どおり再生されるので、host が見る stream は素の event generator と同一です。query 終了後（result 配信済み、transport closed、または subprocess 終了）は、未決および以降の制御呼び出しはすぐ reject されます。唯一の例外は `rewindFiles` で、これは run 後の操作として `result` event と `close()` の間も呼び出せます。
+
+| メソッド | 目的 |
+| --- | --- |
+| `interrupt()` | 現在の turn を中断します。 |
+| `setPermissionMode(mode)` | session 中に permission mode を切り替えます。 |
+| `setModel(model?)` | session の model を切り替えます。引数を省略するとリセットします。 |
+| `setMaxThinkingTokens(n)` | thinking token 上限を設定またはクリア（`null`）します。 |
+| `mcpServerStatus()` | MCP server の状態を報告します。 |
+| `reconnectMcpServer(name)` | MCP server を 1 つ再接続します。 |
+| `toggleMcpServer(name, enabled)` | MCP server を 1 つ有効化/無効化します。 |
+| `setMcpServers(servers)` | MCP server の集合を置き換えます。 |
+| `stopTask(id)` | 実行中の background task を停止します。 |
+| `applyFlagSettings(settings)` | flag 形式の設定を runtime に適用します。 |
+| `rewindFiles(userMessageId, options?)` | あるユーザーメッセージ以降のファイル変更を巻き戻します。`{ dry_run: true }` でプレビューできます。`result` event 後も呼び出せます。 |
+| `initializationResult()` | 解析済み initialize payload（commands、agents、models、account、output styles）を返します。 |
+| `reinitialize()` | 新しい initialize request を送り、キャッシュ payload を更新します。 |
+| `supportedCommands()` | session が対応するコマンド一覧（`initializationResult()` から派生）。 |
+| `supportedModels()` | session が対応するモデル一覧（`initializationResult()` から派生）。 |
+| `supportedAgents()` | session が対応する agents 一覧（`initializationResult()` から派生）。 |
+| `accountInfo()` | account 情報を返します（`initializationResult()` から派生）。 |
+| `close()` | subprocess を終了して stream を閉じます。冪等です。 |
+
+event loop がもともと要求する initialize の response は解析されキャッシュされるため、`initializationResult()` とその派生読み取り（`supportedCommands`、`supportedModels`、`supportedAgents`、`accountInfo`）は wire 上に 2 つ目の initialize を送りません。`reinitialize()` は送信してキャッシュを更新します。
+
+suspend と resume は handle でも変わりません。`pending` permission decision は `suspended` event を yield し、`resumeWithDecision(sessionId, decision)` が新しい resumed stream を開始します。
 
 ## Query options の概要
 
@@ -80,13 +114,16 @@ stream は JSON serializable events を返します。重要な event types:
 ```ts
 import { query } from '@margay/ccl-core/sdk'
 
-for await (const event of query('audit the workspace', {
-  cwd: '/srv/workspace',
-  model: 'deepseek-v4-pro',
-  maxTurns: 30,
-  canUseTool: async (toolName, input, context) => {
-    if (toolName === 'Bash') return { behavior: 'pending' }
-    return { behavior: 'allow' }
+for await (const event of query({
+  prompt: 'audit the workspace',
+  options: {
+    cwd: '/srv/workspace',
+    model: 'deepseek-v4-pro',
+    maxTurns: 30,
+    canUseTool: async (toolName, input, context) => {
+      if (toolName === 'Bash') return { behavior: 'pending' }
+      return { behavior: 'allow' }
+    },
   },
 })) {
   if (event.type === 'suspended') {
@@ -135,6 +172,7 @@ for await (const event of resumeWithDecision(sessionId, {
 - `sdk/README.md`
 - `sdk/API.md`
 - `sdk/query.ts`
+- `sdk/queryHandle.ts`
 - `sdk/store.ts`
 - `sdk/transport.ts`
 - `sdk/types.ts`

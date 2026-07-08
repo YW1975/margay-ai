@@ -10,7 +10,7 @@ CCL agents are specialized execution contexts used for exploration, planning, re
 <!-- section: capabilities -->
 ## Capabilities
 
-- Built-in agents include general-purpose, code-reviewer, test-runner, statusline setup, and feature-gated Explore, Plan, guide, and verification agents.
+- Built-in agents include general-purpose, code-reviewer, test-runner, Debug, statusline setup, and feature-gated Explore, Plan, guide, and verification agents.
 - Custom agents are Markdown definitions loaded from user, project, local, managed, or CLI argument sources.
 - Plugin agents are loaded from installed plugin bundles and displayed as a distinct source.
 - Agents can declare `tools`, `disallowedTools`, `skills`, `mcpServers`, `hooks`, `model`, `effort`, `permissionMode`, `maxTurns`, `background`, `memory`, and isolation settings.
@@ -50,6 +50,27 @@ Operational guidance:
 - Use `background: true` only for work that can safely continue while the main session moves on.
 - Use agent memory only for durable, non-secret knowledge that should survive across runs.
 
+## Debug Agent
+
+The built-in Debug agent is a debugging specialist for bug reports, regressions, and "X does not work" tasks — anything that is primarily "find out why this is broken and fix it" rather than "build something new".
+
+Its evidence discipline is non-negotiable:
+
+- Reproduce first. Before touching any code it must produce a reproducible failing artifact — a probe assertion that comes back red on the reported behavior, or a failing test/command with captured output.
+- One hypothesis, one decidable experiment at a time. Every root-cause hypothesis is paired with an experiment whose outcome decides it; it never stacks two unverified hypotheses.
+- The same evidence must turn green after the fix. It re-runs the exact red reproduction with the same oracle; a different, weaker check does not count.
+- Its report is a root-cause chain (symptom, mechanism, origin with file references), an evidence list (every experiment and its verdict), and a minimal fix diff. An honest "unproven" is required when reproduction or proof fails.
+
+The agent drives reproduction through the debug probe tool. Platform support:
+
+| Platform | Status |
+| --- | --- |
+| `tui` | Full support: launches the app in an isolated terminal pane, sends key sequences, captures pane text, and asserts oracles. |
+| `web` | Minimal support: headless browser page (click/fill/type, DOM snapshot, console and network capture). Requires a locally installed browser automation dependency; if it is missing the probe fails with a clear unavailable error and install instructions. |
+| `desktop` | Not yet supported; the probe returns a clear error. |
+
+The Debug agent runs on the analysis capability pool, so quality routing priority sends it to a strong model automatically, and it cannot spawn nested agents.
+
 <!-- section: source-evidence -->
 ## Source evidence
 
@@ -58,6 +79,8 @@ Operational guidance:
 - `tools/AgentTool/runAgent.ts` resolves tools, model, MCP tools, hooks, skills, background behavior, abort controllers, and subagent context.
 - `commands/agents/agents.tsx` renders the agents menu using the current permission context and available tool set.
 - `tools/AgentTool/agentDisplay.ts` defines source group ordering, override annotation, and display model resolution.
+- `tools/AgentTool/built-in/debugAgent.ts` defines the Debug agent: trigger description, evidence discipline, probe-first system prompt, analysis-pool model, and nested-agent denial.
+- `tools/DebugProbeTool/` implements the probe providers: full terminal-pane support, minimal headless-web support, and the unsupported desktop placeholder.
 
 <!-- section: related -->
 ## Related pages

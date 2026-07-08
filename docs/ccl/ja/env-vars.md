@@ -70,6 +70,20 @@ CCL は CCL 接頭辞の環境変数を読み取り、モデル選択、ログ�
 | `CCL_BASE_URL`, `CCL_API_KEY` | 自動同期なし | provider routing 変数へコピーしてはいけません。Claude-channel call の乗っ取りや account auth conflict の原因になります。 |
 | `CCL_GATEWAY_URL`, `CCL_GATEWAY_KEY` | provider SDK へ同期しない | gateway routing は CCL namespace または gateway file に残します。 |
 
+## 二重読み取り変数（CCL 名が優先、レガシー名にフォールバック）
+
+一連の動作トグルについて、CCL はまず `CCL_*` 名を読み、`CCL_*` が未設定の場合だけレガシー互換名にフォールバックします。新しいデプロイでは `CCL_*` 形式を設定してください。レガシー名を使う既存スクリプトは引き続き動作します。
+
+| CCL 変数（設定されれば優先） | レガシーフォールバック | 用途 |
+| --- | --- | --- |
+| `CCL_SIMPLE` | `CLAUDE_CODE_SIMPLE` | Bare/最小 runtime mode（`--bare` と同じ効果）。 |
+| `CCL_MAX_OUTPUT_TOKENS` | `CLAUDE_CODE_MAX_OUTPUT_TOKENS` | 明示的な最大 output token 上書き。設定時は自動 output-token エスカレーションをスキップします。 |
+| `CCL_REMOTE_MEMORY_DIR` | `CLAUDE_CODE_REMOTE_MEMORY_DIR` | リモート/コンテナ実行での memory file の base directory を上書きします。 |
+| `CCL_SKIP_PROMPT_HISTORY` | `CLAUDE_CODE_SKIP_PROMPT_HISTORY` | prompt をコマンド履歴に書かないようにします（生成された検証 session が実履歴を汚さないために使用）。 |
+| `CCL_DISABLE_CLAUDE_MDS` | `CLAUDE_CODE_DISABLE_CLAUDE_MDS` | プロジェクト/ユーザーの記憶指示ファイルの読み込みを無効化します。 |
+
+`CCL_CONFIG_DIR` も同じ考え方ですが OR チェーンです。config home は `CCL_CONFIG_DIR`、次に `CLAUDE_CONFIG_DIR`、最後に home directory の既定値の順に解決され、最初の非空値が勝ちます。
+
 ## 運用変数
 
 | 変数 | 用途 |
@@ -82,7 +96,7 @@ CCL は CCL 接頭辞の環境変数を読み取り、モデル選択、ログ�
 | `CCL_JSONL_HEAP_HEADROOM_MB` | 大きな structured stream 用に JSONL heap headroom を上書きします。 |
 | `CCL_AUTO_HEAPDUMP_OFF` | automatic heap dump monitoring を無効化します。 |
 | `CCL_AUTO_HEAPDUMP_HIGH_MB`, `CCL_AUTO_HEAPDUMP_CRITICAL_MB` | high と critical の heap dump threshold を調整します。 |
-| `CCL_CONFIG_DIR` | CCL 設定を default config home から分離します。 |
+| `CCL_CONFIG_DIR` | CCL 設定を default config home から分離します。レガシーの `CLAUDE_CONFIG_DIR` より優先され、後者は home directory の既定値より優先されます。 |
 
 ## 環境変数のトラブルシューティング
 
@@ -95,6 +109,8 @@ OAuth と Margay gateway を併用する場合、provider SDK の API-key や ba
 
 - `bootstrap/envSync.ts`
 - `bootstrap/gatewayConfig.ts`
+- `utils/env.ts`（config-dir 解決チェーン）
+- `utils/envUtils.ts`、`history.ts`、`memdir/paths.ts`、`tools/AgentTool/agentMemory.ts`、`context.ts`、`query.ts`（二重読み取りの呼び出し箇所）
 - `commands/gateway/gateway.tsx`
 - `commands/gateway/gateway-helpers.ts`
 - `commands/endpoint/endpoint.tsx`

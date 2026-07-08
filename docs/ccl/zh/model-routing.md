@@ -46,6 +46,23 @@ Smart routing 可以使用 gateway classifier 返回的 `model_suggestion`、esc
 - print mode 需要 overload fallback 时，使用 `--fallback-model <model>`。
 - 不要只根据模型显示文本判断 route 正确性；应看 debug markers、gateway logs、usage fields 和 endpoint status。
 
+## 路由优先级：/priority quality|cost
+
+`/priority` 不带参数时显示当前优先级及其来源（环境变量、持久化配置或默认值）。`/priority quality` 或 `/priority cost` 会设置优先级，持久化到全局配置（重启后仍然生效），并刷新当前 session 的 orchestration prompt。
+
+解析顺序：`CCL_ROUTING_PRIORITY` 环境变量优先，其次是持久化配置值，最后是默认值 `cost`。
+
+优先级的生效面：
+
+- Auto 模式编排。当模型设置为 `auto` 或 `smart` 时，system prompt 会带一个 orchestration 段。`quality` 下，分析/规划子任务始终委派给 Plan 或 Explore agent，它们自动运行在最强的可用海外模型上；执行、编码和工具类子任务留在国产模型。`cost`（默认）下国产模型优先，只有在反复失败后才走受预算限制的升级通道。
+- 规划池模型解析。声明为 `pool:planning` 或 `pool:analysis` 的 agents（例如 Plan、Explore、Debug）在 `quality` 下直接解析到最强海外模型；`cost` 下通过网关 routing table 解析。没有可用海外模型时，会响亮地回退到国产路由。
+- Routing table 选择。当网关 classifier 返回 routing table 时，`quality` 从 `models_quality` 列表选择，`cost` 从 `models_cost` 列表选择，都缺失时回退到共享的 `models` 列表。
+
+优先级不生效的场景：
+
+- 模型设置为具体模型（即非 `auto`/`smart`）时，orchestration 段被禁用，优先级不会改变主循环模型。
+- Agent 工具调用上显式指定的模型优先于 pool 解析，因此被 pin 住的子 agent 模型不会被优先级覆盖。
+
 <!-- section: source-evidence -->
 ## Source evidence
 
@@ -56,6 +73,9 @@ Smart routing 可以使用 gateway classifier 返回的 `model_suggestion`、esc
 - `services/api/gatewayTransport.ts` 实现网关流式响应、重试、Bearer 认证、SSE 解析、追踪标签和中止错误归一化。
 - `services/api/claude.ts` 实现智能路由响应、用量处理、回退路径和网关错误分流。
 - `commands/model/model.tsx`、`commands/endpoint/endpoint.tsx`、`commands/priority/priority.tsx` 与 `commands/effort/effort.tsx` 暴露用户路由控制入口。
+- `services/api/intentClassifier.ts` 解析路由优先级（环境变量、持久化配置、默认 `cost`），并按 quality/cost 列表从 routing table 选模型。
+- `utils/model/agent.ts` 在 quality 优先级下把 `pool:planning` / `pool:analysis` agents 解析到最强海外模型，在 cost 优先级下加固回退。
+- `constants/prompts.ts` 生成 auto 模式 orchestration 段并按路由优先级切换委派策略；具体模型设置时不生成该段。
 
 <!-- section: related -->
 ## Related pages

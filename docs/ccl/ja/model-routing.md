@@ -46,6 +46,23 @@ Smart routing は gateway classifier fields、たとえば `model_suggestion`、
 - Print mode で overload fallback が必要な場合: `--fallback-model <model>`。
 - Model display text だけで route correctness を判断しないでください。Debug markers、gateway logs、usage fields、endpoint status を確認します。
 
+## ルーティング優先度：/priority quality|cost
+
+`/priority` を引数なしで実行すると、現在の優先度とその由来（環境変数、永続化された設定、または既定値）を表示します。`/priority quality` または `/priority cost` は優先度を設定し、global config に永続化して再起動後も維持し、現在の session の orchestration prompt を更新します。
+
+解決順序：`CCL_ROUTING_PRIORITY` 環境変数が最優先、次に永続化された設定値、最後に既定値 `cost` です。
+
+優先度が効く場所：
+
+- Auto モードのオーケストレーション。model 設定が `auto` または `smart` のとき、system prompt に orchestration セクションが入ります。`quality` では、分析・計画系のサブタスクは常に Plan または Explore agent に委任され、それらは利用可能な最強の海外モデルで動きます。実行・コーディング・tool 系のサブタスクは国内モデルに残ります。`cost`（既定）では国内モデルが先で、繰り返し失敗した後だけ budget 制限付きのエスカレーション経路を使います。
+- Planning pool のモデル解決。`pool:planning` または `pool:analysis` を宣言した agents（Plan、Explore、Debug など）は、`quality` では最強の海外モデルに直接解決されます。`cost` では gateway routing table 経由で解決されます。海外モデルが利用できない場合は、明示的に国内ルーティングへフォールバックします。
+- Routing table の選択。gateway classifier が routing table を返す場合、`quality` は `models_quality` リストから、`cost` は `models_cost` リストから選択し、どちらも無ければ共有の `models` リストにフォールバックします。
+
+優先度が効かない場所：
+
+- 具体的な model 設定（`auto`/`smart` 以外）では orchestration セクションが無効になり、優先度は main-loop model を変えません。
+- Agent tool 呼び出しで明示された model は pool 解決より優先されるため、pin された subagent model が優先度に上書きされることはありません。
+
 <!-- section: source-evidence -->
 ## Source evidence
 
@@ -56,6 +73,9 @@ Smart routing は gateway classifier fields、たとえば `model_suggestion`、
 - `services/api/gatewayTransport.ts` は gateway streaming、retries、bearer auth、SSE parsing、trace tags、abort normalization を実装します。
 - `services/api/claude.ts` は smart-route replies、usage handling、fallback paths、gateway error routing を実装します。
 - `commands/model/model.tsx`、`commands/endpoint/endpoint.tsx`、`commands/priority/priority.tsx`、`commands/effort/effort.tsx` は user-facing routing controls を公開します。
+- `services/api/intentClassifier.ts` は routing priority（環境変数、永続化設定、既定 `cost`）を解決し、routing table の quality/cost リストからモデルを選択します。
+- `utils/model/agent.ts` は quality priority で `pool:planning` / `pool:analysis` agents を最強の海外モデルに解決し、cost priority ではフォールバックを堅牢化します。
+- `constants/prompts.ts` は auto モードの orchestration セクションを生成し、routing priority で委任ポリシーを切り替えます。具体的な model 設定では生成しません。
 
 <!-- section: related -->
 ## Related pages

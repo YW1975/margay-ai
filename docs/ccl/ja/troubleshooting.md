@@ -64,6 +64,14 @@ Gateway troubleshooting では runtime bugs と gateway service behavior を分�
 | GitHub setup が失敗する | [GitHub と CI ワークフロー](github-ci.md) | `gh --version`、`gh auth status -a`、repo permissions、workflow/secret existence。 |
 | Docs page が壊れている | [公開ドキュメント公開](public-docs.md) | local docs check、audit output、build log、rendered HTML path、hosted URL。 |
 
+## 既知の制限
+
+以下は現在のビルドの正直な制限で、設定ミスではありません：
+
+- Background session サブコマンドはまだ利用できません。`ccl ps`、`ccl logs`、`ccl attach`、`ccl kill` と `--bg`/`--background` フラグは、明確な「not available in this build yet」メッセージで終了します。background session registry 自体は動作しており、ps/logs/attach/kill の CLI surface だけがまだ stub です。
+- メッセージ操作メニュー（メッセージ上で Shift+Up）はフルスクリーンモードが必要です。フルスクリーン外ではメニューのキーバインドが接続されておらず、メニューは開きません。これは想定どおりの動作で、terminal の故障ではありません。
+- Debug agent の probe は terminal（フル対応）と web（最小対応、ローカルのブラウザ自動化依存が必要）をサポートします。desktop probe は未対応で、明確なエラーを返します。
+
 ## Escalation Checklist
 
 Escalation の前に小さな reproduction を用意します。Exact command、CCL version、sanitized environment variable names、relevant settings source、expected behavior、actual behavior、exit code、last diagnostic output です。File paths は repository-relative かつ共有可能な場合だけ含めます。

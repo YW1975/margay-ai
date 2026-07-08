@@ -10,7 +10,7 @@ CCL agents 是专门执行上下文，用于探索、计划、审查、测试、
 <!-- section: capabilities -->
 ## Capabilities
 
-- 内置 agents 包括 general-purpose、code-reviewer、test-runner、statusline setup，以及受 feature gate 控制的 Explore、Plan、guide 和 verification agents。
+- 内置 agents 包括 general-purpose、code-reviewer、test-runner、Debug、statusline setup，以及受 feature gate 控制的 Explore、Plan、guide 和 verification agents。
 - 自定义 agents 是 Markdown definitions，可从 user、project、local、managed 或 CLI argument sources 加载。
 - Plugin agents 从已安装 plugin bundles 加载，并以单独 source 显示。
 - Agents 可声明 `tools`、`disallowedTools`、`skills`、`mcpServers`、`hooks`、`model`、`effort`、`permissionMode`、`maxTurns`、`background`、`memory` 和 isolation settings。
@@ -51,6 +51,27 @@ Review the changed files for correctness risks, missing tests, and unsafe assump
 - 只有工作能安全地在主会话继续时，才使用后台运行设置。
 - Agent 记忆只保存持久、非密钥、适合跨运行复用的知识。
 
+## Debug Agent
+
+内置 Debug agent 是调试专家，面向 bug 报告、回归和「X 不工作」类任务——即以「查明为什么坏了并修好」为主、而不是「构建新东西」的任务。
+
+它的取证纪律不可协商：
+
+- 先复现。改任何代码之前，必须先产出可复现的失败证据——一个在报告行为上返回红色的 probe 断言，或一条带输出捕获的失败测试/命令。
+- 一次一个假设、一个可判定实验。每个根因假设都配一个结果能判定它的实验；绝不叠加两个未验证的假设。
+- 修复后必须让同一份证据变绿。用相同 oracle 重跑完全相同的红色复现；换一个更弱的检查不算数。
+- 报告输出是：根因链（症状、机制、起点，附文件引用）、证据清单（每个实验及其判定）和最小修复 diff。复现或证明失败时，必须诚实写「未证实」。
+
+Debug agent 通过 debug probe 工具驱动复现。平台支持现状：
+
+| 平台 | 状态 |
+| --- | --- |
+| `tui` | 全量支持：在隔离终端 pane 中启动应用、发送按键序列、捕获 pane 文本并断言 oracle。 |
+| `web` | 最小支持：headless 浏览器页面（点击/填写/输入、DOM 快照、console 与 network 捕获）。需要本地安装浏览器自动化依赖；缺失时 probe 会给出清晰的不可用错误和安装指引。 |
+| `desktop` | 尚不支持；probe 返回清晰错误。 |
+
+Debug agent 运行在 analysis capability pool 上，因此 quality 路由优先级会自动把它送到强模型；它不能派生嵌套 agents。
+
 <!-- section: source-evidence -->
 ## Source evidence
 
@@ -59,6 +80,8 @@ Review the changed files for correctness risks, missing tests, and unsafe assump
 - `tools/AgentTool/runAgent.ts` 解析工具、模型、MCP 工具、hooks、skills、后台行为、中止控制器和子 agent 上下文。
 - `commands/agents/agents.tsx` 使用当前权限上下文和可用工具集合渲染 agents menu。
 - `tools/AgentTool/agentDisplay.ts` 定义来源分组顺序、覆盖标注和显示模型解析。
+- `tools/AgentTool/built-in/debugAgent.ts` 定义 Debug agent：触发描述、取证纪律、probe 优先的 system prompt、analysis pool 模型和嵌套 agent 禁用。
+- `tools/DebugProbeTool/` 实现 probe providers：终端 pane 全量支持、headless web 最小支持，以及未支持的 desktop 占位。
 
 <!-- section: related -->
 ## Related pages

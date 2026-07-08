@@ -64,6 +64,14 @@ Gateway troubleshooting 应区分 runtime bug 和 gateway service behavior。Cac
 | GitHub setup 失败 | [GitHub 与 CI 工作流](github-ci.md) | `gh --version`、`gh auth status -a`、repo permissions、workflow/secret existence。 |
 | Docs page 损坏 | [公开文档发布](public-docs.md) | local docs check、audit output、build log、rendered HTML path、hosted URL。 |
 
+## 已知限制
+
+以下是当前构建的诚实限制，不是配置错误：
+
+- 后台会话子命令尚不可用。`ccl ps`、`ccl logs`、`ccl attach`、`ccl kill` 以及 `--bg`/`--background` flag 会以清晰的「not available in this build yet」消息退出。后台会话注册表本身工作正常；只有 ps/logs/attach/kill 的 CLI 表面仍是 stub。
+- 消息操作菜单（在消息上按 Shift+Up）需要全屏模式。非全屏时菜单按键未接线，菜单不会打开；这是预期行为，不是终端故障。
+- Debug agent 的 probe 支持终端（全量）和 web（最小，需要本地浏览器自动化依赖）；desktop probe 尚不支持，会返回清晰错误。
+
 ## Escalation Checklist
 
 升级前先准备小复现：exact command、CCL version、脱敏环境变量名、相关 settings source、expected behavior、actual behavior、exit code 和最后一段 diagnostic output。只有在路径是仓库相对且可共享时，才包含文件路径。

@@ -46,6 +46,23 @@ Smart routing can use gateway classifier fields such as `model_suggestion`, esca
 - Use `--fallback-model <model>` in print mode when overload fallback is desired.
 - Do not infer route correctness from model display text alone; use debug markers, gateway logs, usage fields, and endpoint status.
 
+## Routing Priority: /priority quality|cost
+
+`/priority` without an argument shows the current priority and where it came from (environment, persisted config, or default). `/priority quality` or `/priority cost` sets it, persists it in the global config so it survives restarts, and refreshes the orchestration prompt for the current session.
+
+Resolution order is: `CCL_ROUTING_PRIORITY` environment variable, then the persisted config value, then the default `cost`.
+
+Where the priority takes effect:
+
+- Auto-mode orchestration. When the model setting is `auto` or `smart`, the system prompt carries an orchestration section. Under `quality`, analysis and planning subtasks are always delegated to the Plan or Explore agents, which run on the strongest available overseas model; execution, coding, and tool subtasks stay on domestic models. Under `cost` (default), domestic models run first, with a budget-gated escalation hatch only after repeated failure.
+- Planning-pool model resolution. Agents declared with `pool:planning` or `pool:analysis` (for example Plan, Explore, and Debug) resolve directly to the strongest overseas model under `quality`; under `cost` they resolve through the gateway routing table. If no overseas model is available, resolution loudly falls back to domestic routing.
+- Routing-table selection. When the gateway classifier returns a routing table, `quality` selects from the `models_quality` list and `cost` from the `models_cost` list, falling back to the shared `models` list.
+
+Where the priority does not take effect:
+
+- With a concrete model setting (anything other than `auto`/`smart`), the orchestration section is disabled and the priority does not change the main-loop model.
+- An explicit per-call model on the Agent tool takes precedence over pool resolution, so a pinned subagent model is never overridden by the priority.
+
 <!-- section: source-evidence -->
 ## Source evidence
 
@@ -56,6 +73,9 @@ Smart routing can use gateway classifier fields such as `model_suggestion`, esca
 - `services/api/gatewayTransport.ts` implements gateway streaming, retries, bearer auth, SSE parsing, trace tags, and abort normalization.
 - `services/api/claude.ts` implements smart-route replies, usage handling, fallback paths, and gateway error routing.
 - `commands/model/model.tsx`, `commands/endpoint/endpoint.tsx`, `commands/priority/priority.tsx`, and `commands/effort/effort.tsx` expose user-facing routing controls.
+- `services/api/intentClassifier.ts` resolves the routing priority (environment, persisted config, `cost` default) and selects models from routing-table quality/cost lists.
+- `utils/model/agent.ts` resolves `pool:planning` / `pool:analysis` agents to the strongest overseas model under quality priority and hardens fallbacks under cost priority.
+- `constants/prompts.ts` emits the auto-mode orchestration section and switches its delegation policy on the routing priority; it returns nothing for concrete model settings.
 
 <!-- section: related -->
 ## Related pages

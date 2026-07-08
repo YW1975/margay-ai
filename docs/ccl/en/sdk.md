@@ -10,8 +10,9 @@ The CCL SDK exposes the `@margay/ccl-core/sdk` import path for host processes th
 <!-- section: capabilities -->
 ## Capabilities
 
-- Start a managed CCL subprocess with `query(prompt, options)`.
-- Resume a normal session with `query(prompt, { resume: sessionId })`.
+- Start a managed CCL subprocess with `query({ prompt, options })` and receive a `Query` handle: the event stream plus session control methods.
+- Resume a normal session with `query({ prompt, options: { resume: sessionId } })`.
+- Drive a running session through control methods such as `interrupt`, `setModel`, `setPermissionMode`, and `rewindFiles` without stopping the event stream.
 - Resume a suspended approval flow with `resumeWithDecision(sessionId, decision, options)`.
 - Intercept tool use through `canUseTool` and return `allow`, `deny`, or `pending`.
 - Persist pending approvals and accumulated usage through the `SessionStore` interface.
@@ -31,13 +32,15 @@ The CCL SDK exposes the `@margay/ccl-core/sdk` import path for host processes th
 - Import from `@margay/ccl-core/sdk`.
 - Set `CCL_SDK_CLI_PATH` if the host must point at a specific CLI build.
 - Set `CCL_SDK_STORE_DIR` or pass a custom `SessionStore` when pending approvals and usage need host-controlled persistence.
-- Use `provider: { type: 'openai-compatible', baseUrl, apiKey }` for CCL gateway compatible routes, or inherit the CLI's configured gateway and account state.
+- Use `provider: { type: 'openai-compatible', baseUrl, apiKey }` for CCL gateway compatible routes; it maps to the CCL gateway channel (`CCL_GATEWAY_URL` / `CCL_GATEWAY_KEY`), which normalizes tool calling and rejects models without native function calling instead of silently degrading.
+- Use `provider: { type: 'anthropic', baseUrl?, apiKey? }` for any endpoint that speaks the direct provider protocol; it maps to `--base-url` / `--api-key`.
+- Omit `provider` to inherit the CLI's configured gateway and account state.
 
 ## Public Exports
 
 | Export | Purpose |
 | --- | --- |
-| `query` | Run one prompt and stream SDK events until `result`, `suspended`, or fatal `error`. |
+| `query` | Run one prompt and return a `Query` handle that streams SDK events until `result`, `suspended`, or fatal `error`, and exposes session control methods. |
 | `queryWithTransport` | Run through a caller-supplied transport seam for tests or advanced hosts. |
 | `resumeWithDecision` | Resume a session that suspended on a pending approval. |
 | `buildCliArgs` | Convert SDK options into CLI arguments. |
@@ -48,6 +51,37 @@ The CCL SDK exposes the `@margay/ccl-core/sdk` import path for host processes th
 | `getSessionUsage` | Read accumulated usage for a session from the store. |
 | `fileSessionStore` | File-backed `SessionStore` implementation. |
 | `defaultStoreDir` | Default SDK store directory. |
+
+## Query Handle And Control Methods
+
+`query({ prompt, options })` returns a `Query` handle: the async iterable of SDK events plus control methods that speak the CLI control protocol. The positional form `query(prompt, options)` still works but is deprecated; new code should use the object form.
+
+The handle eagerly pumps the underlying event loop, so control methods resolve without the host iterating events. Events are buffered and replayed to the iterator, so the stream a host sees is identical to the plain event generator. Once the query has ended (result delivered, transport closed, or subprocess exited), pending and future control calls reject fast — except `rewindFiles`, which is a post-run operation and stays callable between the `result` event and `close()`.
+
+| Method | Purpose |
+| --- | --- |
+| `interrupt()` | Interrupt the current turn. |
+| `setPermissionMode(mode)` | Switch permission mode mid-session. |
+| `setModel(model?)` | Switch the session model; omit the argument to reset. |
+| `setMaxThinkingTokens(n)` | Set or clear (`null`) the thinking-token cap. |
+| `mcpServerStatus()` | Report MCP server status. |
+| `reconnectMcpServer(name)` | Reconnect one MCP server. |
+| `toggleMcpServer(name, enabled)` | Enable or disable one MCP server. |
+| `setMcpServers(servers)` | Replace the MCP server set. |
+| `stopTask(id)` | Stop a running background task. |
+| `applyFlagSettings(settings)` | Apply flag-style settings at runtime. |
+| `rewindFiles(userMessageId, options?)` | Rewind file changes made since a user message; pass `{ dry_run: true }` for a preview. Callable after the `result` event. |
+| `initializationResult()` | Return the parsed initialize payload: commands, agents, models, account, and output styles. |
+| `reinitialize()` | Send a fresh initialize request and refresh the cached payload. |
+| `supportedCommands()` | List commands the session supports (derived from `initializationResult()`). |
+| `supportedModels()` | List models the session supports (derived from `initializationResult()`). |
+| `supportedAgents()` | List agents the session supports (derived from `initializationResult()`). |
+| `accountInfo()` | Return account information (derived from `initializationResult()`). |
+| `close()` | Terminate the subprocess and end the stream. Idempotent. |
+
+The initialize response that the event loop already requests is parsed and cached, so `initializationResult()` and the derived reads (`supportedCommands`, `supportedModels`, `supportedAgents`, `accountInfo`) do not send a second initialize on the wire; `reinitialize()` does and refreshes the cache.
+
+Suspend and resume work unchanged with the handle: a `pending` permission decision yields a `suspended` event, and `resumeWithDecision(sessionId, decision)` starts a new resumed stream.
 
 ## Query Options At A Glance
 
@@ -80,13 +114,16 @@ The stream yields JSON-serializable events. Important event types include:
 ```ts
 import { query } from '@margay/ccl-core/sdk'
 
-for await (const event of query('audit the workspace', {
-  cwd: '/srv/workspace',
-  model: 'deepseek-v4-pro',
-  maxTurns: 30,
-  canUseTool: async (toolName, input, context) => {
-    if (toolName === 'Bash') return { behavior: 'pending' }
-    return { behavior: 'allow' }
+for await (const event of query({
+  prompt: 'audit the workspace',
+  options: {
+    cwd: '/srv/workspace',
+    model: 'deepseek-v4-pro',
+    maxTurns: 30,
+    canUseTool: async (toolName, input, context) => {
+      if (toolName === 'Bash') return { behavior: 'pending' }
+      return { behavior: 'allow' }
+    },
   },
 })) {
   if (event.type === 'suspended') {
@@ -135,6 +172,7 @@ If no pending approval exists for the session, the first iteration fails with a 
 - `sdk/README.md`
 - `sdk/API.md`
 - `sdk/query.ts`
+- `sdk/queryHandle.ts`
 - `sdk/store.ts`
 - `sdk/transport.ts`
 - `sdk/types.ts`
