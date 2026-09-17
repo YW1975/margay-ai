@@ -7,6 +7,12 @@
 
 この index は正しい CCL documentation path を選ぶために使います。CCL は command-line agent runtime で、interactive sessions、print-mode automation、tools、settings、gateway routing、MCP、plugins、skills、agents、workflows、remote automation、Ralph-Lisa governance を扱います。
 
+<!-- section: duo-ide-guides -->
+## 2 つのエージェントの協働とエディター接続
+
+- [Duo：対等なエージェントの協働](duo.md)
+- [VS Code で CCL を使う](ide.md)
+
 <!-- section: capabilities -->
 ## Capabilities
 

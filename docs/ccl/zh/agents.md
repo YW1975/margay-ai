@@ -91,3 +91,5 @@ Debug agent 运行在 analysis capability pool 上，因此 quality 路由优先
 - [Skills](skills.md)
 - [MCP 服务器与工具](mcp.md)
 - [权限与安全](permissions-security.md)
+- [Duo：对等双 Agent 协作](duo.md)
+- [在 VS Code 中使用 CCL](ide.md)

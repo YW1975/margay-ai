@@ -124,3 +124,5 @@ Use `/cost`, `/context`, `/usage`, `/stats`, `/insights`, `/endpoint`, and `/gat
 - [Workflows](workflows.md)
 - [Permissions and Security](permissions-security.md)
 - [Hooks](hooks.md)
+- [Duo: Peer Collaboration](duo.md)
+- [Using CCL in VS Code](ide.md)

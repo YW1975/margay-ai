@@ -92,3 +92,5 @@ Debug agent は analysis capability pool で動くため、quality routing prior
 - [Skills](skills.md)
 - [MCP サーバーとツール](mcp.md)
 - [権限とセキュリティ](permissions-security.md)
+- [Duo：対等なエージェントの協働](duo.md)
+- [VS Code で CCL を使う](ide.md)

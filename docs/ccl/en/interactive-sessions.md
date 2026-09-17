@@ -62,3 +62,5 @@ Do not use `--dangerously-skip-permissions` as the normal automation path. Prefe
 - [Interactive Commands](commands.md)
 - [Memory, Context, and Sessions](memory-sessions.md)
 - [Workflows](workflows.md)
+- [Duo: Peer Collaboration](duo.md)
+- [Using CCL in VS Code](ide.md)

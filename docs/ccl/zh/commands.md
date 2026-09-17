@@ -124,3 +124,5 @@
 - [工作流](workflows.md)
 - [权限与安全](permissions-security.md)
 - [Hook](hooks.md)
+- [Duo：对等双 Agent 协作](duo.md)
+- [在 VS Code 中使用 CCL](ide.md)

@@ -90,3 +90,5 @@ The Debug agent runs on the analysis capability pool, so quality routing priorit
 - [Skills](skills.md)
 - [MCP Servers and Tools](mcp.md)
 - [Permissions and Security](permissions-security.md)
+- [Duo: Peer Collaboration](duo.md)
+- [Using CCL in VS Code](ide.md)

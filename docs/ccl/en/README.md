@@ -7,6 +7,12 @@
 
 Use this index to choose the correct CCL documentation path. CCL is a command-line agent runtime with interactive sessions, print-mode automation, tools, settings, gateway routing, MCP, plugins, skills, agents, workflows, remote automation, and Ralph-Lisa governance.
 
+<!-- section: duo-ide-guides -->
+## Two agents and editor integration
+
+- [Duo: Peer Collaboration](duo.md)
+- [Using CCL in VS Code](ide.md)
+
 <!-- section: capabilities -->
 ## Capabilities
 

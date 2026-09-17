@@ -252,6 +252,39 @@
       ]
     },
     {
+      "slug": "duo",
+      "group": "Use",
+      "page_type": "standard",
+      "nav_hidden": false,
+      "title": "Duo: Peer Collaboration",
+      "source_evidence": [
+        "commands/duo",
+        "utils/duoMode.ts",
+        "utils/swarm/peerReview.ts"
+      ],
+      "related": [
+        "ide",
+        "agents",
+        "interactive-sessions"
+      ]
+    },
+    {
+      "slug": "ide",
+      "group": "Use",
+      "page_type": "standard",
+      "nav_hidden": false,
+      "title": "Using CCL in VS Code",
+      "source_evidence": [
+        "commands/ide",
+        "utils/ide.ts"
+      ],
+      "related": [
+        "duo",
+        "installation",
+        "troubleshooting"
+      ]
+    },
+    {
       "slug": "cli-reference",
       "group": "Reference",
       "page_type": "standard",
@@ -944,6 +977,23 @@
       "page": "ralph-lisa-loop",
       "source": [
         "AGENTS.md"
+      ]
+    },
+    {
+      "id": "duo",
+      "page": "duo",
+      "source": [
+        "commands/duo",
+        "utils/duoMode.ts",
+        "utils/swarm/peerReview.ts"
+      ]
+    },
+    {
+      "id": "ide",
+      "page": "ide",
+      "source": [
+        "commands/ide",
+        "utils/ide.ts"
       ]
     }
   ]

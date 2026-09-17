@@ -62,3 +62,5 @@ Resume 行为在两种模式中都很重要。`--continue` 恢复当前目录最
 - [交互式命令](commands.md)
 - [记忆、上下文和会话](memory-sessions.md)
 - [Workflows](workflows.md)
+- [Duo：对等双 Agent 协作](duo.md)
+- [在 VS Code 中使用 CCL](ide.md)

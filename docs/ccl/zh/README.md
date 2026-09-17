@@ -7,6 +7,12 @@
 
 使用本索引选择正确的 CCL 文档路径。CCL 是命令行 agent 运行时，覆盖交互式 session、print-mode 自动化、tools、settings、gateway routing、MCP、plugins、skills、agents、workflows、remote automation 和 Ralph-Lisa governance。
 
+<!-- section: duo-ide-guides -->
+## 双 Agent 协作与编辑器接入
+
+- [Duo：对等双 Agent 协作](duo.md)
+- [在 VS Code 中使用 CCL](ide.md)
+
 <!-- section: capabilities -->
 ## Capabilities
 

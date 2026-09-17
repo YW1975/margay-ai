@@ -124,3 +124,5 @@ shell 変数と保存設定が食い違う場合は `/gateway doctor` を使い�
 - [ワークフロー](workflows.md)
 - [権限とセキュリティ](permissions-security.md)
 - [Hook](hooks.md)
+- [Duo：対等なエージェントの協働](duo.md)
+- [VS Code で CCL を使う](ide.md)
