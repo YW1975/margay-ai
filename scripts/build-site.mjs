@@ -3,10 +3,18 @@ import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { basename, join } from 'node:path'
 
+// Multi-product docs site generator.
+//
+// Discovers every product under `docs/<product>/` that ships a `docs-inventory.json`
+// plus at least one `<lang>/` directory of markdown, and renders each into
+// `site/<product>/<lang>/`. The root `site/index.html` is a product index. Nothing
+// here is hardcoded to a single product or brand — product display name, publisher
+// brand, languages and nav all come from each product's own `docs-inventory.json`.
+// (super-rll#20)
+
 const root = process.cwd()
-const docsRoot = join(root, 'docs', 'ccl')
+const docsBase = join(root, 'docs')
 const outRoot = join(root, 'site')
-const langs = ['en', 'zh', 'ja']
 
 function escapeHtml(value) {
   return value
@@ -141,22 +149,14 @@ function markdownToHtml(markdown, lang) {
   return html.join('\n')
 }
 
-function pageShell({ title, body, nav, lang }) {
-  const langLinks = langs.map(code => `<a ${code === lang ? 'aria-current="page"' : ''} href="../${code}/index.html">${code.toUpperCase()}</a>`).join('')
-  return `<!doctype html>
-<html lang="${lang}">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${escapeHtml(title)} | MargayAI Docs</title>
-  <style>
-    :root { color-scheme: light dark; --bg: #f8faf9; --fg: #13201a; --muted: #5d6f67; --line: #d8e2dc; --link: #145f45; --panel: #ffffff; }
+const SITE_STYLE = `:root { color-scheme: light dark; --bg: #f8faf9; --fg: #13201a; --muted: #5d6f67; --line: #d8e2dc; --link: #145f45; --panel: #ffffff; }
     @media (prefers-color-scheme: dark) { :root { --bg: #111714; --fg: #edf6f1; --muted: #9eb0a8; --line: #2d3a34; --link: #7ee0b2; --panel: #18211d; } }
     * { box-sizing: border-box; }
     body { margin: 0; font: 16px/1.65 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--fg); background: var(--bg); }
     header { border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }
     .top { max-width: 1240px; margin: 0 auto; padding: 14px 20px; display: flex; gap: 18px; align-items: center; justify-content: space-between; }
     .brand { font-weight: 700; letter-spacing: 0; }
+    .brand a { color: inherit; text-decoration: none; }
     .langs { display: flex; gap: 10px; }
     .langs a { color: var(--link); text-decoration: none; font-weight: 600; }
     .langs a[aria-current="page"] { color: var(--fg); }
@@ -174,11 +174,30 @@ function pageShell({ title, body, nav, lang }) {
     th { background: color-mix(in srgb, var(--line) 32%, transparent); }
     blockquote { margin: 0 0 24px; padding: 12px 16px; border-left: 4px solid var(--line); color: var(--muted); background: color-mix(in srgb, var(--panel) 74%, transparent); }
     a { color: var(--link); }
-    @media (max-width: 800px) { .layout { display: block; padding-top: 18px; } nav { border-right: 0; border-bottom: 1px solid var(--line); padding: 0 0 18px; margin-bottom: 24px; } .top { align-items: flex-start; flex-direction: column; } }
+    .products { list-style: none; padding: 0; margin: 28px 0; display: grid; gap: 14px; }
+    .products li { border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; background: var(--panel); }
+    .products a { font-weight: 700; font-size: 1.1rem; text-decoration: none; }
+    .products .langhint { color: var(--muted); margin-left: 10px; font-size: .9rem; font-weight: 400; }
+    @media (max-width: 800px) { .layout { display: block; padding-top: 18px; } nav { border-right: 0; border-bottom: 1px solid var(--line); padding: 0 0 18px; margin-bottom: 24px; } .top { align-items: flex-start; flex-direction: column; } }`
+
+function pageShell({ title, body, nav, lang, product }) {
+  // Language switcher scoped to THIS product's languages, linking within the product.
+  const langLinks = product.langs
+    .map(code => `<a ${code === lang ? 'aria-current="page"' : ''} href="../${code}/index.html">${code.toUpperCase()}</a>`)
+    .join('')
+  const brandText = escapeHtml(`${product.displayName} Docs`)
+  return `<!doctype html>
+<html lang="${lang}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${escapeHtml(title)} | ${escapeHtml(product.publisher)}</title>
+  <style>
+    ${SITE_STYLE}
   </style>
 </head>
 <body>
-  <header><div class="top"><div class="brand">MargayAI Docs</div><div class="langs">${langLinks}</div></div></header>
+  <header><div class="top"><div class="brand"><a href="../../index.html">${brandText}</a></div><div class="langs">${langLinks}</div></div></header>
   <div class="layout">
     <nav aria-label="Documentation">${nav}</nav>
     <main>${body}</main>
@@ -188,14 +207,8 @@ function pageShell({ title, body, nav, lang }) {
 `
 }
 
-async function filesFor(lang) {
-  return (await readdir(join(docsRoot, lang))).filter(name => name.endsWith('.md')).sort()
-}
-
-async function readInventory() {
-  const path = join(docsRoot, 'docs-inventory.json')
-  if (!existsSync(path)) return null
-  return JSON.parse(await readFile(path, 'utf8'))
+async function markdownFilesFor(productDir, lang) {
+  return (await readdir(join(productDir, lang))).filter(name => name.endsWith('.md')).sort()
 }
 
 function navFilesFor(files, inventory) {
@@ -207,49 +220,139 @@ function navFilesFor(files, inventory) {
   return ['README.md', ...visible.filter(file => file !== 'README.md')]
 }
 
-async function main() {
-  if (!existsSync(docsRoot)) throw new Error(`Missing ${docsRoot}`)
-  await rm(outRoot, { recursive: true, force: true })
-  await mkdir(outRoot, { recursive: true })
+// Discover every buildable product: a `docs/<product>/` dir with a docs-inventory.json
+// and at least one `<lang>/` subdir of markdown. README-only stubs are skipped.
+async function discoverProducts() {
+  const entries = await readdir(docsBase, { withFileTypes: true })
+  const products = []
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue
+    const dir = join(docsBase, entry.name)
+    const inventoryPath = join(dir, 'docs-inventory.json')
+    if (!existsSync(inventoryPath)) continue
+    const inventory = JSON.parse(await readFile(inventoryPath, 'utf8'))
+    const declaredLangs = Array.isArray(inventory.languages) ? inventory.languages : []
+    const langs = declaredLangs.filter(lang => existsSync(join(dir, lang)))
+    if (langs.length === 0) continue
+    products.push({
+      id: entry.name,
+      dir,
+      inventory,
+      langs,
+      displayName: inventory.product || entry.name,
+      publisher: inventory.publisher || inventory.product || entry.name,
+      defaultLang: langs.includes('en') ? 'en' : langs[0],
+    })
+  }
+  return products.sort((a, b) => a.id.localeCompare(b.id))
+}
 
-  const inventory = await readInventory()
-  const filesByLang = Object.fromEntries(await Promise.all(langs.map(async lang => [lang, await filesFor(lang)])))
+async function buildProduct(product) {
   const titles = {}
-  for (const lang of langs) {
+  const filesByLang = {}
+  for (const lang of product.langs) {
+    filesByLang[lang] = await markdownFilesFor(product.dir, lang)
     titles[lang] = {}
     for (const file of filesByLang[lang]) {
-      const md = await readFile(join(docsRoot, lang, file), 'utf8')
-      const title = /^#\s+(.+)$/m.exec(md)?.[1] ?? basename(file, '.md')
-      titles[lang][file] = title
+      const md = await readFile(join(product.dir, lang, file), 'utf8')
+      titles[lang][file] = /^#\s+(.+)$/m.exec(md)?.[1] ?? basename(file, '.md')
     }
   }
 
-  for (const lang of langs) {
-    const langOut = join(outRoot, lang)
+  for (const lang of product.langs) {
+    const langOut = join(outRoot, product.id, lang)
     await mkdir(langOut, { recursive: true })
-    const nav = navFilesFor(filesByLang[lang], inventory)
+    const nav = navFilesFor(filesByLang[lang], product.inventory)
       .map(file => {
         const href = file === 'README.md' ? 'index.html' : file.replace(/\.md$/, '.html')
         return `<a href="${href}">${escapeHtml(titles[lang][file])}</a>`
       })
       .join('\n')
     for (const file of filesByLang[lang]) {
-      const markdown = await readFile(join(docsRoot, lang, file), 'utf8')
+      const markdown = await readFile(join(product.dir, lang, file), 'utf8')
       const title = titles[lang][file]
       const body = markdownToHtml(markdown, lang)
-      const html = pageShell({ title, body, nav, lang })
+      const html = pageShell({ title, body, nav, lang, product })
       const target = file === 'README.md' ? 'index.html' : file.replace(/\.md$/, '.html')
       await writeFile(join(langOut, target), html, 'utf8')
     }
   }
+}
 
-  await writeFile(join(outRoot, 'index.html'), `<!doctype html>
+async function readSiteConfig() {
+  const path = join(docsBase, 'site.config.json')
+  if (!existsSync(path)) return {}
+  return JSON.parse(await readFile(path, 'utf8'))
+}
+
+function rootIndexHtml({ title, products }) {
+  const items = products
+    .map(p => `<li><a href="${p.id}/${p.defaultLang}/index.html">${escapeHtml(p.displayName)}</a><span class="langhint">${p.langs.map(l => l.toUpperCase()).join(' · ')}</span></li>`)
+    .join('\n      ')
+  return `<!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="refresh" content="0; url=en/index.html"><title>MargayAI Docs</title></head>
-<body><p><a href="en/index.html">Open MargayAI Docs</a></p></body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${escapeHtml(title)}</title>
+  <style>
+    ${SITE_STYLE}
+  </style>
+</head>
+<body>
+  <header><div class="top"><div class="brand">${escapeHtml(title)}</div></div></header>
+  <div class="layout" style="display:block">
+    <main>
+      <h1>${escapeHtml(title)}</h1>
+      <p>Product documentation:</p>
+      <ul class="products">
+      ${items}
+      </ul>
+    </main>
+  </div>
+</body>
 </html>
-`, 'utf8')
-  console.log(`Built static site at ${outRoot}`)
+`
+}
+
+function redirectHtml(target) {
+  return `<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=${escapeHtml(target)}"><title>Redirecting…</title></head>
+<body><p><a href="${escapeHtml(target)}">Continue to documentation</a></p></body>
+</html>
+`
+}
+
+async function main() {
+  if (!existsSync(docsBase)) throw new Error(`Missing ${docsBase}`)
+  const products = await discoverProducts()
+  if (products.length === 0) throw new Error(`No buildable products under ${docsBase} (need docs-inventory.json + a <lang>/ dir)`)
+
+  await rm(outRoot, { recursive: true, force: true })
+  await mkdir(outRoot, { recursive: true })
+
+  for (const product of products) await buildProduct(product)
+
+  const siteConfig = await readSiteConfig()
+  const siteTitle = siteConfig.title || `${products[0].publisher} Docs`
+
+  // Root product index (replaces the old single-product 302 redirect).
+  await writeFile(join(outRoot, 'index.html'), rootIndexHtml({ title: siteTitle, products }), 'utf8')
+
+  // Optional back-compat: a previously-root product can keep its old `site/<lang>/`
+  // URLs alive via redirect stubs, so external links don't 404 after the move to
+  // `site/<product>/<lang>/`. Opt-in + explicit via docs/site.config.json — no
+  // product is special-cased in code.
+  const legacy = products.find(p => p.id === siteConfig.legacyRootProduct)
+  if (legacy) {
+    for (const lang of legacy.langs) {
+      await mkdir(join(outRoot, lang), { recursive: true })
+      await writeFile(join(outRoot, lang, 'index.html'), redirectHtml(`../${legacy.id}/${lang}/index.html`), 'utf8')
+    }
+  }
+
+  console.log(`Built static site at ${outRoot} for ${products.length} product(s): ${products.map(p => `${p.id}[${p.langs.join('/')}]`).join(', ')}`)
 }
 
 main().catch(error => {
