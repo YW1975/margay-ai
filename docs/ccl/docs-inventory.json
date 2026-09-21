@@ -263,9 +263,26 @@
         "utils/swarm/peerReview.ts"
       ],
       "related": [
+        "buddy",
         "ide",
         "agents",
         "interactive-sessions"
+      ]
+    },
+    {
+      "slug": "buddy",
+      "group": "Use",
+      "page_type": "standard",
+      "nav_hidden": false,
+      "title": "Buddy: Teammates and Lightweight Peer Review",
+      "source_evidence": [
+        "commands/buddy/index.ts",
+        "utils/swarm/peerReview.ts"
+      ],
+      "related": [
+        "duo",
+        "agents",
+        "commands"
       ]
     },
     {
@@ -985,6 +1002,14 @@
       "source": [
         "commands/duo",
         "utils/duoMode.ts",
+        "utils/swarm/peerReview.ts"
+      ]
+    },
+    {
+      "id": "buddy",
+      "page": "buddy",
+      "source": [
+        "commands/buddy/index.ts",
         "utils/swarm/peerReview.ts"
       ]
     },

@@ -8,13 +8,13 @@
 
 | 路径 | 验证状态 |
 | --- | --- |
-| 已安装开发构建的终端 Duo | 三项真实有头场景共 46 步通过 |
+| 已审核本机候选的终端 Duo | 隔离 provider 下，完整审查与接受 15/15 步；下一任务未审核答复控制 18/18 步 |
 | CCL 连接 VS Code | 临时环境变量下已验证握手、服务能力和实际连接 |
 | 默认 IDE 连接 | 已复现 `bufferUtil.mask is not a function`，尚未修复 |
 | VS Code 集成终端中的 Duo 全流程 | 以下为操作步骤；本轮实际握手来自外部 WezTerm，尚未独立验收完整流程 |
 | Trae、CCL/Duo 原生聊天面板、会话迁移 | 尚未验证，不由 VS Code 连接结果推定兼容 |
 
-此 Duo 开发构建虽显示 `1.4.0-beta.0`，不代表 npm 同版本已包含新功能。先确认自己的构建支持 `/duo-agent`。
+已审核 Duo 候选位于提交 `1387fdae`；npm 的 `next` 仍是 `1.4.1-beta-duo.0`，不包含其后的修复。请核对 CLI 身份，不要只看版本号。npm 包提供 `margay`，本机 `ccl` 启动器可能指向别处。
 
 <!-- section: setup -->
 <a id="guide-setup"></a>
@@ -53,15 +53,13 @@ WS_NO_BUFFER_UTIL=1 ccl --ide
 ```
 
 3. 如未自动选中，在 CCL 中执行 `/ide` 并选择 Visual Studio Code。
-4. 在同一终端界面配置双方模型，再输入任务：
+4. 在同一终端界面进入 Duo，再输入任务。候选会自动选择不同的执行与审核模型；可选用 `/model` 或 `--reviewer-model` 覆盖选择：
 
 ```text
-/model
 /duo-agent
-/duo --reviewer-model <固定模型ID>
 ```
 
-将占位符替换为实际可用模型 ID。Duo 无目标时可以待命，暂停和反审规则见 [Duo 指南](duo.md)。
+Duo 无目标时可以待命。需要覆盖审核模型时，在待命中输入 `/duo --reviewer-model <可用固定模型ID>`。模型证据、暂停及接受规则见 [Duo 指南](duo.md)。
 
 <!-- section: troubleshooting -->
 <a id="guide-troubleshooting"></a>
@@ -84,6 +82,7 @@ Claude Code 官方扩展和 Codex 官方扩展各自提供原生聊天界面。C
 ## 继续阅读
 
 - [Duo：对等双 Agent 协作](duo.md)
+- [Buddy：队友与轻量审查](buddy.md)
 - [交互式会话](interactive-sessions.md)
 - [安装与更新](installation.md)
 - [故障排查](troubleshooting.md)

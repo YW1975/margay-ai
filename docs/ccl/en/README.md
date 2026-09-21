@@ -11,6 +11,7 @@ Use this index to choose the correct CCL documentation path. CCL is a command-li
 ## Two agents and editor integration
 
 - [Duo: Peer Collaboration](duo.md)
+- [Buddy: Teammates and Peer Review](buddy.md)
 - [Using CCL in VS Code](ide.md)
 
 <!-- section: capabilities -->

@@ -63,4 +63,5 @@ Resume behavior はどちらの mode でも重要です。`--continue` は curre
 - [Memory, Context, and Sessions](memory-sessions.md)
 - [Workflows](workflows.md)
 - [Duo：対等なエージェントの協働](duo.md)
+- [Buddy：チームメイトと軽量レビュー](buddy.md)
 - [VS Code で CCL を使う](ide.md)

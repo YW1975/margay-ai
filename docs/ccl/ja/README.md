@@ -11,6 +11,7 @@
 ## 2 つのエージェントの協働とエディター接続
 
 - [Duo：対等なエージェントの協働](duo.md)
+- [Buddy：チームメイトと軽量レビュー](buddy.md)
 - [VS Code で CCL を使う](ide.md)
 
 <!-- section: capabilities -->

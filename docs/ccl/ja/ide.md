@@ -8,13 +8,13 @@
 
 | 経路 | 検証状況 |
 | --- | --- |
-| インストール済み開発ビルドの端末 Duo | 実際の画面付き端末で 3 シナリオ、計 46 ステップ成功 |
+| レビュー済みローカル候補の端末 Duo | 隔離 provider でレビューと受け入れ 15/15 ステップ、次のタスクの未レビュー回答制御 18/18 ステップを確認 |
 | CCL から VS Code への接続 | 一時的な環境変数を使い、ハンドシェイク、サービスの機能情報、実接続を確認 |
 | 既定の IDE 接続 | `bufferUtil.mask is not a function` を再現済み、未修正 |
 | VS Code 統合ターミナルでの Duo 全体の流れ | 手順は下記。実測の接続元は外部 WezTerm で、統合ターミナルでの全工程は未検証 |
 | Trae、CCL/Duo のネイティブチャットパネル、セッション移行 | 未検証。VS Code の接続結果から互換性を推定しない |
 
-Duo 開発ビルドの表示は `1.4.0-beta.0` ですが、npm の同じバージョンに新機能があるとは限りません。お使いのビルドが `/duo-agent` に対応することを確認してください。
+レビュー済み Duo 候補はコミット `1387fdae` です。npm の `next` はまだ `1.4.1-beta-duo.0` で、後の修正を含みません。バージョンだけでなく CLI の実体を確認してください。npm パッケージのコマンドは `margay` で、ローカルの `ccl` ランチャーは別の場所を指す場合があります。
 
 <!-- section: setup -->
 <a id="guide-setup"></a>
@@ -53,15 +53,13 @@ WS_NO_BUFFER_UTIL=1 ccl --ide
 ```
 
 3. 自動選択されない場合、CCL で `/ide` を実行し Visual Studio Code を選びます。
-4. 同じ端末画面で双方のモデルを設定し、タスクを入力します。
+4. 同じ端末で Duo に入り、タスクを入力します。候補は異なる実行モデルとレビューモデルを自動選択します。必要なら `/model` または `--reviewer-model` で選択を上書きできます。
 
 ```text
-/model
 /duo-agent
-/duo --reviewer-model <固定モデルID>
 ```
 
-プレースホルダーを利用可能なモデル ID に置き換えます。Duo は目標なしでも待機できます。停止とレビューの再確認の規則は [Duo ガイド](duo.md) を参照してください。
+Duo は目標なしでも待機できます。レビューモデルを指定する場合は、待機中に `/duo --reviewer-model <利用可能な固定モデルID>` を入力します。モデルの証拠、停止、受け入れの規則は [Duo ガイド](duo.md) を参照してください。
 
 <!-- section: troubleshooting -->
 <a id="guide-troubleshooting"></a>
@@ -84,6 +82,7 @@ Claude Code と Codex の公式拡張機能には、それぞれネイティブ�
 ## 関連ページ
 
 - [Duo：対等なエージェントの協働](duo.md)
+- [Buddy：チームメイトと軽量レビュー](buddy.md)
 - [対話セッション](interactive-sessions.md)
 - [インストールと更新](installation.md)
 - [トラブルシューティング](troubleshooting.md)

@@ -8,13 +8,13 @@ Updated 2026-09-17. Start with the same CCL terminal interface inside the IDE's 
 
 | Route | Verification status |
 | --- | --- |
-| Terminal Duo in the installed development build | Three real headed scenarios passed, totaling 46 steps |
+| Terminal Duo in the reviewed local candidate | Full review/acceptance 15/15 steps; next-task unfinished-answer control 18/18 steps, using an isolated provider |
 | CCL connection to VS Code | Handshake, advertised service capabilities, and actual connection verified with a temporary environment variable |
 | Default IDE connection | `bufferUtil.mask is not a function` reproduced; not fixed |
 | Complete Duo flow in the VS Code integrated terminal | Instructions below; the observed handshake came from external WezTerm, and the complete integrated-terminal flow remains unverified |
 | Trae, native CCL/Duo chat panels, session migration | Unverified; VS Code connectivity does not establish compatibility |
 
-The Duo development build displays `1.4.0-beta.0`; that does not mean the npm package with that version contains the new features. Check that your build supports `/duo-agent`.
+The reviewed Duo candidate is at commit `1387fdae`; npm `next` remains `1.4.1-beta-duo.0` and lacks those later fixes. Check the CLI identity, not only its version. The installed package exposes `margay`; a local `ccl` launcher may point elsewhere.
 
 <!-- section: setup -->
 <a id="guide-setup"></a>
@@ -53,15 +53,13 @@ WS_NO_BUFFER_UTIL=1 ccl --ide
 ```
 
 3. If it is not selected automatically, run `/ide` in CCL and select Visual Studio Code.
-4. Configure both models in the same terminal interface, then enter your task:
+4. Enter Duo in the same terminal interface, then enter your task. The candidate selects distinct execution and review models automatically; optional `/model` and `--reviewer-model` commands override the selection:
 
 ```text
-/model
 /duo-agent
-/duo --reviewer-model <fixed-model-id>
 ```
 
-Replace the placeholder with an available model ID. Duo can wait without a goal. See the [Duo guide](duo.md) for pause and counter-review rules.
+Duo can wait without a goal. If you override the reviewer, use `/duo --reviewer-model <available-fixed-model-id>` while in standby. See the [Duo guide](duo.md) for model evidence, pause, and acceptance rules.
 
 <!-- section: troubleshooting -->
 <a id="guide-troubleshooting"></a>
@@ -84,6 +82,7 @@ Those are capabilities of the respective official products. Using an existing pa
 ## Continue reading
 
 - [Duo: Peer Collaboration](duo.md)
+- [Buddy: Teammates and Peer Review](buddy.md)
 - [Interactive Sessions](interactive-sessions.md)
 - [Installation and Updates](installation.md)
 - [Troubleshooting](troubleshooting.md)

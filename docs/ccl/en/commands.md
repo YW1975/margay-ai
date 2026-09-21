@@ -88,7 +88,7 @@ Use `/gateway doctor` when shell variables and saved config disagree. In the cur
 | `/commit-push-pr` | Automates commit, push, and PR flow where enabled. | The repository policy allows automated GitHub handoff. | Requires correct branch, auth, and review discipline. |
 | `/mcp` | Manages MCP tool servers in-session. | External tools should be connected, inspected, or toggled. | Workspace trust matters; do not spawn untrusted stdio servers casually. |
 | `/agents` | Shows or manages active agent visibility. | You need to know which built-in/custom/plugin agents can be used. | MCP requirements or setting sources can hide an expected agent. |
-| `/buddy` | Starts a teammate or pair-agent path through the Agent tool with `team_name` and `name`. | A task benefits from a visible helper agent coordinated with the lead session. | It is an interactive prompt command; verify the spawned teammate and permissions before relying on its output. |
+| `/buddy` | Expands a prompt that asks the lead to create/reuse a Team before calling Agent with its returned team name. `--peer-review` starts the protected review path with a fixed reviewer model. | A task benefits from a visible teammate or independent review. | Confirm the actual Team/Agent result; prompt expansion alone does not start a teammate. See [Buddy](buddy.md). |
 | `/hooks` | Inspects hook configuration. | Tool behavior is being changed by policy automation. | Hooks can block or rewrite tool input; check event scope. |
 | `/workflows` | Creates, lists, runs, tails, or inspects workflow automation. | A repeatable multi-step operation needs structure and verification. | Workflow background runs need explicit follow-up via tail/inspect. |
 | `/endpoint` | Pins, inspects, or switches endpoint routing where configured. | A model route or endpoint compatibility issue is suspected. | Endpoint switching depends on configured registry data. |
@@ -125,4 +125,5 @@ Use `/cost`, `/context`, `/usage`, `/stats`, `/insights`, `/endpoint`, and `/gat
 - [Permissions and Security](permissions-security.md)
 - [Hooks](hooks.md)
 - [Duo: Peer Collaboration](duo.md)
+- [Buddy: Teammates and Peer Review](buddy.md)
 - [Using CCL in VS Code](ide.md)

@@ -88,7 +88,7 @@
 | `/commit-push-pr` | 在启用时自动 commit、push、开 PR。 | 仓库策略允许自动 GitHub 交接时。 | 需要正确分支、认证和审阅纪律。 |
 | `/mcp` | 在会话内管理 MCP 工具 server。 | 需要连接、检查或切换外部工具时。 | workspace trust 很重要；不要随意启动不可信 stdio server。 |
 | `/agents` | 显示或管理 active agent 可见性。 | 需要知道哪些内置/自定义/插件 agent 可用时。 | MCP 要求或设置来源可能隐藏预期 agent。 |
-| `/buddy` | 通过 Agent 工具携带 `team_name` 和 `name` 启动 teammate 或 pair-agent 路径。 | 任务需要一个与主会话协作的可见 helper agent 时。 | 它是交互式 prompt 命令；依赖输出前应确认 teammate 已启动并检查权限。 |
+| `/buddy` | 展开提示，让主 Agent 先创建或复用 Team，再用实际返回的团队名调用 Agent；`--peer-review` 使用固定审核模型进入受保护审查路径。 | 需要可见队友或独立审查时。 | 仅展开提示不会启动队友；请核对 Team/Agent 实际结果。详见 [Buddy](buddy.md)。 |
 | `/hooks` | 检查 hook 配置。 | 工具行为被策略自动化改变时。 | hook 可阻止或改写工具输入；检查事件作用域。 |
 | `/workflows` | 创建、列出、运行、tail 或检查 workflow 自动化。 | 可重复多步骤操作需要结构和验证时。 | 后台 workflow run 需要明确 tail/inspect 跟进。 |
 | `/endpoint` | 在配置时 pin、检查或切换 endpoint 路由。 | 怀疑模型路由或 endpoint 兼容问题时。 | endpoint 切换依赖已配置 registry 数据。 |
@@ -125,4 +125,5 @@
 - [权限与安全](permissions-security.md)
 - [Hook](hooks.md)
 - [Duo：对等双 Agent 协作](duo.md)
+- [Buddy：队友与轻量审查](buddy.md)
 - [在 VS Code 中使用 CCL](ide.md)

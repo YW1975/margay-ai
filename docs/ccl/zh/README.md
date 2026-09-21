@@ -11,6 +11,7 @@
 ## 双 Agent 协作与编辑器接入
 
 - [Duo：对等双 Agent 协作](duo.md)
+- [Buddy：队友与轻量审查](buddy.md)
 - [在 VS Code 中使用 CCL](ide.md)
 
 <!-- section: capabilities -->

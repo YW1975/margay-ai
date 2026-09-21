@@ -88,7 +88,7 @@ shell 変数と保存設定が食い違う場合は `/gateway doctor` を使い�
 | `/commit-push-pr` | 対応している場合 commit、push、PR 作成を自動化します。 | リポジトリ方針が自動 GitHub 引き渡しを許す時。 | 正しい branch、認証、レビュー規律が必要です。 |
 | `/mcp` | セッション内で MCP tool server を管理します。 | 外部ツールを接続、確認、切り替える時。 | workspace trust が重要です。信頼できない stdio server を気軽に起動しないでください。 |
 | `/agents` | active agent の可視性を表示または管理します。 | 利用可能な組み込み/カスタム/プラグイン agent を知りたい時。 | MCP 要件や設定元により期待した agent が隠れることがあります。 |
-| `/buddy` | Agent tool に `team_name` と `name` を渡し、teammate または pair-agent path を開始します。 | lead session と協調する visible helper agent が必要な時。 | interactive prompt command です。出力に依存する前に teammate 起動と権限を確認してください。 |
+| `/buddy` | メインエージェントに Team の作成または再利用を先に求め、実際に返されたチーム名で Agent を呼ぶプロンプトに展開します。`--peer-review` は固定したレビューモデルで保護されたレビュー経路を使います。 | 見えるチームメイトまたは独立レビューが必要な時。 | プロンプト展開だけでは起動しません。Team/Agent の実際の結果を確認してください。詳しくは [Buddy](buddy.md)。 |
 | `/hooks` | hook 設定を確認します。 | ツール動作が方針自動化で変わっている時。 | hook は tool input をブロックまたは書き換えます。イベント範囲を確認してください。 |
 | `/workflows` | workflow 自動化を作成、一覧、実行、tail、inspect します。 | 反復可能な多段階操作に構造と検証が必要な時。 | background run は tail/inspect で明示的に追跡してください。 |
 | `/endpoint` | 設定済みの場合 endpoint routing を pin、確認、切替します。 | モデル経路や endpoint 互換性が疑わしい時。 | endpoint 切替は設定済み registry データに依存します。 |
@@ -125,4 +125,5 @@ shell 変数と保存設定が食い違う場合は `/gateway doctor` を使い�
 - [権限とセキュリティ](permissions-security.md)
 - [Hook](hooks.md)
 - [Duo：対等なエージェントの協働](duo.md)
+- [Buddy：チームメイトと軽量レビュー](buddy.md)
 - [VS Code で CCL を使う](ide.md)
