@@ -26,7 +26,7 @@ CCL は model selection と provider transport を分離します。Users は `s
 
 Model selection precedence は in-session overrides、startup flags、environment/settings values、defaults の順です。`utils/model/model.ts` は user-specified aliases と built-in defaults を解決します。Gateway config が存在する場合、gateway-first defaults は direct-provider defaults より前に configured main model と small-fast model を選べます。
 
-Gateway config は explicit `CCL_GATEWAY_URL` / `CCL_GATEWAY_KEY`、loaded `gateway.json`、fallback file lookup から解決されます。Complete explicit environment pair が勝ち、それ以外では persisted file が route を提供できます。Authentication state と route state は同じではありません。Direct auth と gateway credentials は同時に存在し得ます。
+ゲートウェイの環境設定には `CCL_GATEWAY_URL`、`CCL_GATEWAY_KEY`、`CCL_GATEWAY_CREDENTIAL_TYPE`、`CCL_GATEWAY_ISSUER` の四つをまとめて指定します。issuer は正規化した URL と一致する必要があります。`/gateway login` または `/gateway register` で型付き資格情報を作成し、`/gateway doctor` で隔離や不一致を調べてください。上流プロバイダーのキーをゲートウェイ資格情報として使わないでください。
 
 Endpoint compatibility は段階的に検査されます。Endpoint が model list を宣言している場合はその list を先に確認します。宣言がない場合、CCL は endpoint に対して model validation を行えます。Active messages がある場合、endpoint-declared または model-default context limits に対して context-window fit を確認します。
 
@@ -62,6 +62,13 @@ Smart routing は gateway classifier fields、たとえば `model_suggestion`、
 
 - 具体的な model 設定（`auto`/`smart` 以外）では orchestration セクションが無効になり、優先度は main-loop model を変えません。
 - Agent tool 呼び出しで明示された model は pool 解決より優先されるため、pin された subagent model が優先度に上書きされることはありません。
+
+<!-- section: recovery-rc1 -->
+## rc.1 の回復と出力上限
+
+観測済みのゲートウェイ出力上限は、選択した予算と最終 HTTP リクエストの両方に適用され、extra-body の変更も対象です。後続の予算拡大でも上限を再確認し、同意を求めます。出力の切り詰めと残高不足は別です。ゲートウェイ内部の deployment fallback と、明示設定した CLI のモデル・endpoint fallback は別の仕組みで、複数 endpoint の登録だけでは切り替えの許可になりません。
+
+[エラー回復とユーザーの同意](error-recovery.md)
 
 <!-- section: source-evidence -->
 ## Source evidence

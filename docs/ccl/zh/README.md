@@ -48,6 +48,13 @@
 
 修改导航或页面清单后，除了 Markdown，还要验证生成的 `site/<lang>/index.html`。静态构建器会把 Markdown 链接改写成 HTML 链接，渲染后的导航才是用户最终看到的 artifact。英文锚点：Public Documentation Publishing。
 
+<!-- section: recovery-rc1 -->
+## rc.1 的恢复与输出上限
+
+短时低风险修复可在已有授权内执行；耗时长、不确定、敏感或影响体验的恢复先征求同意。持续外部阻塞会保留任务未完成状态，并说明需要用户提供的帮助。
+
+[错误恢复与用户同意](error-recovery.md)
+
 <!-- section: source-evidence -->
 ## Source evidence
 

@@ -22,11 +22,13 @@ CCL は複数の認証 channel を扱えます。Margay gateway credentials、di
 <!-- section: operational-model -->
 ## Operational model
 
-Gateway authentication は正規化された gateway URL と key を CCL config home の `gateway.json` に保存します。起動時、gateway bootstrap は完全な explicit shell environment override が存在しない限り、その file を `CCL_GATEWAY_URL` と `CCL_GATEWAY_KEY` に読み込みます。これにより URL/key の mixed-source pair を避けつつ、意図的な shell override を保持します。
+ゲートウェイの環境設定には `CCL_GATEWAY_URL`、`CCL_GATEWAY_KEY`、`CCL_GATEWAY_CREDENTIAL_TYPE`、`CCL_GATEWAY_ISSUER` の四つをまとめて指定します。issuer は正規化した URL と一致する必要があります。`/gateway login` または `/gateway register` で型付き資格情報を作成し、`/gateway doctor` で隔離や不一致を調べてください。上流プロバイダーのキーをゲートウェイ資格情報として使わないでください。
 
-Gateway login は validation が有効な場合 `GET /auth/me` で credentials を検証します。Gateway registration は invite code と optional user details を `/register` に送り、gateway が返す modern JWT-style `token` または古い compatible `api_key` を保存します。
+ゲートウェイのログイン・登録は専用資格情報を検証し、型付き状態を `~/.ccl/gateway.json` に保存して現在のプロセスを更新します。新しい shell rc ブロックは書きません。新規プロセスの起動前に四つの古い環境変数を削除または更新してください。旧 compact JWT の互換受け入れは移行経路であり、メタデータ省略の推奨ではありません。
 
-Gateway URL の優先順位は explicit environment、`gateway.json`、built-in default gateway URL です。URL だけでは authentication ではなく、key が必要です。Shell の `CCL_GATEWAY_URL` または `CCL_GATEWAY_KEY` が `gateway.json` を shadow している場合、`/gateway doctor` は conflict と unset/login fix を表示します。
+ログインは同一オリジンの `GET /auth/me` でゲートウェイ専用資格情報を検証してから保存します。登録は招待コードと任意の情報を `/register` に送り、返されたゲートウェイ JWT だけを同じゲートウェイで検証します。旧 `api_key` 応答は登録資格情報として受け入れません。
+
+受け入れ条件を満たす完全な環境設定、または型付きの保存済み設定を使います。URL だけでは認証できません。型のない不透明な資格情報や issuer の不一致はリクエスト前に隔離されます。`/gateway doctor` で調べ、四つの設定を削除または修正してから再ログインしてください。
 
 Direct Claude authentication は別 channel です。`ANTHROPIC_API_KEY`、OAuth tokens、gateway credentials は同時に存在し得ますが、route selection は selected model と provider compatibility に依存します。Gateway doctor は Claude-direct と gateway の channel state を別々に報告します。
 
@@ -47,7 +49,7 @@ Direct Claude authentication は別 channel です。`ANTHROPIC_API_KEY`、OAuth
 
 - `bootstrap/gatewayConfig.ts` は gateway config loading、`gateway.json`、explicit environment override behavior、default gateway URL resolution を定義します。
 - `commands/gateway/gateway.tsx` は `/gateway status`、`login`、`logout`、`doctor`、`register` を実装します。
-- `commands/gateway/gateway-helpers.ts` は `GET /auth/me` による gateway login validation、credential persistence、registration argument parsing、modern/legacy gateway credential fields を扱います。
+- `commands/gateway/gateway-helpers.ts` — ログインは同一オリジンの `GET /auth/me` でゲートウェイ専用資格情報を検証してから保存します。登録は招待コードと任意の情報を `/register` に送り、返されたゲートウェイ JWT だけを同じゲートウェイで検証します。旧 `api_key` 応答は登録資格情報として受け入れません。
 - `services/gateway/gatewayDoctor.ts` は placeholder values、stale environment shadowing、missing gateway config、API-key/OAuth conflicts を検出します。
 - `main.tsx` は `auth login/status/logout`、`setup-token`、`--api-key`、`--base-url`、`--bare`、authentication initialization flow を定義します。
 - `services/mcp/auth.ts` と `commands/mcp/mcp.tsx` は MCP-related authentication surfaces を実装します。

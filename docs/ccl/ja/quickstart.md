@@ -35,7 +35,7 @@ Print mode と interactive mode は多くの runtime を共有しますが、表
 2. `ccl --version` を実行し、期待する CCL version が表示されることを確認します。
 3. `ccl --help` を実行し、現在の build に `-p, --print`、`--output-format`、`--model`、`--settings`、`--mcp-config`、permission flags があることを確認します。
 4. Installation、updater、`PATH`、package manager、shell、sandbox、workspace trust が不明な場合は `ccl doctor` を実行します。
-5. 承認済みの方法で credentials を設定します。Gateway users は `CCL_GATEWAY_URL` と `CCL_GATEWAY_KEY`、または `/gateway login URL TOKEN` による local gateway file を使います。
+5. 許可された方法で認証します。ゲートウェイでは `/gateway login URL TOKEN` または `/gateway register URL INVITE` を優先してください。手動設定には[認証ガイド](authentication.md)の四つの資格情報フィールドが必要です。
 6. 非変更 smoke test として `ccl -p "Summarize this repository in five bullets." --allowedTools ""` を実行します。
 7. Route evidence が必要なら `--debug-file <path>` を付けて再実行し、route markers、model selection、gateway status を確認します。
 8. Non-interactive smoke test が成功したら、`ccl` で interactive session を開始します。
@@ -50,6 +50,15 @@ Print mode と interactive mode は多くの runtime を共有しますが、表
 | Model または endpoint が違う | Route precedence | `/model`、`/endpoint`、`/gateway status`、debug route markers、settings sources を確認します。 |
 | Smoke test で tool prompt が出る | Prompt または tool policy | 非変更 smoke test では `--allowedTools ""` を維持し、その後意図的に permissions を広げます。 |
 | Print mode で slash command が使えない | Surface mismatch | Interactive `ccl` を使うか、対応する top-level CLI command を使います。 |
+
+<!-- section: recovery-rc1 -->
+## rc.1 の回復と出力上限
+
+npm パッケージ `@margay/ccl-core` は `margay` コマンドを提供します。既存の配布形態によっては独立した `ccl` ランチャーもあります。他のページでその名前を使う例は、npm 導入時には `margay` に置き換えてください。
+
+短時間で低リスクの修復は既存の許可内で実行できます。長時間、不確実、機密性が高い、または体験に影響する回復は先に同意を求めます。継続する外部障害ではタスクを未完了として保持し、必要な対応を説明します。
+
+[エラー回復とユーザーの同意](error-recovery.md)
 
 <!-- section: source-evidence -->
 ## Source evidence

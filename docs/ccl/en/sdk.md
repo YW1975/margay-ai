@@ -7,6 +7,13 @@
 
 The CCL SDK exposes the `@margay/ccl-core/sdk` import path for host processes that need a headless, stream-oriented CCL agent session with permission interception, resumable sessions, pending approvals, and usage accounting.
 
+<!-- section: recovery-rc1 -->
+## Recovery and output limits in rc.1
+
+A terminal `result` can carry optional `recovery: { status, reason, attempts }`, with `status` equal to `needs_user` or `blocked_external`. Check `isError` before marking work complete. Headless runtime proposals that require consent end with `needs_user`; they do not automatically produce `suspended` or a pending record. Use `resumeWithDecision` only for an actual pending tool approval. Opt into process events with `includeErrorDiagnostics: true`; `error_diagnostic` is not another terminal result.
+
+[Error recovery and user consent](error-recovery.md)
+
 <!-- section: capabilities -->
 ## Capabilities
 

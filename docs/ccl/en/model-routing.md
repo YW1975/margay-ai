@@ -26,7 +26,7 @@ This separation lets a project use domestic gateway models by default while stil
 
 Model selection precedence starts with in-session overrides, then startup flags, environment/settings values, and finally defaults. `utils/model/model.ts` resolves user-specified aliases and built-in defaults. When a gateway config exists, gateway-first defaults can choose a configured main model and a configured small-fast model before direct-provider defaults.
 
-Gateway config is resolved from explicit `CCL_GATEWAY_URL` / `CCL_GATEWAY_KEY`, loaded `gateway.json`, or fallback file lookup. A complete explicit environment pair wins; otherwise the persisted file can supply the route. Authentication state is not the same as route state: direct auth can exist while gateway credentials also exist.
+Gateway environment configuration uses four fields together: `CCL_GATEWAY_URL`, `CCL_GATEWAY_KEY`, `CCL_GATEWAY_CREDENTIAL_TYPE`, and `CCL_GATEWAY_ISSUER`. The issuer must match the normalized gateway URL. Prefer `/gateway login` or `/gateway register` to create typed credentials; use `/gateway doctor` to diagnose quarantined or mismatched state. Never substitute an upstream provider key for a gateway credential.
 
 Endpoint compatibility is checked in layers. If an endpoint declares a model list, that list is checked first. Otherwise CCL may validate the model against the endpoint. If active messages are provided, context-window fit is checked against endpoint-declared or model-default context limits.
 
@@ -62,6 +62,13 @@ Where the priority does not take effect:
 
 - With a concrete model setting (anything other than `auto`/`smart`), the orchestration section is disabled and the priority does not change the main-loop model.
 - An explicit per-call model on the Agent tool takes precedence over pool resolution, so a pinned subagent model is never overridden by the priority.
+
+<!-- section: recovery-rc1 -->
+## Recovery and output limits in rc.1
+
+Observed gateway output ceilings clamp both the selected budget and the final HTTP request, including extra-body overrides. Later budget escalation rechecks the ceiling and requires consent. Output truncation is separate from account credit. Gateway deployment fallback is separate from explicitly configured CLI model/endpoint fallback; listing multiple endpoints alone does not authorize switching.
+
+[Error recovery and user consent](error-recovery.md)
 
 <!-- section: source-evidence -->
 ## Source evidence

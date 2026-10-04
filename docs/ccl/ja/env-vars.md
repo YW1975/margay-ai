@@ -11,7 +11,7 @@ CCL は CCL 接頭辞の環境変数を読み取り、モデル選択、ログ�
 ## 機能範囲
 
 - `CCL_MODEL` とモデル既定値変数で、互換デプロイのメインモデルまたは高速モデルを選びます。
-- `CCL_GATEWAY_URL` と `CCL_GATEWAY_KEY` は Margay ゲートウェイルーティングに使います。設定されている場合は `~/.ccl/gateway.json` より優先されます。
+- Margay ゲートウェイには `CCL_GATEWAY_URL`、`CCL_GATEWAY_KEY`、`CCL_GATEWAY_CREDENTIAL_TYPE`、`CCL_GATEWAY_ISSUER` の四つを設定し、`/gateway login` または `/gateway register` を優先してください。URL と KEY の設定だけで保存済み設定を上書きできるとは限らず、資格情報の受け入れ検査を通る必要があります。
 - `CCL_LOG`、`CCL_BETAS`、`CCL_CUSTOM_HEADERS`、`CCL_PERMISSIONS_TEMPLATE` は診断、beta フラグ、ヘッダー、権限既定値に使います。
 - OAuth とゲートウェイを意図的に併用するデプロイでは、`CCL_QUIET_DUAL_CHANNEL=1` で起動時の dual-channel 情報メモを非表示にできます。Claude は OAuth、third-party model は gateway を使います。
 
@@ -19,13 +19,13 @@ CCL は CCL 接頭辞の環境変数を読み取り、モデル選択、ログ�
 ## 運用モデル
 
 - `bootstrap/envSync.ts` は、互換変数が未設定の場合に限り、一部の非ルーティング `CCL_*` 変数を互換変数へ対応付けます。誤った provider ルーティングを避けるため、`CCL_BASE_URL` と `CCL_API_KEY` は明示的に同期対象外です。
-- `bootstrap/gatewayConfig.ts` は `CCL_GATEWAY_URL` と `CCL_GATEWAY_KEY` の両方がない場合だけ `~/.ccl/gateway.json` を読み込みます。どちらかの shell 変数が存在する場合、shell 環境が原子的な設定ペアとして優先されます。
+- ゲートウェイの環境設定には `CCL_GATEWAY_URL`、`CCL_GATEWAY_KEY`、`CCL_GATEWAY_CREDENTIAL_TYPE`、`CCL_GATEWAY_ISSUER` の四つをまとめて指定します。issuer は正規化した URL と一致する必要があります。`/gateway login` または `/gateway register` で型付き資格情報を作成し、`/gateway doctor` で隔離や不一致を調べてください。上流プロバイダーのキーをゲートウェイ資格情報として使わないでください。
 - dual-channel mode では、OAuth または first-party API-key auth が利用できる場合、Claude model call は local Claude auth channel を使います。DeepSeek や Kimi などの非 Claude model は設定済み gateway を使います。この mode では gateway credential を provider SDK 変数に入れないでください。
 
 <!-- section: configuration -->
 ## 設定とコマンド
 
-- `/gateway login`、`/gateway register`、`/gateway logout` は `CCL_GATEWAY_URL` と `CCL_GATEWAY_KEY` を書き込みまたは削除します。
+- ゲートウェイのログイン・登録は専用資格情報を検証し、型付き状態を `~/.ccl/gateway.json` に保存して現在のプロセスを更新します。新しい shell rc ブロックは書きません。新規プロセスの起動前に四つの古い環境変数を削除または更新してください。旧 compact JWT の互換受け入れは移行経路であり、メタデータ省略の推奨ではありません。
 - `ANTHROPIC_*` などの互換リテラルは、基盤 SDK 互換層に必要な環境変数名としてのみ記載し、ベンダーブランド文言としては扱いません。
 - provider cache ヒット率はこのページではまだ扱いません。cache-read/cache-write 指標は、ゲートウェイが検証済み usage フィールドを公開してから追記します。
 
@@ -33,14 +33,20 @@ CCL は CCL 接頭辞の環境変数を読み取り、モデル選択、ログ�
 
 | 環境 | 例 | 使う場面 |
 | --- | --- | --- |
-| POSIX shell | `export CCL_GATEWAY_URL=https://gateway.example.com` | 現在の shell と子プロセスに値を渡したい時。 |
+| POSIX shell | `export CCL_LOG=debug` | 現在の shell と子プロセスに値を渡したい時。 |
 | 一回のコマンド | `CCL_LOG=debug ccl doctor` | 一時的な診断 override が必要な時。 |
 | ローカル gateway ファイル | `~/.ccl/gateway.json` | `/gateway login` で永続ローカル gateway 資格情報を保存した時。 |
 | 管理設定 | organization-managed settings | チームが policy-controlled default を必要とする時。 |
 
 ## 優先順位とルーティング安全性
 
-`CCL_GATEWAY_URL` と `CCL_GATEWAY_KEY` は原子的なペアです。shell 環境にどちらか一つでも存在する場合、CCL は `~/.ccl/gateway.json` を読み込みません。shell 環境が優先されます。これにより、環境 URL と古いファイル key の混在を避けます。
+ゲートウェイの環境設定には `CCL_GATEWAY_URL`、`CCL_GATEWAY_KEY`、`CCL_GATEWAY_CREDENTIAL_TYPE`、`CCL_GATEWAY_ISSUER` の四つをまとめて指定します。issuer は正規化した URL と一致する必要があります。`/gateway login` または `/gateway register` で型付き資格情報を作成し、`/gateway doctor` で隔離や不一致を調べてください。上流プロバイダーのキーをゲートウェイ資格情報として使わないでください。
+
+ゲートウェイのログイン・登録は専用資格情報を検証し、型付き状態を `~/.ccl/gateway.json` に保存して現在のプロセスを更新します。新しい shell rc ブロックは書きません。新規プロセスの起動前に四つの古い環境変数を削除または更新してください。旧 compact JWT の互換受け入れは移行経路であり、メタデータ省略の推奨ではありません。
+
+```bash
+unset CCL_GATEWAY_URL CCL_GATEWAY_KEY CCL_GATEWAY_CREDENTIAL_TYPE CCL_GATEWAY_ISSUER
+```
 
 `bootstrap/envSync.ts` は選択された非ルーティング `CCL_*` 変数だけを互換 SDK 変数へ同期します。`CCL_BASE_URL` や `CCL_API_KEY` を provider routing 変数へ同期しません。
 
@@ -48,8 +54,9 @@ CCL は CCL 接頭辞の環境変数を読み取り、モデル選択、ログ�
 
 | 変数 | 用途 | メモ |
 | --- | --- | --- |
-| `CCL_GATEWAY_URL` | ゲートウェイ base URL | `CCL_GATEWAY_KEY` と併用します。shell 値があると gateway ファイル読み込みを止めます。 |
-| `CCL_GATEWAY_KEY` | ゲートウェイ API key | `CCL_GATEWAY_URL` と併用します。公開文書や commit に入れないでください。 |
+| `CCL_GATEWAY_URL` | ゲートウェイ base URL | 四つの設定をそろえ、対話ログインを優先します。 |
+| `CCL_GATEWAY_KEY` | ゲートウェイ専用資格情報 | 公開せず、上流プロバイダーのキーも使わないでください。 |
+| `CCL_GATEWAY_CREDENTIAL_TYPE`, `CCL_GATEWAY_ISSUER` | 資格情報のメタデータ | 型と issuer はゲートウェイ設定との一致が必要です。 |
 | `CCL_MODEL` | モデル選択 | 互換 target 変数が未設定の場合だけ互換モデル変数へ同期されます。 |
 | `CCL_SMALL_FAST_MODEL` | 小型高速モデル選択 | 大きい task と低コスト task を分けるデプロイに有用です。 |
 | `CCL_LOG` | ログ詳細度 | 診断ではコマンド単位の一時 override を優先します。 |
@@ -77,7 +84,7 @@ CCL は CCL 接頭辞の環境変数を読み取り、モデル選択、ログ�
 | CCL 変数（設定されれば優先） | レガシーフォールバック | 用途 |
 | --- | --- | --- |
 | `CCL_SIMPLE` | `CLAUDE_CODE_SIMPLE` | Bare/最小 runtime mode（`--bare` と同じ効果）。 |
-| `CCL_MAX_OUTPUT_TOKENS` | `CLAUDE_CODE_MAX_OUTPUT_TOKENS` | 明示的な最大 output token 上書き。設定時は自動 output-token エスカレーションをスキップします。 |
+| `CCL_MAX_OUTPUT_TOKENS` | `CLAUDE_CODE_MAX_OUTPUT_TOKENS` | 出力予算の指定です。CCL 変数が優先しますが既知のモデル・ゲートウェイ上限は適用され、回復時の予算拡大には同意が必要です。 |
 | `CCL_REMOTE_MEMORY_DIR` | `CLAUDE_CODE_REMOTE_MEMORY_DIR` | リモート/コンテナ実行での memory file の base directory を上書きします。 |
 | `CCL_SKIP_PROMPT_HISTORY` | `CLAUDE_CODE_SKIP_PROMPT_HISTORY` | prompt をコマンド履歴に書かないようにします（生成された検証 session が実履歴を汚さないために使用）。 |
 | `CCL_DISABLE_CLAUDE_MDS` | `CLAUDE_CODE_DISABLE_CLAUDE_MDS` | プロジェクト/ユーザーの記憶指示ファイルの読み込みを無効化します。 |

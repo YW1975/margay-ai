@@ -76,6 +76,13 @@ These are honest, current-build limitations, not configuration errors:
 
 Escalate only after collecting a small reproduction: exact command, CCL version, sanitized environment variable names, relevant settings source, expected behavior, actual behavior, exit code, and last diagnostic output. Include file paths only when they are repository-relative and safe to share.
 
+<!-- section: recovery-rc1 -->
+## Recovery and output limits in rc.1
+
+Short, low-risk repairs can proceed within existing authority. Long, uncertain, sensitive, or experience-changing repairs need consent. Persistent external blockers leave the task unfinished and explain the help needed.
+
+[Error recovery and user consent](error-recovery.md)
+
 <!-- section: source-evidence -->
 ## Source evidence
 

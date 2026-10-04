@@ -35,7 +35,7 @@ Minimal first run:
 2. Run `ccl --version`; confirm it prints the expected CCL version.
 3. Run `ccl --help`; confirm `-p, --print`, `--output-format`, `--model`, `--settings`, `--mcp-config`, and permission flags are available in your build.
 4. Run `ccl doctor` if installation, updater, PATH, package-manager, shell, sandbox, or workspace trust state is unclear.
-5. Configure credentials through your approved path. Gateway users should prefer `CCL_GATEWAY_URL` plus `CCL_GATEWAY_KEY`, or save a gateway file through `/gateway login URL TOKEN`.
+5. Configure authentication using the approved path. Gateway users should prefer `/gateway login URL TOKEN` or `/gateway register URL INVITE`; manual environment setup requires all four credential fields described in [Authentication](authentication.md).
 6. Run `ccl -p "Summarize this repository in five bullets." --allowedTools ""` for a non-mutating smoke test.
 7. If route evidence is needed, rerun with `--debug-file <path>` and inspect route markers, model selection, and gateway status.
 8. Run `ccl` for the interactive session after the non-interactive smoke test works.
@@ -50,6 +50,15 @@ Common first-run symptoms:
 | Wrong model or endpoint | Route precedence | Check `/model`, `/endpoint`, `/gateway status`, debug route markers, and settings sources. |
 | Tool prompt appears in smoke test | Prompt or tool policy | Keep `--allowedTools ""` for non-mutating smoke tests, then expand permissions deliberately. |
 | Slash command unavailable in print mode | Surface mismatch | Use interactive `ccl`, or use the matching top-level CLI command when one exists. |
+
+<!-- section: recovery-rc1 -->
+## Recovery and output limits in rc.1
+
+The npm package `@margay/ccl-core` exposes the `margay` command. Some existing distributions also provide a separate `ccl` launcher. The examples on other pages may use that launcher; substitute `margay` when using the npm package.
+
+Short, low-risk repairs can proceed within existing authority. Long, uncertain, sensitive, or experience-changing repairs need consent. Persistent external blockers leave the task unfinished and explain the help needed.
+
+[Error recovery and user consent](error-recovery.md)
 
 <!-- section: source-evidence -->
 ## Source evidence

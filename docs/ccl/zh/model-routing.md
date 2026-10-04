@@ -26,7 +26,7 @@ CCL 将模型选择和 provider transport 分离。用户可以选择 `sonnet`�
 
 模型选择优先级从会话内 override 开始，然后是启动 flags、环境/settings 值，最后是默认值。`utils/model/model.ts` 解析用户指定别名和内置默认值。当 gateway config 存在时，gateway-first 默认值可以先选择配置的 main model 和 small-fast model，再进入 direct-provider 默认值。
 
-Gateway config 从显式 `CCL_GATEWAY_URL` / `CCL_GATEWAY_KEY`、已加载 `gateway.json` 或 fallback 文件读取。一组完整显式环境变量优先；否则持久化文件可以提供 route。认证状态不等于 route 状态：direct auth 和 gateway credentials 可以同时存在。
+网关环境配置需同时提供 `CCL_GATEWAY_URL`、`CCL_GATEWAY_KEY`、`CCL_GATEWAY_CREDENTIAL_TYPE` 和 `CCL_GATEWAY_ISSUER` 四字段，issuer 必须匹配规范化网关 URL。优先用 `/gateway login` 或 `/gateway register` 创建带类型的凭据，用 `/gateway doctor` 检查隔离或不匹配状态。不能用上游供应商密钥冒充网关凭据。
 
 Endpoint compatibility 按层检查。如果 endpoint 声明了模型列表，先检查该列表。否则 CCL 可以对 endpoint 做模型校验。提供 active messages 时，会根据 endpoint 声明或模型默认 context limit 检查当前上下文是否能放下。
 
@@ -62,6 +62,13 @@ Smart routing 可以使用 gateway classifier 返回的 `model_suggestion`、esc
 
 - 模型设置为具体模型（即非 `auto`/`smart`）时，orchestration 段被禁用，优先级不会改变主循环模型。
 - Agent 工具调用上显式指定的模型优先于 pool 解析，因此被 pin 住的子 agent 模型不会被优先级覆盖。
+
+<!-- section: recovery-rc1 -->
+## rc.1 的恢复与输出上限
+
+已观察到的网关输出上限同时约束所选预算和最终 HTTP 请求，包括 extra-body 改写。后续升级预算会重新检查上限，并请求同意。输出截断与账户余额耗尽不同。网关内部 deployment fallback 与显式配置的 CLI 模型/endpoint fallback 是两层机制；仅列出多个 endpoint 不等于授权切换。
+
+[错误恢复与用户同意](error-recovery.md)
 
 <!-- section: source-evidence -->
 ## Source evidence

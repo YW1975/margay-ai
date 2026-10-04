@@ -22,11 +22,13 @@ CCL can authenticate through several channels: Margay gateway credentials, direc
 <!-- section: operational-model -->
 ## Operational model
 
-Gateway authentication stores a normalized gateway URL and key in `gateway.json` under the CCL config home. On startup, gateway bootstrap loads that file into `CCL_GATEWAY_URL` and `CCL_GATEWAY_KEY` unless a complete explicit shell environment override is already present. This prevents mixed-source URL/key pairs while preserving deliberate shell overrides.
+Gateway environment configuration uses four fields together: `CCL_GATEWAY_URL`, `CCL_GATEWAY_KEY`, `CCL_GATEWAY_CREDENTIAL_TYPE`, and `CCL_GATEWAY_ISSUER`. The issuer must match the normalized gateway URL. Prefer `/gateway login` or `/gateway register` to create typed credentials; use `/gateway doctor` to diagnose quarantined or mismatched state. Never substitute an upstream provider key for a gateway credential.
 
-Gateway login validates credentials with `GET /auth/me` when validation is enabled. Gateway registration posts an invite code and optional user details to `/register`, then persists whichever credential the gateway returns: modern JWT-style `token` or older compatible `api_key`.
+Gateway login/registration verifies a gateway-owned credential, writes typed state to `~/.ccl/gateway.json`, and updates the current process. It does not write a new shell rc block. Clear or update all four stale exported fields before starting another process. Legacy compact JWT admission is a compatibility path, not an instruction to omit metadata.
 
-Gateway URL precedence is explicit environment, then `gateway.json`, then the built-in default gateway URL. A URL alone is not authentication; a key is still required. If shell `CCL_GATEWAY_URL` or `CCL_GATEWAY_KEY` shadows `gateway.json`, `/gateway doctor` reports the conflict and prints an unset/login fix.
+Login verifies a gateway-owned credential with same-origin `GET /auth/me` before saving it. Registration posts an invite and optional user details to `/register`, accepts only the returned gateway JWT, and verifies it with that same gateway. A legacy `api_key` response is not accepted as registration credentials.
+
+Use a complete admitted environment tuple or typed saved gateway state. A URL alone is not authentication. Untyped opaque credentials and issuer mismatches are quarantined before requests; inspect `/gateway doctor` and clear or correct the full tuple before logging in again.
 
 Direct Claude authentication is separate. `ANTHROPIC_API_KEY`, OAuth tokens, and gateway credentials can all exist, but route selection depends on the selected model and provider compatibility. The gateway doctor reports both channel states so users can see whether Claude-direct and gateway paths are configured independently.
 
@@ -47,7 +49,7 @@ Direct Claude authentication is separate. `ANTHROPIC_API_KEY`, OAuth tokens, and
 
 - `bootstrap/gatewayConfig.ts` defines gateway config loading, `gateway.json`, explicit environment override behavior, and default gateway URL resolution.
 - `commands/gateway/gateway.tsx` implements `/gateway status`, `login`, `logout`, `doctor`, and `register`.
-- `commands/gateway/gateway-helpers.ts` validates gateway login with `GET /auth/me`, persists credentials, parses registration arguments, and handles modern/legacy gateway credential fields.
+- `commands/gateway/gateway-helpers.ts` — Login verifies a gateway-owned credential with same-origin `GET /auth/me` before saving it. Registration posts an invite and optional user details to `/register`, accepts only the returned gateway JWT, and verifies it with that same gateway. A legacy `api_key` response is not accepted as registration credentials.
 - `services/gateway/gatewayDoctor.ts` detects placeholder values, stale environment shadowing, missing gateway config, and API-key/OAuth conflicts.
 - `main.tsx` defines `auth login/status/logout`, `setup-token`, `--api-key`, `--base-url`, `--bare`, and authentication initialization flow.
 - `services/mcp/auth.ts` and `commands/mcp/mcp.tsx` implement MCP-related authentication surfaces.

@@ -685,6 +685,23 @@
       ]
     },
     {
+      "slug": "error-recovery",
+      "group": "Operate",
+      "page_type": "standard",
+      "nav_hidden": false,
+      "title": "Error Recovery and User Consent",
+      "source_evidence": [
+        "docs/error-recovery-usage.md",
+        "sdk/API.md"
+      ],
+      "related": [
+        "installation",
+        "sdk",
+        "model-routing",
+        "troubleshooting"
+      ]
+    },
+    {
       "slug": "troubleshooting",
       "group": "Operate",
       "page_type": "standard",
@@ -1019,6 +1036,14 @@
       "source": [
         "commands/ide",
         "utils/ide.ts"
+      ]
+    },
+    {
+      "id": "error-recovery",
+      "page": "error-recovery",
+      "source": [
+        "docs/error-recovery-usage.md",
+        "sdk/API.md"
       ]
     }
   ]

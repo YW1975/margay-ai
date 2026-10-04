@@ -11,7 +11,7 @@ CCL reads CCL-prefixed environment variables for model selection, logging, permi
 ## Capabilities
 
 - Use `CCL_MODEL` and model default variables to select the main or fast model for compatible deployments.
-- Use `CCL_GATEWAY_URL` and `CCL_GATEWAY_KEY` for Margay gateway routing; these variables are authoritative over `~/.ccl/gateway.json` when set.
+- Configure Margay gateway routing with all four fields: `CCL_GATEWAY_URL`, `CCL_GATEWAY_KEY`, `CCL_GATEWAY_CREDENTIAL_TYPE`, and `CCL_GATEWAY_ISSUER`; prefer `/gateway login` or `/gateway register`. Setting URL and KEY alone does not guarantee an override of saved gateway configuration: credentials must pass admission checks.
 - Use `CCL_LOG`, `CCL_BETAS`, `CCL_CUSTOM_HEADERS`, and `CCL_PERMISSIONS_TEMPLATE` for diagnostics, beta flags, headers, and permission defaults.
 - Use `CCL_QUIET_DUAL_CHANNEL=1` to silence the expected OAuth-plus-gateway informational note when the deployment intentionally uses Claude through OAuth and third-party models through the gateway.
 
@@ -19,13 +19,13 @@ CCL reads CCL-prefixed environment variables for model selection, logging, permi
 ## Operational model
 
 - `bootstrap/envSync.ts` maps selected non-routing `CCL_*` variables to compatibility variables only when the compatibility variable is not already set. It explicitly excludes `CCL_BASE_URL` and `CCL_API_KEY` from sync to avoid accidental provider routing changes.
-- `bootstrap/gatewayConfig.ts` loads `~/.ccl/gateway.json` only when neither `CCL_GATEWAY_URL` nor `CCL_GATEWAY_KEY` is present. If either shell variable is present, the shell environment is authoritative as an atomic pair.
+- Gateway environment configuration uses four fields together: `CCL_GATEWAY_URL`, `CCL_GATEWAY_KEY`, `CCL_GATEWAY_CREDENTIAL_TYPE`, and `CCL_GATEWAY_ISSUER`. The issuer must match the normalized gateway URL. Prefer `/gateway login` or `/gateway register` to create typed credentials; use `/gateway doctor` to diagnose quarantined or mismatched state. Never substitute an upstream provider key for a gateway credential.
 - In dual-channel mode, Claude model calls use the local Claude auth channel when OAuth or first-party API-key auth is available, while non-Claude models such as DeepSeek or Kimi use the configured gateway. Do not put gateway credentials in provider SDK variables for this mode.
 
 <!-- section: configuration -->
 ## Configuration and commands
 
-- Gateway commands write and clear `CCL_GATEWAY_URL` and `CCL_GATEWAY_KEY` as part of `/gateway login`, `/gateway register`, and `/gateway logout`.
+- Gateway login/registration verifies a gateway-owned credential, writes typed state to `~/.ccl/gateway.json`, and updates the current process. It does not write a new shell rc block. Clear or update all four stale exported fields before starting another process. Legacy compact JWT admission is a compatibility path, not an instruction to omit metadata.
 - Compatibility literals such as `ANTHROPIC_*` may appear in this page only as environment-variable names required by the underlying SDK compatibility layer, not as vendor branding.
 - CCL does not currently document provider cache-hit accounting here; cache-read/cache-write metrics are deferred until the gateway exposes verified usage fields.
 
@@ -33,14 +33,20 @@ CCL reads CCL-prefixed environment variables for model selection, logging, permi
 
 | Environment | Example | Use when |
 | --- | --- | --- |
-| POSIX shell | `export CCL_GATEWAY_URL=https://gateway.example.com` | You need the value for the current shell and child processes. |
+| POSIX shell | `export CCL_LOG=debug` | You need the value for the current shell and child processes. |
 | One command | `CCL_LOG=debug ccl doctor` | You need a temporary diagnostic override. |
 | Local gateway file | `~/.ccl/gateway.json` | You used `/gateway login` and want durable local gateway credentials. |
 | Managed settings | organization-managed settings | The team needs policy-controlled defaults. |
 
 ## Precedence And Routing Safety
 
-`CCL_GATEWAY_URL` and `CCL_GATEWAY_KEY` are an atomic pair. If either is present in the shell environment, CCL does not load `~/.ccl/gateway.json`; the shell environment is authoritative. This avoids combining an environment URL with a stale file key.
+Gateway environment configuration uses four fields together: `CCL_GATEWAY_URL`, `CCL_GATEWAY_KEY`, `CCL_GATEWAY_CREDENTIAL_TYPE`, and `CCL_GATEWAY_ISSUER`. The issuer must match the normalized gateway URL. Prefer `/gateway login` or `/gateway register` to create typed credentials; use `/gateway doctor` to diagnose quarantined or mismatched state. Never substitute an upstream provider key for a gateway credential.
+
+Gateway login/registration verifies a gateway-owned credential, writes typed state to `~/.ccl/gateway.json`, and updates the current process. It does not write a new shell rc block. Clear or update all four stale exported fields before starting another process. Legacy compact JWT admission is a compatibility path, not an instruction to omit metadata.
+
+```bash
+unset CCL_GATEWAY_URL CCL_GATEWAY_KEY CCL_GATEWAY_CREDENTIAL_TYPE CCL_GATEWAY_ISSUER
+```
 
 `bootstrap/envSync.ts` intentionally syncs only selected non-routing `CCL_*` variables to compatibility SDK variables. It does not sync `CCL_BASE_URL` or `CCL_API_KEY` into provider routing variables.
 
@@ -48,8 +54,9 @@ CCL reads CCL-prefixed environment variables for model selection, logging, permi
 
 | Variable | Purpose | Notes |
 | --- | --- | --- |
-| `CCL_GATEWAY_URL` | Gateway base URL | Use with `CCL_GATEWAY_KEY`; shell value overrides gateway file loading. |
-| `CCL_GATEWAY_KEY` | Gateway API key | Use with `CCL_GATEWAY_URL`; keep out of public docs and commits. |
+| `CCL_GATEWAY_URL` | Gateway base URL | Supply the complete four-field tuple; prefer interactive login. |
+| `CCL_GATEWAY_KEY` | Gateway-owned credential | Keep private; never use an upstream provider key. |
+| `CCL_GATEWAY_CREDENTIAL_TYPE`, `CCL_GATEWAY_ISSUER` | Credential admission metadata | Type and issuer must agree with the gateway configuration. |
 | `CCL_MODEL` | Model selection | Synced to the compatibility model variable only if that target is unset. |
 | `CCL_SMALL_FAST_MODEL` | Fast/small model selection | Useful for deployments that split large and cheap tasks. |
 | `CCL_LOG` | Logging verbosity | Use temporary command-level overrides for diagnostics. |
@@ -77,7 +84,7 @@ For a set of behavior toggles, CCL reads the `CCL_*` name first and falls back t
 | CCL variable (wins when set) | Legacy fallback | Purpose |
 | --- | --- | --- |
 | `CCL_SIMPLE` | `CLAUDE_CODE_SIMPLE` | Bare/minimal runtime mode (same effect as `--bare`). |
-| `CCL_MAX_OUTPUT_TOKENS` | `CLAUDE_CODE_MAX_OUTPUT_TOKENS` | Explicit max-output-token override; when set, the automatic output-token escalation is skipped. |
+| `CCL_MAX_OUTPUT_TOKENS` | `CLAUDE_CODE_MAX_OUTPUT_TOKENS` | Output budget override. `CCL_MAX_OUTPUT_TOKENS` takes precedence; known model/gateway ceilings still apply. Recovery escalation needs consent. |
 | `CCL_REMOTE_MEMORY_DIR` | `CLAUDE_CODE_REMOTE_MEMORY_DIR` | Overrides the base directory for memory files in remote/containerized runs. |
 | `CCL_SKIP_PROMPT_HISTORY` | `CLAUDE_CODE_SKIP_PROMPT_HISTORY` | Skips writing prompts to the command history (used by spawned verification sessions to avoid polluting real history). |
 | `CCL_DISABLE_CLAUDE_MDS` | `CLAUDE_CODE_DISABLE_CLAUDE_MDS` | Disables loading of project/user memory instruction files. |

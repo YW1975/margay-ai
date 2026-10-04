@@ -7,6 +7,13 @@
 
 CCL SDK は `@margay/ccl-core/sdk` の import path を公開し、host process から TTY なしの stream 型 CCL agent session を実行できるようにします。権限 interception、再開可能 session、pending approval、usage accounting を扱えます。
 
+<!-- section: recovery-rc1 -->
+## rc.1 の回復と出力上限
+
+最終 `result` は任意の `recovery: { status, reason, attempts }` を持ち、`status` は `needs_user` または `blocked_external` です。完了扱いにする前に `isError` を確認します。非対話のランタイム提案に同意が必要なら `needs_user` で終了し、`suspended` や pending 記録を自動生成しません。`resumeWithDecision` は実際のツール pending 承認だけに使います。`includeErrorDiagnostics: true` で過程のイベントを受信できますが、`error_diagnostic` は追加の終端結果ではありません。
+
+[エラー回復とユーザーの同意](error-recovery.md)
+
 <!-- section: capabilities -->
 ## 機能範囲
 

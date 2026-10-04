@@ -48,6 +48,13 @@ For local verification of this documentation set, run `node scripts/check-docs.m
 
 After changing navigation or page inventory, verify the generated `site/<lang>/index.html` files, not only the Markdown. The static builder rewrites Markdown links to HTML links, so rendered navigation is the final artifact users see.
 
+<!-- section: recovery-rc1 -->
+## Recovery and output limits in rc.1
+
+Short, low-risk repairs can proceed within existing authority. Long, uncertain, sensitive, or experience-changing repairs need consent. Persistent external blockers leave the task unfinished and explain the help needed.
+
+[Error recovery and user consent](error-recovery.md)
+
 <!-- section: source-evidence -->
 ## Source evidence
 

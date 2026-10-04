@@ -5,16 +5,16 @@
 <!-- section: purpose -->
 ## Purpose
 
-CCL は `@margay/ccl-core` package の `ccl` binary として配布されます。Installation docs は 3 つを分けて説明する必要があります。Binary の install または replacement、shell から binary へ到達する設定、そして settings、gateway file、account tokens、project memory、session transcript など user-local state の保持です。
+npm パッケージ `@margay/ccl-core` は `margay` コマンドを提供します。既存の配布形態によっては独立した `ccl` ランチャーもあります。他のページでその名前を使う例は、npm 導入時には `margay` に置き換えてください。
 
 <!-- section: capabilities -->
 ## Capabilities
 
-- `ccl install [target]` で stable、latest、または明示 version の build を install します。
+- `margay install [target]` で stable、latest、または明示 version の build を install します。
 - Local installation を意図的に置き換える場合だけ force reinstall を使います。
 - Installed build が提供する update または upgrade command surfaces で更新を確認し適用します。
-- `ccl doctor` で runtime health、package-manager state、shell integration、updater status、sandbox signals、workspace trust を確認します。
-- `ccl --version` と `ccl --help` で現在の executable を検証します。
+- `margay doctor` で runtime health、package-manager state、shell integration、updater status、sandbox signals、workspace trust を確認します。
+- `margay --version` と `margay --help` で現在の executable を検証します。
 - Release tarball が配布 artifact の場合、target host の package manager で install します。
 
 <!-- section: operational-model -->
@@ -24,22 +24,33 @@ Installation commands は local runtime を変更しますが、project を変�
 
 Install command は target channel または明示 version を解決し、native installer を実行し、launcher と shell integration を確認し、必要に応じて古い package-manager installs を削除し、古い shell aliases を掃除します。`latest` または `stable` を明示選択した場合だけ `autoUpdatesChannel` を保存します。
 
-Command が起動しない、誤った executable に解決される、shell ごとに挙動が違う場合は、まず `ccl doctor` を使います。Healthy install report は package-manager cache から推測するより強い evidence です。
+Command が起動しない、誤った executable に解決される、shell ごとに挙動が違う場合は、まず `margay doctor` を使います。Healthy install report は package-manager cache から推測するより強い evidence です。
 
 <!-- section: configuration -->
 ## Configuration and commands
 
 | タスク | コマンド | 注意 |
 | --- | --- | --- |
-| 現在の binary を確認 | `ccl --version` | Top-level CLI は実行中の CCL build version を出力します。 |
-| Command surface を確認 | `ccl --help` | Installed build の help を available flags の最終情報源にします。 |
-| Target build を install | `ccl install [latest|stable|version]` | Target は installer が対応する channel または明示 version です。 |
-| 意図的に reinstall | `ccl install --force [target]` | 既知の install を置き換える場合だけ使います。 |
-| Local binary を update | `ccl update` または `ccl upgrade` | Availability と behavior は build/channel により異なります。 |
-| Environment を diagnose | `ccl doctor` | `PATH`、shell aliases、package-manager state を変える前に output を集めます。 |
+| 現在の binary を確認 | `margay --version` | Top-level CLI は実行中の CCL build version を出力します。 |
+| Command surface を確認 | `margay --help` | Installed build の help を available flags の最終情報源にします。 |
+| Target build を install | `margay install [latest|stable|version]` | Target は installer が対応する channel または明示 version です。 |
+| 意図的に reinstall | `margay install --force [target]` | 既知の install を置き換える場合だけ使います。 |
+| Local binary を update | `margay update` または `margay upgrade` | Availability と behavior は build/channel により異なります。 |
+| Environment を diagnose | `margay doctor` | `PATH`、shell aliases、package-manager state を変える前に output を集めます。 |
 | Tarball を install | `npm install -g ./margay-ccl-core-<version>.tgz` | Host と artifact に合う package manager を使います。 |
 
-現在の public package metadata は package name `@margay/ccl-core`、version `1.3.1` を示しています。Setup scripts に古い version を hard-code しないでください。User machine を診断するときは installed `ccl --version` を確認します。
+2026-10-04 時点で、ソース候補版 `1.4.5-rc.1` の検証と両コマンドのローカル導入が完了しています。今回 rc.1 を npm に公開してはいません。通常の npm インストールはレジストリの既定タグを使うため、この候補版を取得するとは限りません。PATH に存在する各コマンドを確認してください。独立したランチャーの実行版はパッケージ管理情報と異なる場合があります。
+
+<!-- section: recovery-rc1 -->
+## rc.1 の回復と出力上限
+
+置き換え前に元のランチャーとプログラムを保存し、復元手順を記録してください。ロールバックには導入時に付属した手順を使います。ローカル検証の記録は、npm パッケージが共通のロールバックコマンドを提供することを意味しません。
+
+```bash
+margay --version
+```
+
+[エラー回復とユーザーの同意](error-recovery.md)
 
 <!-- section: source-evidence -->
 ## Source evidence

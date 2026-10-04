@@ -35,7 +35,7 @@ Print mode 和 interactive mode 共享大量运行时，但暴露面并不完全
 2. 运行 `ccl --version`，确认输出预期的 CCL 版本。
 3. 运行 `ccl --help`，确认当前构建包含 `-p, --print`、`--output-format`、`--model`、`--settings`、`--mcp-config` 和权限 flags。
 4. 如果安装、更新器、`PATH`、包管理器、shell、sandbox 或 workspace trust 不清楚，运行 `ccl doctor`。
-5. 通过批准的路径配置凭据。网关用户应优先使用 `CCL_GATEWAY_URL` 加 `CCL_GATEWAY_KEY`，或通过 `/gateway login URL TOKEN` 保存本地网关文件。
+5. 通过批准的路径配置认证。网关用户优先使用 `/gateway login URL TOKEN` 或 `/gateway register URL INVITE`；手动环境配置需提供[认证说明](authentication.md)中的四个凭据字段。
 6. 运行 `ccl -p "Summarize this repository in five bullets." --allowedTools ""` 作为非变更 smoke test。
 7. 如果需要路由证据，带 `--debug-file <path>` 重跑，并检查 route markers、model selection 和 gateway status。
 8. 非交互 smoke test 成功后，再运行 `ccl` 进入交互式 session。
@@ -50,6 +50,15 @@ Print mode 和 interactive mode 共享大量运行时，但暴露面并不完全
 | 模型或 endpoint 不对 | 路由优先级 | 检查 `/model`、`/endpoint`、`/gateway status`、debug route markers 和 settings sources。 |
 | Smoke test 出现工具提示 | Prompt 或工具策略 | 非变更 smoke test 保持 `--allowedTools ""`，之后再有意扩大权限。 |
 | Print mode 下 slash command 不可用 | 表面不匹配 | 使用交互式 `ccl`，或使用存在的顶层 CLI 命令。 |
+
+<!-- section: recovery-rc1 -->
+## rc.1 的恢复与输出上限
+
+npm 包 `@margay/ccl-core` 提供 `margay` 命令。部分既有发行方式还提供独立的 `ccl` 启动入口；其它页面的示例可能使用该入口，npm 用户可将命令名替换为 `margay`。
+
+短时低风险修复可在已有授权内执行；耗时长、不确定、敏感或影响体验的恢复先征求同意。持续外部阻塞会保留任务未完成状态，并说明需要用户提供的帮助。
+
+[错误恢复与用户同意](error-recovery.md)
 
 <!-- section: source-evidence -->
 ## Source evidence

@@ -7,6 +7,13 @@
 
 CCL SDK 通过 `@margay/ccl-core/sdk` 导入路径，为宿主进程提供无 TTY、流式的 CCL agent 会话，并支持权限拦截、可恢复会话、挂起审批和用量累计。
 
+<!-- section: recovery-rc1 -->
+## rc.1 的恢复与输出上限
+
+最终 `result` 可带可选字段 `recovery: { status, reason, attempts }`，其中 `status` 为 `needs_user` 或 `blocked_external`。标记完成前须检查 `isError`。无交互运行时提议需要同意时以 `needs_user` 结束，不会自动产生 `suspended` 或 pending 记录；`resumeWithDecision` 仅适用于真实的工具 pending 审批。设置 `includeErrorDiagnostics: true` 可接收过程事件，`error_diagnostic` 不是另一个终态。
+
+[错误恢复与用户同意](error-recovery.md)
+
 <!-- section: capabilities -->
 ## 能力范围
 

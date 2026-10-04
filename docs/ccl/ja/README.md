@@ -48,6 +48,13 @@ Generated static site はこの README を language home page として使いま
 
 Navigation または page inventory を変更した後は、Markdown だけでなく generated `site/<lang>/index.html` も verify します。Static builder は Markdown links を HTML links に rewrite するため、rendered navigation が users の見る final artifact です。English anchor: Public Documentation Publishing。
 
+<!-- section: recovery-rc1 -->
+## rc.1 の回復と出力上限
+
+短時間で低リスクの修復は既存の許可内で実行できます。長時間、不確実、機密性が高い、または体験に影響する回復は先に同意を求めます。継続する外部障害ではタスクを未完了として保持し、必要な対応を説明します。
+
+[エラー回復とユーザーの同意](error-recovery.md)
+
 <!-- section: source-evidence -->
 ## Source evidence
 

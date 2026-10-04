@@ -76,6 +76,13 @@ Gateway troubleshooting では runtime bugs と gateway service behavior を分�
 
 Escalation の前に小さな reproduction を用意します。Exact command、CCL version、sanitized environment variable names、relevant settings source、expected behavior、actual behavior、exit code、last diagnostic output です。File paths は repository-relative かつ共有可能な場合だけ含めます。
 
+<!-- section: recovery-rc1 -->
+## rc.1 の回復と出力上限
+
+短時間で低リスクの修復は既存の許可内で実行できます。長時間、不確実、機密性が高い、または体験に影響する回復は先に同意を求めます。継続する外部障害ではタスクを未完了として保持し、必要な対応を説明します。
+
+[エラー回復とユーザーの同意](error-recovery.md)
+
 <!-- section: source-evidence -->
 ## Source evidence
 

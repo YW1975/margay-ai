@@ -76,6 +76,13 @@ Gateway troubleshooting 应区分 runtime bug 和 gateway service behavior。Cac
 
 升级前先准备小复现：exact command、CCL version、脱敏环境变量名、相关 settings source、expected behavior、actual behavior、exit code 和最后一段 diagnostic output。只有在路径是仓库相对且可共享时，才包含文件路径。
 
+<!-- section: recovery-rc1 -->
+## rc.1 的恢复与输出上限
+
+短时低风险修复可在已有授权内执行；耗时长、不确定、敏感或影响体验的恢复先征求同意。持续外部阻塞会保留任务未完成状态，并说明需要用户提供的帮助。
+
+[错误恢复与用户同意](error-recovery.md)
+
 <!-- section: source-evidence -->
 ## Source evidence
 

@@ -22,11 +22,13 @@ CCL 支持多条认证通道：Margay gateway 凭据、直接 API key、Claude �
 <!-- section: operational-model -->
 ## Operational model
 
-Gateway 认证会把规范化后的 gateway URL 和 key 保存到 CCL 配置目录下的 `gateway.json`。启动时，gateway bootstrap 会把该文件加载到 `CCL_GATEWAY_URL` 和 `CCL_GATEWAY_KEY`，除非 shell 中已经存在一组完整且显式的环境覆盖。这样既避免 URL/key 来自不同来源，又保留用户有意设置的 shell 覆盖。
+网关环境配置需同时提供 `CCL_GATEWAY_URL`、`CCL_GATEWAY_KEY`、`CCL_GATEWAY_CREDENTIAL_TYPE` 和 `CCL_GATEWAY_ISSUER` 四字段，issuer 必须匹配规范化网关 URL。优先用 `/gateway login` 或 `/gateway register` 创建带类型的凭据，用 `/gateway doctor` 检查隔离或不匹配状态。不能用上游供应商密钥冒充网关凭据。
 
-Gateway login 在启用校验时使用 `GET /auth/me` 验证凭据。Gateway register 会把邀请码和可选用户信息提交到 `/register`，然后保存 gateway 返回的凭据：现代 JWT 风格的 `token` 或旧兼容网关的 `api_key`。
+网关登录/注册会验证网关自身凭据，把带类型的状态写入 `~/.ccl/gateway.json` 并更新当前进程，不新写 shell rc 块。启动新进程前应清理或更新四个过时导出字段。兼容接纳旧 compact JWT 是迁移路径，不是省略元数据的配置建议。
 
-Gateway URL 的优先级是显式环境变量、`gateway.json`、内置默认 gateway URL。只有 URL 不代表已经认证；仍然需要 key。如果 shell 中的 `CCL_GATEWAY_URL` 或 `CCL_GATEWAY_KEY` 覆盖了 `gateway.json`，`/gateway doctor` 会报告冲突并给出 unset 或重新 login 的修复建议。
+登录通过同源 `GET /auth/me` 验证网关自身凭据后才保存。注册向 `/register` 提交邀请码和可选用户信息，只接纳返回的网关 JWT，并由同一网关验证；不再接纳旧 `api_key` 返回字段作为注册凭据。
+
+使用完整且通过准入的环境元组或带类型的已保存网关状态，只有 URL 不代表已认证。无类型的不透明凭据与 issuer 不匹配状态会在请求前隔离；用 `/gateway doctor` 检查，清理或修正完整元组后重新登录。
 
 Claude 直接认证是独立通道。`ANTHROPIC_API_KEY`、OAuth token 和 gateway 凭据可以同时存在，但实际路由取决于所选模型和供应商兼容性。Gateway doctor 会分别报告 Claude-direct 与 gateway 的登录/配置状态。
 
@@ -47,7 +49,7 @@ Claude 直接认证是独立通道。`ANTHROPIC_API_KEY`、OAuth token 和 gatew
 
 - `bootstrap/gatewayConfig.ts` 定义 gateway 配置加载、`gateway.json`、显式环境覆盖行为和默认 gateway URL 解析。
 - `commands/gateway/gateway.tsx` 实现 `/gateway status`、`login`、`logout`、`doctor` 和 `register`。
-- `commands/gateway/gateway-helpers.ts` 用 `GET /auth/me` 校验 gateway login，持久化凭据，解析注册参数，并兼容现代与旧版 gateway 凭据字段。
+- `commands/gateway/gateway-helpers.ts` — 登录通过同源 `GET /auth/me` 验证网关自身凭据后才保存。注册向 `/register` 提交邀请码和可选用户信息，只接纳返回的网关 JWT，并由同一网关验证；不再接纳旧 `api_key` 返回字段作为注册凭据。
 - `services/gateway/gatewayDoctor.ts` 检测占位值、过期环境覆盖、缺失 gateway 配置和 API-key/OAuth 冲突。
 - `main.tsx` 定义 `auth login/status/logout`、`setup-token`、`--api-key`、`--base-url`、`--bare` 和认证初始化流程。
 - `services/mcp/auth.ts` 与 `commands/mcp/mcp.tsx` 实现 MCP 相关认证入口。
