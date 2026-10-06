@@ -10,6 +10,7 @@ GitHub Pages target: <https://yw1975.github.io/margay-ai/>
 - `docs/ccl/` — CCL CLI documentation.
 - `docs/margay/` — MargayAI account, gateway, and platform documentation.
 - `docs/ralph-lisa/` — Ralph-Lisa Loop and Margay Studio documentation.
+- `docs/staff/` — Staff, the personal assistant in Margay: user guide (en / zh / ja).
 
 ## Release Artifacts
 

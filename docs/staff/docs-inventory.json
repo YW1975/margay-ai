@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "generated_by": "manual (staff user guide)",
+  "product": "Staff",
+  "publisher": "MargayAI",
+  "languages": [
+    "en",
+    "zh",
+    "ja"
+  ],
+  "pages": [
+    {
+      "slug": "README"
+    },
+    {
+      "slug": "01-getting-started"
+    },
+    {
+      "slug": "02-reaching-staff-in-im"
+    },
+    {
+      "slug": "03-daily-rhythm"
+    },
+    {
+      "slug": "04-todos-calendar-delegation"
+    },
+    {
+      "slug": "05-standing-orders-and-capabilities"
+    },
+    {
+      "slug": "06-boundaries-and-audit"
+    },
+    {
+      "slug": "07-troubleshooting"
+    },
+    {
+      "slug": "08-command-reference"
+    }
+  ]
+}
